@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+
+quit() {
+    exit $1
+}
+
+errcheck() {
+    if [[ $1 -ne 0 ]]; then
+        quit 1
+    fi
+}
+
+usage () {
+    echo "run [OPTIONS]+ [APP OPTIONS]"
+    echo "  build and/or run the app"
+    echo "  at least one OPTION is required."
+    echo "  OPTIONS are listed as single chars with no whitespace"
+    echo "     ex: 'rb' uses r and b to build then run the app."
+    echo "[OPTIONS]"
+    echo "  b - build regularly"
+    echo "  c - clear all build files first, then build the app"
+    echo "  r - run app in the build dir"
+    echo "  g - same as 'r' but using gdb"
+    echo "  v - same as 'r' but using valgrind"
+    echo "  p - same as 'v' but more options for detailed profiling with valgrind"
+    echo "  h - display this help blurb"
+}
+
+app="swifty"
+base_cmd="build/$app.app"
+
+run_cmd=""
+cmake_clean=""
+do_build="false"
+do_run="false"
+
+if [[ $# -lt 1 ]]; then
+    echo "ERROR: not enough arguments! use h to display help and info."
+    quit 1
+fi
+
+args=($(echo $1 | grep -o .))
+
+build () {
+    echo "building '$app'"
+    mkdir -p build && cd build
+    errcheck $?
+    cmake -DAPP_NAME=$app ..
+    errcheck $?
+    cmake --build . $cmake_clean
+    errcheck $?
+    cd ..
+}
+
+for c in "${args[@]}"; do
+    case $c in
+        b)
+            do_build="true";;
+        c)
+            do_build="true"
+            cmake_clean="--clean-first";;
+        g)
+            run_cmd="gdb $base_cmd"
+            do_run="true";;
+        r)
+            do_run="true"
+            run_cmd="$base_cmd";;
+        v)
+            run_cmd="valgrind --track-origins=yes --leak-check=yes --log-file='valgrind.log' $base_cmd"
+            do_run="true";;
+        p)
+            run_cmd="valgrind --tool=callgrind $base_cmd"
+            do_run="true";;
+        h)
+            usage;;
+        *)
+            echo "bad arg: $c";;
+  esac
+done
+
+if [[ $do_build == "true" ]]; then
+    build
+fi
+
+if [[ $do_run == "true" ]]; then
+    eval "$run_cmd $@"
+fi
+
+quit 0

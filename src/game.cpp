@@ -1,0 +1,124 @@
+#include "game.hpp"
+
+Game::Game():
+window(sf::VideoMode(WINDOW::width, WINDOW::height), WINDOW::title, WINDOW::style),
+camera(CAMERA::view_rect),
+background(BACKGROUND::img_fp)
+{
+    window.setKeyRepeatEnabled(false);
+    GameObjectAsset cat_ast;
+    player = std::make_shared<GameObject>(cat_ast);
+    boundaries.push_back(std::make_shared<Boundary>(sf::IntRect(0, 200, WINDOW::width, 5), sf::Color(80, 80, 150)));
+    boundaries.push_back(std::make_shared<Boundary>(sf::IntRect(0, 0, 5, 200), sf::Color(80, 80, 150)));
+    boundaries.push_back(std::make_shared<Boundary>(sf::IntRect(50, 150, 50, 5), sf::Color(80, 80, 150)));
+    boundaries.push_back(std::make_shared<Boundary>(sf::IntRect(100, 175, 100, 5), sf::Color(80, 80, 150)));
+}
+void Game::setUp()
+{
+    player->setUp();
+    collision_system.add(player);
+    for (auto& bnd : boundaries) {
+        collision_system.add(bnd);
+    }
+    camera.setCenter(player->getPosition());
+    camera.update(window.getSize());
+    dt = frame_clock.restart().asSeconds();
+}
+void Game::update()
+{
+    dt = frame_clock.restart().asSeconds();
+    // sleep(0.5f);
+    __inputUpdate();
+    __gameUpdate();
+    __lateUpdate();
+}
+void Game::__inputUpdate()
+{
+    sf::Event event;
+    while (window.pollEvent(event)) {
+        switch (event.type) {
+            case sf::Event::Closed: { window.close(); break; }
+            case sf::Event::Resized: {
+                camera.update(sf::Vector2u(event.size.width, event.size.height));
+                break;
+            }
+            case sf::Event::KeyPressed: {
+                switch (event.key.code) {
+                    case sf::Keyboard::Q: { window.close(); break; }
+                    case sf::Keyboard::Escape: { window.close(); break; }
+                    case sf::Keyboard::Space: { player->jump(); break; }
+                    case sf::Keyboard::Left: { player->moving(DIR_LEFT); break; }
+                    case sf::Keyboard::Right: { player->moving(DIR_RIGHT); break; }
+
+                    case sf::Keyboard::A: { player->increase(PHY::mass); break; }
+                    case sf::Keyboard::Z: { player->decrease(PHY::mass); break; }
+
+                    case sf::Keyboard::S: { player->increase(PHY::speed); break; }
+                    case sf::Keyboard::X: { player->decrease(PHY::speed); break; }
+
+                    case sf::Keyboard::D: { player->increase(PHY::max_x_vel); break; }
+                    case sf::Keyboard::C: { player->decrease(PHY::max_x_vel); break; }
+
+                    case sf::Keyboard::F: { player->increase(PHY::jump_power); break; }
+                    case sf::Keyboard::V: { player->decrease(PHY::jump_power); break; }
+
+                    case sf::Keyboard::H: { player->increase(PHY::friction); break; }
+                    case sf::Keyboard::N: { player->decrease(PHY::friction); break; }
+
+                    case sf::Keyboard::J: { player->increase(PHY::gravity); break; }
+                    case sf::Keyboard::M: { player->decrease(PHY::gravity); break; }
+                    default: { break; }
+                }
+                break;
+            }
+            case sf::Event::KeyReleased: {
+                switch (event.key.code) {
+                    case sf::Keyboard::Up: { player->stop(DIR_UP); break; }
+                    case sf::Keyboard::Down: { player->stop(DIR_DOWN); break; }
+                    case sf::Keyboard::Left: { player->stop(DIR_LEFT); break; }
+                    case sf::Keyboard::Right: { player->stop(DIR_RIGHT); break; }
+                    case sf::Keyboard::Space: { player->terminateJump(); break; }
+                    default: { break; }
+                }
+                break;
+            }
+            default: { break; }
+        }
+    }
+}
+void Game::__gameUpdate()
+{
+    player->update(dt);
+    physics_system.update(player->cmpnt<RigidBody>(), dt);
+}
+void Game::__lateUpdate()
+{
+    collision_system.checkCollisions();
+    background.setCenter(player->getPosition());
+    camera.setCenter(player->getPosition());
+    camera.applyView(window);
+}
+void Game::render()
+{
+    window.clear(sf::Color::White);
+    background.render(window);
+    for (auto& bndry : boundaries) {
+        bndry->render(window);
+    }
+    player->render(window);
+    window.display();
+}
+void Game::sleep(const float sec)
+{
+    sf::Clock wait_clock;
+    wait_clock.restart().asSeconds();
+    float wait_dt = 0.0;
+    while (wait_dt < 0.1f) {
+        wait_dt += wait_clock.restart().asSeconds();
+    }
+    frame_clock.restart().asSeconds();
+}
+bool Game::isRunning() const
+{
+    return window.isOpen();
+}
