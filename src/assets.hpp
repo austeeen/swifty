@@ -10,7 +10,7 @@
 struct GameObjectAsset
 {
 
-    const std::string img_fp = "res/cat-16x16.png";
+    const std::string img_fp = "res/elthen/cat-16x16.png";
     const sf::IntRect start_texture_rect = sf::IntRect(0, 0, CAT_WIDTH, CAT_HEIGHT);
     const sf::Vector2f start_pos = sf::Vector2f(150, 200 - CAT_HEIGHT - 1);
     const sf::Vector2i size = sf::Vector2i(CAT_WIDTH, CAT_HEIGHT);

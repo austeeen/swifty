@@ -2,6 +2,8 @@
 #define COMMON_HPP
 
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <map>
 #include <cstdint>
 #include <memory>
@@ -9,6 +11,8 @@
 #include <typeindex>
 #include <typeinfo>
 #include <SFML/Graphics.hpp>
+#include "rapidxml/rapidxml.hpp"
 
+namespace rx = rapidxml;
 
 #endif // COMMON_HPP

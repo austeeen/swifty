@@ -1,7 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="1.7.2" orientation="orthogonal" renderorder="right-down" width="25" height="40" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="49">
- <tileset firstgid="1" source="sky_background.tsx"/>
- <tileset firstgid="65" source="basic_tiles.tsx"/>
+<map version="1.8" tiledversion="1.8.5" orientation="orthogonal" renderorder="right-down" width="25" height="40" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="49">
+ <tileset firstgid="1" name="sky_background" tilewidth="32" tileheight="32" tilecount="64" columns="8">
+  <image source="sky-tiles.png" width="256" height="256"/>
+ </tileset>
+ <tileset firstgid="65" name="basic_tiles" tilewidth="32" tileheight="32" tilecount="16" columns="4">
+  <image source="basic-tiles.png" width="128" height="128"/>
+  <wangsets>
+   <wangset name="basic_1" type="mixed" tile="-1">
+    <wangcolor name="" color="#ff0000" tile="-1" probability="1"/>
+    <wangcolor name="" color="#00ff00" tile="-1" probability="1"/>
+    <wangtile tileid="1" wangid="1,2,2,2,2,2,2,2"/>
+    <wangtile tileid="2" wangid="2,2,1,2,2,2,2,2"/>
+    <wangtile tileid="3" wangid="1,2,1,2,2,2,2,2"/>
+    <wangtile tileid="4" wangid="2,2,2,2,1,2,2,2"/>
+    <wangtile tileid="5" wangid="1,2,2,2,1,2,2,2"/>
+    <wangtile tileid="6" wangid="2,2,1,2,1,2,2,2"/>
+    <wangtile tileid="7" wangid="1,2,1,2,1,2,2,2"/>
+    <wangtile tileid="8" wangid="2,2,2,2,2,2,1,2"/>
+    <wangtile tileid="9" wangid="1,2,2,2,2,2,1,2"/>
+    <wangtile tileid="10" wangid="2,2,1,2,2,2,1,2"/>
+    <wangtile tileid="11" wangid="1,2,1,2,2,2,1,2"/>
+    <wangtile tileid="12" wangid="2,2,2,2,1,2,1,2"/>
+    <wangtile tileid="13" wangid="1,2,2,2,1,2,1,2"/>
+    <wangtile tileid="14" wangid="2,2,1,2,1,2,1,2"/>
+    <wangtile tileid="15" wangid="1,2,1,2,1,2,1,2"/>
+   </wangset>
+  </wangsets>
+ </tileset>
  <layer id="1" name="background" width="25" height="40">
   <data encoding="csv">
 23,18,33,12,45,17,42,37,11,62,14,58,50,42,5,42,52,4,21,6,64,2,61,18,9,

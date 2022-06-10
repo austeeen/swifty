@@ -1,33 +1,47 @@
 #ifndef FCT_RSRCS_HPP
 #define FCT_RSRCS_HPP
-/*
-#include "rapidxml/rapidxml.hpp"
+
 #include "common.hpp"
 
-class XML
+struct LayerObject {
+  LayerObject(rx::xml_node<> *node);
+  int id;
+  sf::IntRect rect;
+};
+
+struct MapLayer {
+  MapLayer(rx::xml_node<> *node);
+  std::string name;
+  int id;
+};
+
+struct TileLayer: MapLayer {
+  TileLayer(rx::xml_node<> *node);
+  std::string gid_str;
+  sf::Vector2f size;
+};
+
+struct ObjectGroup: MapLayer {
+  ObjectGroup(rx::xml_node<> *node);
+  std::map<const int, LayerObject> objects;
+};
+
+struct TileSet {
+  TileSet(rx::xml_node<> *node);
+  std::string name, img_src;
+  int first_gid, columns, total_tiles;
+  sf::Vector2f tilesize, imagesize;
+};
+
+
+struct TileMap
 {
-public:
-    static std::ifstream fs;
-    static std::string err_str;
-    static Json::CharReaderBuilder builder;
-    static bool load(const std::string &fp, Json::Value &root);
+  TileMap(const char* filepath);
+  std::map<const std::string, TileSet> tilesets;
+  std::map<const std::string, MapLayer> layers;
+  sf::Vector2i mapsize, tilesize;
+  rx::xml_document<>* doc;
 };
 
-struct rsrc {
-    virtual bool load(const std::string &fp) = 0;
-    virtual ~rsrc() {};
-};
-
-struct jsonRsrc: public rsrc {
-    bool load(const std::string &fp) override;
-    Json::Value root;
-};
-
-struct imgRsrc: public rsrc {
-    bool load(const std::string &fp) override;
-    int img_cols;
-    sf::Texture img_texture;
-};
-*/
 
 #endif // FCT_RSRCS_HPP
