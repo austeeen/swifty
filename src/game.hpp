@@ -7,6 +7,7 @@
 #include "game_object.hpp"
 #include "sys_collision.hpp"
 #include "sys_physics_2d.hpp"
+#include "rsrc_tiled.hpp"
 
 class Game
 {
@@ -30,6 +31,9 @@ private:
 
     sf::RenderWindow window;
     Camera camera;
+
+    TileMap tile_map;
+
     Background background;
     std::shared_ptr<GameObject> player;
     std::vector<std::shared_ptr<Boundary>> boundaries;

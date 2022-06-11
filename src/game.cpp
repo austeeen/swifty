@@ -3,11 +3,14 @@
 Game::Game():
 window(sf::VideoMode(WINDOW::width, WINDOW::height), WINDOW::title, WINDOW::style),
 camera(CAMERA::view_rect),
-background(BACKGROUND::img_fp)
+background(BACKGROUND::img_fp),
+tile_map("res/basic_level.tmx")
 {
     window.setKeyRepeatEnabled(false);
     GameObjectAsset cat_ast;
     player = std::make_shared<GameObject>(cat_ast);
+
+    
     boundaries.push_back(std::make_shared<Boundary>(sf::IntRect(0, 200, WINDOW::width, 5), sf::Color(80, 80, 150)));
     boundaries.push_back(std::make_shared<Boundary>(sf::IntRect(0, 0, 5, 200), sf::Color(80, 80, 150)));
     boundaries.push_back(std::make_shared<Boundary>(sf::IntRect(50, 150, 50, 5), sf::Color(80, 80, 150)));
