@@ -7,54 +7,47 @@ void split(const std::string &s, char delim, std::vector<float> &result);
 void split(const std::string &s, char delim, std::vector<int> &result);
 void split(const std::string &s, char delim, std::vector<std::string> &result);
 
-struct TileMap;
+class TileMap;
 
-struct LayerObject {
-  LayerObject(rx::xml_node<> *node);
+struct TileLayer {
+  TileLayer(rx::xml_node<> *node);
+  void build(TileMap* map);
 
-  int id;
-  sf::IntRect rect;
-};
-
-struct MapLayer {
-  MapLayer(rx::xml_node<> *node);
-  virtual void build(TileMap* map) = 0;
   std::string name;
   int id;
-};
-
-struct TileLayer: MapLayer {
-  TileLayer(rx::xml_node<> *node);
-  void build(TileMap* map) override;
   std::string gidstr;
   sf::Vector2i size;
-  sf::VertexArray vertices;
-  sf::RenderTexture render_texture;
+  sf::VertexArray vertex_array;
+  sf::RenderTexture* render_texture;
 };
 
-struct ObjectGroup: MapLayer {
+struct ObjectGroup {
   ObjectGroup(rx::xml_node<> *node);
-  void build(TileMap* map) override;
+  void build(TileMap* map);
 
-  std::map<const int, LayerObject> objects;
+  std::string name;
+  int id;
+  std::map<const int, sf::IntRect> objects;
 };
 
 struct TileSet {
   TileSet(rx::xml_node<> *node);
 
-  sf::Texture img_texture;
   std::string name, img_src;
   int firstgid, columns, totaltiles;
   sf::Vector2i tilesize, imagesize;
+  sf::Texture img_texture;
+  sf::RenderStates render_states;
 };
-
 
 struct TileMap {
   TileMap(const char* filepath);
   void build();
-  void getTileset(const int cur_gid, TileSet *next_ts);
-  std::map<const int, TileSet> tilesets;
-  std::vector<MapLayer> layers;
+  TileSet* getTileset(const int cur_gid);
+
+  std::map<const int, TileSet*> tilesets;
+  std::vector<TileLayer*> tile_layers;
+  std::vector<ObjectGroup*> object_groups;
   sf::Vector2i mapsize, tilesize;
   rx::xml_document<>* doc;
 };

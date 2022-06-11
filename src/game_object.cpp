@@ -106,11 +106,15 @@ const COLLIDER::group GameObject::getColliderGroup() const
 
 /**************************************************************************************************/
 
+Boundary::Boundary(const sf::IntRect rect):
+col_group(COLLIDER::group::floor), shape(sf::Vector2f(rect.width, rect.height)), rect(rect)
+{
+    shape.setPosition(rect.left, rect.top);
+}
 Boundary::Boundary(const sf::IntRect rect, const sf::Color c):
-col_group(COLLIDER::group::floor), shape(sf::Vector2f(rect.width, rect.height)), rect(rect), color(c)
+Boundary(rect)
 {
     shape.setFillColor(color);
-    shape.setPosition(rect.left, rect.top);
 }
 void Boundary::render(sf::RenderWindow &window)
 {

@@ -44,6 +44,7 @@ protected:
 class Boundary
 {
 public:
+    Boundary(const sf::IntRect rect);
     Boundary(const sf::IntRect rect, const sf::Color c);
     void render(sf::RenderWindow &window);
     const sf::Vector2f getPosition() const;

@@ -3,18 +3,18 @@
 Game::Game():
 window(sf::VideoMode(WINDOW::width, WINDOW::height), WINDOW::title, WINDOW::style),
 camera(CAMERA::view_rect),
-background(BACKGROUND::img_fp),
-tile_map("res/basic_level.tmx")
+tile_map(new TileMap("res/basic_level.tmx"))
 {
     window.setKeyRepeatEnabled(false);
     GameObjectAsset cat_ast;
     player = std::make_shared<GameObject>(cat_ast);
 
-    
-    boundaries.push_back(std::make_shared<Boundary>(sf::IntRect(0, 200, WINDOW::width, 5), sf::Color(80, 80, 150)));
-    boundaries.push_back(std::make_shared<Boundary>(sf::IntRect(0, 0, 5, 200), sf::Color(80, 80, 150)));
-    boundaries.push_back(std::make_shared<Boundary>(sf::IntRect(50, 150, 50, 5), sf::Color(80, 80, 150)));
-    boundaries.push_back(std::make_shared<Boundary>(sf::IntRect(100, 175, 100, 5), sf::Color(80, 80, 150)));
+    tile_map->build();
+    for (auto& object_group : tile_map->object_groups) {
+        for (auto& [id, rect] : object_group->objects) {
+            boundaries.push_back(std::make_shared<Boundary>(rect));
+        }
+    }
 }
 void Game::setUp()
 {
@@ -97,17 +97,20 @@ void Game::__gameUpdate()
 void Game::__lateUpdate()
 {
     collision_system.checkCollisions();
-    background.setCenter(player->getPosition());
-    camera.setCenter(player->getPosition());
-    camera.applyView(window);
+    // camera.setCenter(player->getPosition());
+    // camera.applyView(window);
 }
 void Game::render()
 {
-    window.clear(sf::Color::White);
-    background.render(window);
+    window.clear(sf::Color::Blue);
+    for (auto& tile_layer : tile_map->tile_layers) {
+        window.draw(sf::Sprite(tile_layer->render_texture->getTexture()));
+    }
+    /*
     for (auto& bndry : boundaries) {
         bndry->render(window);
     }
+    */
     player->render(window);
     window.display();
 }

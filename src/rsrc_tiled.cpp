@@ -64,24 +64,11 @@ std::vector<float> split2(const std::string &s, char delim)
 
 /******************************************************************************/
 
-LayerObject::LayerObject(rx::xml_node<> *node)
-{
-    attr(id, "id", node);
-    attr(rect.left, "x", node);
-    attr(rect.top, "y", node);
-    attr(rect.width, "width", node);
-    attr(rect.height, "height", node);
-}
-
-MapLayer::MapLayer(rx::xml_node<> *node)
+TileLayer::TileLayer(rx::xml_node<> *node):
+render_texture(new sf::RenderTexture())
 {
     attr(name, "name", node);
     attr(id, "id", node);
-}
-
-TileLayer::TileLayer(rx::xml_node<> *node):
- MapLayer(node)
-{
     attr(size.x, "width", node);
     attr(size.y, "height", node);
     rx::xml_node<> *data = node->first_node("data");
@@ -89,56 +76,82 @@ TileLayer::TileLayer(rx::xml_node<> *node):
 }
 void TileLayer::build(TileMap *map)
 {
-    render_texture.create(map->tilesize.x * size.x, map->tilesize.y * size.y);
+    render_texture->create(map->tilesize.x * size.x, map->tilesize.y * size.y);
+    render_texture->clear();
 
     std::vector<int> all_gids = {};
     split(gidstr, ',', all_gids);
-    vertices.setPrimitiveType(sf::Quads);
-    vertices.resize(all_gids.size() * 4);
-
-    TileSet *tile_set = nullptr;
     int tw = map->tilesize.x;
     int th = map->tilesize.y;
     int px, py, ix, iy;
+    vertex_array.resize(size.x * size.y * 4);
+
+    TileSet* cur_tileset;
 
     for (size_t i = 0; i < all_gids.size(); i++)
     {
         int gid = all_gids[i];
+        if (gid == 0) {
+            continue;
+        }
+        cur_tileset = map->getTileset(gid);
+        int real_gid = gid - cur_tileset->firstgid;
+        sf::RenderStates& rs = cur_tileset->render_states;
+        std::cout << &rs << std::endl;
+
+        // printf("%s - gid: %d | %s %d = %d\n", name.c_str(), gid, cur_tileset->name.c_str(), cur_tileset->firstgid, real_gid);
+
+        /*
+        sf::Vector2f pos((i % size.x) * tw, (i / size.x) * th);
+
+        sf::IntRect texture_rect;
+        texture_rect.left = (gid % cur_tileset->columns) * tw;
+        texture_rect.top = (gid / cur_tileset->columns) * th;
+        texture_rect.width = tw;
+        texture_rect.height = th;
+
+        sf::Sprite s(cur_tileset->img_texture, texture_rect);
+        s.setPosition(pos);
+
+        render_texture->draw(s);
+        */
         px = (i % size.x) * tw;
         py = (i / size.x) * th;
-        ix = (gid % size.x) * tw;
-        iy = (gid / size.x) * th;
+        ix = (real_gid % cur_tileset->columns) * tw;
+        iy = (real_gid / cur_tileset->columns) * th;
 
-        sf::Vertex *quad = &vertices[i * 4];
-        quad[0].position = sf::Vector2f(px,      py);
-        quad[1].position = sf::Vector2f(px + tw, py);
-        quad[2].position = sf::Vector2f(px + tw, py  + th);
-        quad[3].position = sf::Vector2f(px,      py  + th);
-        quad[0].texCoords = sf::Vector2f(ix,      iy);
-        quad[1].texCoords = sf::Vector2f(ix + tw, iy);
-        quad[2].texCoords = sf::Vector2f(ix + tw, iy  + th);
-        quad[3].texCoords = sf::Vector2f(ix,      iy  + th);
+        sf::Vertex *quads = &vertex_array[i * 4];
+        quads[0].position = sf::Vector2f(px,      py);
+        quads[1].position = sf::Vector2f(px + tw, py);
+        quads[2].position = sf::Vector2f(px + tw, py  + th);
+        quads[3].position = sf::Vector2f(px,      py  + th);
+        quads[0].texCoords = sf::Vector2f(ix,      iy);
+        quads[1].texCoords = sf::Vector2f(ix + tw, iy);
+        quads[2].texCoords = sf::Vector2f(ix + tw, iy  + th);
+        quads[3].texCoords = sf::Vector2f(ix,      iy  + th);
 
-        map->getTileset(gid, tile_set);
-        sf::RenderStates rs(tile_set->img_texture);
-        render_texture.draw(vertices[i], rs);
+        // printf("pos (%f, %f) | tex (%f, %f)\n", quads[0].position.x, quads[0].position.y, quads[0].texCoords.x, quads[0].texCoords.y);
+        render_texture->draw(quads, 4, sf::Quads, rs);
     }
+    render_texture->display();
 }
 
-ObjectGroup::ObjectGroup(rx::xml_node<> *node):
- MapLayer(node)
+ObjectGroup::ObjectGroup(rx::xml_node<> *node)
 {
+    attr(name, "name", node);
+    attr(id, "id", node);
     rx::xml_node<> *obj_node = node->first_node();
     while (obj_node) {
       int id;
       attr(id, "id", obj_node);
-      objects[id] = LayerObject(obj_node);
+      sf::IntRect rect;
+      attr(rect.left, "x", obj_node);
+      attr(rect.top, "y", obj_node);
+      attr(rect.width, "width", obj_node);
+      attr(rect.height, "height", obj_node);
+      objects[id] = rect;
       obj_node = obj_node->next_sibling();
     }
-}
-void ObjectGroup::build(TileMap *map)
-{
-
 }
 
 TileSet::TileSet(rx::xml_node<> *node)
@@ -154,52 +167,59 @@ TileSet::TileSet(rx::xml_node<> *node)
     attr(img_src, "source", image);
     attr(imagesize.x, "width", image);
     attr(imagesize.y, "height", image);
-    img_texture.loadFromFile(img_src);
+
+    img_texture.loadFromFile("res/" + img_src);
+    render_states.texture = &img_texture;
+    std::cout << name << " " << &render_states << std::endl;
 }
 
 TileMap::TileMap(const char* filepath)
 {
   doc = new rx::xml_document<>();
   openXmlFile(filepath, doc);
-  rx::xml_node<> *root = doc->first_node();
-  rx::xml_node<> *map = root->first_node("map");
+  rx::xml_node<> *map = doc->first_node("map");
   attr(mapsize.x, "width", map);
   attr(mapsize.y, "height", map);
   attr(tilesize.x, "tilewidth", map);
   attr(tilesize.y, "tileheight", map);
+
   rx::xml_node<> *node = map->first_node();
-  while (node) {
-    std::string name;
-    attr(name, "name", node);
+  while (node != NULL) {
+    std::cout << node << std::endl;
     std::string type = std::string(node->name());
+    // std::cout << "node: " << type << std::endl;
     if (type == "tileset") {
         int firstgid;
         attr(firstgid, "firstgid", node);
-        tilesets[firstgid] = TileSet(node);
+        tilesets[firstgid] = new TileSet(node);
     }
     else if (type == "layer") {
-      layers.push_back(TileLayer(node));
+      tile_layers.push_back(new TileLayer(node));
     }
     else if (type == "objectgroup") {
-      layers.push_back(ObjectGroup(node));
+      object_groups.push_back(new ObjectGroup(node));
     }
     node = node->next_sibling();
   }
 }
 void TileMap::build()
 {
-    for (auto& lyr : layers) {
-        lyr.build(this);
+    for (auto& lyr : tile_layers) {
+        std::cout << "building: " << lyr->name << std::endl;
+        lyr->build(this);
     }
 }
-void TileMap::getTileset(const int cur_gid, TileSet *next_ts)
+TileSet* TileMap::getTileset(const int cur_gid)
 {
-    for (auto itr = tilesets.end(); itr != tilesets.begin(); itr --) {
-        next_ts = &itr->second;
-        if (cur_gid < itr->first) {
-            break;
+    int indx = 0; // arbitrary number
+    for (auto [ts_gid, ts] : tilesets) {
+        if (cur_gid >= ts_gid) {
+            if (indx < ts_gid) {
+                indx = ts_gid;
+            }
         }
     }
+    return tilesets[indx];
 }
 
 /******************************************************************************/
