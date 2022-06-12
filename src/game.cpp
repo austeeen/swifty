@@ -3,7 +3,7 @@
 Game::Game():
 window(sf::VideoMode(WINDOW::width, WINDOW::height), WINDOW::title, WINDOW::style),
 camera(CAMERA::view_rect),
-tile_map(new TileMap("res/basic_level.tmx"))
+tile_map(new TileMap("res/new_basic_level.tmx"))
 {
     window.setKeyRepeatEnabled(false);
     GameObjectAsset cat_ast;
@@ -97,8 +97,8 @@ void Game::__gameUpdate()
 void Game::__lateUpdate()
 {
     collision_system.checkCollisions();
-    // camera.setCenter(player->getPosition());
-    // camera.applyView(window);
+    camera.setCenter(player->getPosition());
+    camera.applyView(window);
 }
 void Game::render()
 {

@@ -7,8 +7,8 @@
 #define CAT_WIDTH 16
 #define CAT_HEIGHT 16
 
-#define CAT_START_X 7
-#define CAT_START_Y 20
+#define CAT_START_X 3
+#define CAT_START_Y 2
 
 struct GameObjectAsset
 {

@@ -2,16 +2,6 @@
 
 /******************************************************************************/
 
-void openXmlFile(const char *filepath, rx::xml_document<>* doc)
-{
-  std::ifstream file(filepath);
-  std::stringstream buffer;
-  buffer << file.rdbuf();
-  file.close();
-  std::string content(buffer.str());
-  doc->parse<0>(&content[0]);
-}
-
 void val(std::string& value, rx::xml_node<> *node)
 {
   value = node->value();
@@ -77,7 +67,7 @@ render_texture(new sf::RenderTexture())
 void TileLayer::build(TileMap *map)
 {
     render_texture->create(map->tilesize.x * size.x, map->tilesize.y * size.y);
-    render_texture->clear();
+    render_texture->clear(sf::Color::Transparent);
 
     std::vector<int> all_gids = {};
     split(gidstr, ',', all_gids);
@@ -96,25 +86,6 @@ void TileLayer::build(TileMap *map)
         }
         cur_tileset = map->getTileset(gid);
         int real_gid = gid - cur_tileset->firstgid;
-        sf::RenderStates& rs = cur_tileset->render_states;
-        std::cout << &rs << std::endl;
-
-        // printf("%s - gid: %d | %s %d = %d\n", name.c_str(), gid, cur_tileset->name.c_str(), cur_tileset->firstgid, real_gid);
-
-        /*
-        sf::Vector2f pos((i % size.x) * tw, (i / size.x) * th);
-
-        sf::IntRect texture_rect;
-        texture_rect.left = (gid % cur_tileset->columns) * tw;
-        texture_rect.top = (gid / cur_tileset->columns) * th;
-        texture_rect.width = tw;
-        texture_rect.height = th;
-
-        sf::Sprite s(cur_tileset->img_texture, texture_rect);
-        s.setPosition(pos);
-
-        render_texture->draw(s);
-        */
         px = (i % size.x) * tw;
         py = (i / size.x) * th;
         ix = (real_gid % cur_tileset->columns) * tw;
@@ -130,9 +101,10 @@ void TileLayer::build(TileMap *map)
         quads[2].texCoords = sf::Vector2f(ix + tw, iy  + th);
         quads[3].texCoords = sf::Vector2f(ix,      iy  + th);
 
-        // printf("pos (%f, %f) | tex (%f, %f)\n", quads[0].position.x, quads[0].position.y, quads[0].texCoords.x, quads[0].texCoords.y);
-        render_texture->draw(quads, 4, sf::Quads, rs);
+        render_texture->draw(quads, 4, sf::Quads, cur_tileset->render_states);
     }
+
+    std::cout << "done building " << name << std::endl;
     render_texture->display();
 }
 
@@ -163,44 +135,49 @@ TileSet::TileSet(rx::xml_node<> *node)
     attr(totaltiles, "tilecount", node);
     attr(columns, "columns", node);
 
-    rx::xml_node<> *image = node->first_node("image");
+    rx::xml_node<> *image = node->first_node();
     attr(img_src, "source", image);
     attr(imagesize.x, "width", image);
     attr(imagesize.y, "height", image);
 
     img_texture.loadFromFile("res/" + img_src);
     render_states.texture = &img_texture;
-    std::cout << name << " " << &render_states << std::endl;
 }
 
 TileMap::TileMap(const char* filepath)
 {
-  doc = new rx::xml_document<>();
-  openXmlFile(filepath, doc);
-  rx::xml_node<> *map = doc->first_node("map");
-  attr(mapsize.x, "width", map);
-  attr(mapsize.y, "height", map);
-  attr(tilesize.x, "tilewidth", map);
-  attr(tilesize.y, "tileheight", map);
+    std::ifstream file(filepath);
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    file.close();
+    std::string content(buffer.str());
 
-  rx::xml_node<> *node = map->first_node();
-  while (node != NULL) {
-    std::cout << node << std::endl;
-    std::string type = std::string(node->name());
-    // std::cout << "node: " << type << std::endl;
-    if (type == "tileset") {
-        int firstgid;
-        attr(firstgid, "firstgid", node);
-        tilesets[firstgid] = new TileSet(node);
+    doc = new rx::xml_document<>();
+    doc->parse<0>(&content[0]);
+
+    rx::xml_node<> *map = doc->first_node();
+    attr(mapsize.x, "width", map);
+    attr(mapsize.y, "height", map);
+    attr(tilesize.x, "tilewidth", map);
+    attr(tilesize.y, "tileheight", map);
+
+    rx::xml_node<> *node = map->first_node();
+    while(node != nullptr) {
+        std::string type = std::string(node->name());
+        printf("<%s ...> \n", type.c_str());
+        if (type == "tileset") {
+            int firstgid;
+            attr(firstgid, "firstgid", node);
+            tilesets[firstgid] = new TileSet(node);
+        }
+        else if (type == "layer") {
+            tile_layers.push_back(new TileLayer(node));
+        }
+        else if (type == "objectgroup") {
+            object_groups.push_back(new ObjectGroup(node));
+        }
+        node = node->next_sibling();
     }
-    else if (type == "layer") {
-      tile_layers.push_back(new TileLayer(node));
-    }
-    else if (type == "objectgroup") {
-      object_groups.push_back(new ObjectGroup(node));
-    }
-    node = node->next_sibling();
-  }
 }
 void TileMap::build()
 {
