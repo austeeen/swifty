@@ -32,7 +32,7 @@ private:
     sf::RenderWindow window;
     Camera camera;
 
-    TileMap* tile_map;
+    std::shared_ptr<TileMap> tile_map;
     std::shared_ptr<GameObject> player;
     std::vector<std::shared_ptr<Boundary>> boundaries;
     CollisionSystem collision_system;

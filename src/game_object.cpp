@@ -136,31 +136,3 @@ const COLLIDER::group Boundary::getColliderGroup() const
 {
     return this->col_group;
 }
-
-/**************************************************************************************************/
-
-Background::Background(const std::string img_fp) {
-    img_texture.loadFromFile(img_fp);
-    sprite.setTexture(img_texture);
-}
-void Background::render(sf::RenderWindow& window) {
-    window.draw(sprite);
-}
-void Background::setCenter(const sf::Vector2f center)
-{
-    sf::FloatRect r = sprite.getGlobalBounds();
-    sprite.setPosition(center.x - (r.width / 2), center.y - (r.height / 2));
-}
-const sf::Vector2f Background::getPosition() const
-{
-    return sprite.getPosition();
-}
-const sf::Vector2f Background::getSize() const
-{
-    sf::FloatRect r = sprite.getGlobalBounds();
-    return sf::Vector2f(r.width, r.height);
-}
-const sf::FloatRect Background::getRect() const
-{
-    return sprite.getGlobalBounds();
-}

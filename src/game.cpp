@@ -3,7 +3,7 @@
 Game::Game():
 window(sf::VideoMode(WINDOW::width, WINDOW::height), WINDOW::title, WINDOW::style),
 camera(CAMERA::view_rect),
-tile_map(new TileMap("res/new_basic_level.tmx"))
+tile_map(std::make_shared<TileMap>("res/new_basic_level.tmx"))
 {
     window.setKeyRepeatEnabled(false);
     GameObjectAsset cat_ast;

@@ -16,10 +16,5 @@ namespace CAMERA
     const sf::FloatRect view_rect(0, 0, 300, 225);
 }
 
-namespace BACKGROUND
-{
-    const std::string img_fp = "res/sky_background.png";
-}
-
 
 #endif // DATA_HPP

@@ -9,8 +9,11 @@ void split(const std::string &s, char delim, std::vector<std::string> &result);
 
 class TileMap;
 
-struct TileLayer {
+class TileLayer
+{
+public:
   TileLayer(rx::xml_node<> *node);
+  ~TileLayer();
   void build(TileMap* map);
 
   std::string name;
@@ -40,8 +43,11 @@ struct TileSet {
   sf::RenderStates render_states;
 };
 
-struct TileMap {
+class TileMap
+{
+public:
   TileMap(const char* filepath);
+  ~TileMap();
   void build();
   TileSet* getTileset(const int cur_gid);
 

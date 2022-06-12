@@ -13,6 +13,7 @@ class Component
 {
 public:
     Component(GameObject* obj);
+    ~Component() { obj = nullptr; }
     virtual void setUp();
     virtual void update(const float dt);
     virtual void render(sf::RenderWindow &window);

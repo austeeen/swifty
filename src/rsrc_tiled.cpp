@@ -64,6 +64,11 @@ render_texture(new sf::RenderTexture())
     rx::xml_node<> *data = node->first_node("data");
     val(gidstr, data);
 }
+TileLayer::~TileLayer()
+{
+    delete render_texture;
+    render_texture = nullptr;
+}
 void TileLayer::build(TileMap *map)
 {
     render_texture->create(map->tilesize.x * size.x, map->tilesize.y * size.y);
@@ -178,6 +183,23 @@ TileMap::TileMap(const char* filepath)
         }
         node = node->next_sibling();
     }
+}
+TileMap::~TileMap()
+{
+    for (auto& [gid, ts] : tilesets) {
+        delete ts;
+    }
+    tilesets.clear();
+
+    for (auto& tl : tile_layers) {
+        delete tl;
+    }
+    tile_layers.clear();
+
+    for (auto& og : object_groups) {
+        delete og;
+    }
+    object_groups.clear();
 }
 void TileMap::build()
 {
