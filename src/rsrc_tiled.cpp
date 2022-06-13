@@ -1,22 +1,17 @@
 #include "rsrc_tiled.hpp"
 
+
 /******************************************************************************/
 
-void val(std::string& value, rx::xml_node<> *node)
+void loadXML(const char *fp, std::string& content, rx::xml_document<>* doc)
 {
-  value = node->value();
-}
-void attr(float &dst, const char* attr_name, rx::xml_node<> *node)
-{
-  dst = std::atof(node->first_attribute(attr_name)->value());
-}
-void attr(int &dst, const char* attr_name, rx::xml_node<> *node)
-{
-  dst = std::atoi(node->first_attribute(attr_name)->value());
-}
-void attr(std::string &dst, const char* attr_name, rx::xml_node<> *node)
-{
-  dst = std::string(node->first_attribute(attr_name)->value());
+    std::ifstream file(fp);
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    file.close();
+    content = buffer.str();
+    doc = new rx::xml_document<>();
+    doc->parse<0>(&content[0]);
 }
 
 /******************************************************************************/
@@ -56,17 +51,27 @@ std::vector<float> split2(const std::string &s, char delim)
     return result;
 }
 
+template <> std::string attr(const rx::xml_node<> *n, const char *key)
+{
+    char *n_attr = n->first_attribute(key)->value();
+    if(!n_attr) {
+        return "";
+    }
+    return std::string(n_attr);
+}
+
 /******************************************************************************/
 
 TileLayer::TileLayer(rx::xml_node<> *node):
 render_texture(new sf::RenderTexture())
 {
-    attr(name, "name", node);
-    attr(id, "id", node);
-    attr(size.x, "width", node);
-    attr(size.y, "height", node);
+    name = attr<std::string>(node, "name");
+    id = attr<int>(node, "id");
+    size.x = attr<int>(node, "width");
+    size.y = attr<int>(node, "height");
+
     rx::xml_node<> *data = node->first_node("data");
-    val(gidstr, data);
+    gidstr = data->value();
 }
 TileLayer::~TileLayer()
 {
@@ -119,35 +124,35 @@ void TileLayer::build(TileMap *map)
 
 ObjectGroup::ObjectGroup(rx::xml_node<> *node)
 {
-    attr(name, "name", node);
-    attr(id, "id", node);
+    name = attr<std::string>(node, "name");
+    id = attr<int>(node, "id");
+
     rx::xml_node<> *obj_node = node->first_node();
     while (obj_node) {
-      int id;
-      attr(id, "id", obj_node);
-      sf::IntRect rect;
-      attr(rect.left, "x", obj_node);
-      attr(rect.top, "y", obj_node);
-      attr(rect.width, "width", obj_node);
-      attr(rect.height, "height", obj_node);
-      objects[id] = rect;
-      obj_node = obj_node->next_sibling();
+        int obj_id = attr<int>(node, "id");
+        sf::IntRect rect;
+        rect.left = attr<int>(node, "x");
+        rect.top = attr<int>(node, "y");
+        rect.width = attr<int>(node, "width");
+        rect.height = attr<int>(node, "height");
+        objects[obj_id] = rect;
+        obj_node = obj_node->next_sibling();
     }
 }
 
 TileSet::TileSet(rx::xml_node<> *node)
 {
-    attr(name, "name", node);
-    attr(firstgid, "firstgid", node);
-    attr(tilesize.x, "tilewidth", node);
-    attr(tilesize.y, "tileheight", node);
-    attr(totaltiles, "tilecount", node);
-    attr(columns, "columns", node);
+    name = attr<std::string>(node, "name");
+    firstgid = attr<int>(node, "firstgid");
+    tilesize.x = attr<int>(node, "tilewidth");
+    tilesize.y = attr<int>(node, "tileheight");
+    totaltiles = attr<int>(node, "tilecount");
+    columns = attr<int>(node, "columns");
 
     rx::xml_node<> *image = node->first_node();
-    attr(img_src, "source", image);
-    attr(imagesize.x, "width", image);
-    attr(imagesize.y, "height", image);
+    img_src = attr<std::string>(image, "source");
+    imagesize.x = attr<int>(image, "tilewidth");
+    imagesize.y = attr<int>(image, "tileheight");
 
     img_texture.loadFromFile("res/" + img_src);
     render_states.texture = &img_texture;
@@ -155,28 +160,21 @@ TileSet::TileSet(rx::xml_node<> *node)
 
 TileMap::TileMap(const char* filepath)
 {
-    std::ifstream file(filepath);
-    std::stringstream buffer;
-    buffer << file.rdbuf();
-    file.close();
-    std::string content(buffer.str());
-
-    doc = new rx::xml_document<>();
-    doc->parse<0>(&content[0]);
+    rx::xml_document<>* doc;
+    std::string content;
+    loadXML(filepath, content, doc);
 
     rx::xml_node<> *map = doc->first_node();
-    attr(mapsize.x, "width", map);
-    attr(mapsize.y, "height", map);
-    attr(tilesize.x, "tilewidth", map);
-    attr(tilesize.y, "tileheight", map);
-
+    mapsize.x = attr<int>(map, "width");
+    mapsize.y = attr<int>(map, "height");
+    tilesize.x = attr<int>(map, "tilewidth");
+    tilesize.y = attr<int>(map, "tileheight");
     rx::xml_node<> *node = map->first_node();
     while(node != nullptr) {
         std::string type = std::string(node->name());
         printf("<%s ...> \n", type.c_str());
         if (type == "tileset") {
-            int firstgid;
-            attr(firstgid, "firstgid", node);
+            int firstgid = attr<int>(node, "firstgid");
             tilesets[firstgid] = new TileSet(node);
         }
         else if (type == "layer") {
@@ -188,7 +186,6 @@ TileMap::TileMap(const char* filepath)
         node = node->next_sibling();
     }
     delete doc;
-    doc = nullptr;
 }
 TileMap::~TileMap()
 {
@@ -206,15 +203,10 @@ TileMap::~TileMap()
         delete og;
     }
     object_groups.clear();
-
-    if (doc != nullptr) {
-        delete doc;
-    }
 }
 void TileMap::build()
 {
     for (auto& lyr : tile_layers) {
-        std::cout << "building: " << lyr->name << std::endl;
         lyr->build(this);
     }
 }
@@ -235,31 +227,70 @@ TileSet* TileMap::getTileset(const int cur_gid)
 
 TileObject::TileObject(const char* filepath)
 {
-    std::ifstream file(filepath);
-    std::stringstream buffer;
-    buffer << file.rdbuf();
-    file.close();
-    std::string content(buffer.str());
+    rx::xml_document<>* doc;
+    std::string content;
+    loadXML(filepath, content, doc);
 
-    doc = new rx::xml_document<>();
-    doc->parse<0>(&content[0]);
+    rx::xml_node<> *ts_node = doc->first_node("tileset");
+    name = attr<std::string>(ts_node, "name");
+    tilesize.x = attr<int>(ts_node, "tilewidth");
+    tilesize.y = attr<int>(ts_node, "tileheight");
+    columns = attr<int>(ts_node, "columns");
+    totaltiles = attr<int>(ts_node, "tilecount");
 
-    rx::xml_node<> *cat = doc->first_node();
-    rx::xml_node<> *phys = cat->first_node("physics");
-
-    attr(speed, "speed", phys);
-    attr(mass, "mass", phys);
-    attr(max_x_vel, "maxvel", phys);
-    attr(jump_power, "jump", phys);
-    attr(acl_gravity, "grav", phys);
-    attr(damping, "damping", phys);
+    std::string type;
+    rx::xml_node<> *node = ts_node->first_node();
+    while(node != nullptr) {
+        type = std::string(node->name());
+        if (type == "properties") {
+            getProperties(node);
+        } else if (type == "image") {
+            img_src = attr<std::string>(node, "source");
+            imagesize.x = attr<int>(node, "width");
+            imagesize.y = attr<int>(node, "height");
+            img_texture.loadFromFile("res/" + img_src);
+        } else if (type == "tile") {
+            addTile(node);
+        }
+        node = node->next_sibling();
+    }
 
     delete doc;
-    doc = nullptr;
 }
-TileObject::~TileObject()
+void TileObject::getProperties(rx::xml_node<> *all_properties)
 {
-    if (doc != nullptr) {
-        delete doc;
+    std::string prp_type, prp_name;
+    rx::xml_node<> *prp = all_properties->first_node();
+    while(prp != nullptr) {
+        prp_type = attr<std::string>(prp, "type");
+        prp_name = attr<std::string>(prp, "name");
+        if (prp_name == "config") {
+                if (prp_type == "file") {
+                    std::string cfg_fp = attr<std::string>(prp, "value");
+                    loadConfig(cfg_fp.c_str());
+            }
+        }
+        prp = prp->next_sibling();
     }
+}
+void TileObject::loadConfig(const char *cfg_fp)
+{
+    rx::xml_document<>* doc;
+    std::string content;
+    loadXML(cfg_fp, content, doc);
+    rx::xml_node<> *phys = doc->first_node("physics");
+    speed = attr<int>(phys, "speed");
+    mass = attr<int>(phys, "mass");
+    max_x_vel = attr<int>(phys, "maxvel");
+    jump_power = attr<int>(phys, "jump");
+    acl_gravity = attr<int>(phys, "grav");
+    damping = attr<int>(phys, "damping");
+}
+void TileObject::addTile(rx::xml_node<> *node)
+{
+
+}
+void TileObject::addRoll(rx::xml_node<> *node)
+{
+
 }

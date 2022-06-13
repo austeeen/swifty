@@ -7,12 +7,24 @@ void split(const std::string &s, char delim, std::vector<float> &result);
 void split(const std::string &s, char delim, std::vector<int> &result);
 void split(const std::string &s, char delim, std::vector<std::string> &result);
 
+template<class T> T attr(const rx::xml_node<> *n, const char* key)
+{
+    char *n_attr = n->first_attribute(key)->value();
+    T val;
+    if(!n_attr) {
+        return val;
+    }
+    std::istringstream ss(n_attr);
+    ss >> val;
+    return val;
+}
+
 class TileMap;
 
 class TileLayer
 {
 public:
-    TileLayer(rx::xml_node<> *node);
+    TileLayer(rx::xml_node<>* node);
     ~TileLayer();
     void build(TileMap* map);
 
@@ -25,7 +37,7 @@ public:
 };
 
 struct ObjectGroup {
-    ObjectGroup(rx::xml_node<> *node);
+    ObjectGroup(rx::xml_node<>* node);
     void build(TileMap* map);
 
     std::string name;
@@ -34,7 +46,7 @@ struct ObjectGroup {
 };
 
 struct TileSet {
-    TileSet(rx::xml_node<> *node);
+    TileSet(rx::xml_node<>* node);
 
     std::string name, img_src;
     int firstgid, columns, totaltiles;
@@ -55,7 +67,6 @@ public:
     std::vector<TileLayer*> tile_layers;
     std::vector<ObjectGroup*> object_groups;
     sf::Vector2i mapsize, tilesize;
-    rx::xml_document<>* doc;
 };
 
 /******************************************************************************/
@@ -76,12 +87,13 @@ class TileObject
 {
 public:
     TileObject(const char* filepath);
-    ~TileObject();
-    void build();
+    void getProperties(rx::xml_node<>* node);
+    void loadConfig(const char *cfg_fp);
+    void addTile(rx::xml_node<>* node);
+    void addRoll(rx::xml_node<>* node);
 
-    rx::xml_document<>* doc;
-    
-    int firstgid, columns, totaltiles;
+    std::string name, img_src;
+    int tilecount, columns, totaltiles;
     sf::Vector2i tilesize, imagesize;
     sf::Texture img_texture;
     sf::RenderStates render_states;
