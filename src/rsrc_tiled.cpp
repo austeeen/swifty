@@ -200,6 +200,9 @@ TileMap::~TileMap()
         delete og;
     }
     object_groups.clear();
+
+    delete doc;
+    doc = nullptr;
 }
 void TileMap::build()
 {
