@@ -44,6 +44,7 @@ protected:
 class Boundary
 {
 public:
+    Boundary(const sf::IntRect rect);
     Boundary(const sf::IntRect rect, const sf::Color c);
     void render(sf::RenderWindow &window);
     const sf::Vector2f getPosition() const;
@@ -56,23 +57,6 @@ private:
     sf::RectangleShape shape;
     sf::IntRect rect;
     sf::Color color;
-};
-
-/**************************************************************************************************/
-
-class Background
-{
-public:
-    Background(const std::string img_fp);
-    void render(sf::RenderWindow& window);
-    void setCenter(const sf::Vector2f center);
-    const sf::Vector2f getPosition() const;
-    const sf::Vector2f getSize() const;
-    const sf::FloatRect getRect() const;
-
-private:
-    sf::Texture img_texture;
-    sf::Sprite sprite;
 };
 
 

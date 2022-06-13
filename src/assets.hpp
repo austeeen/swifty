@@ -7,12 +7,15 @@
 #define CAT_WIDTH 16
 #define CAT_HEIGHT 16
 
+#define CAT_START_X 3
+#define CAT_START_Y 2
+
 struct GameObjectAsset
 {
 
     const std::string img_fp = "res/elthen/cat-16x16.png";
     const sf::IntRect start_texture_rect = sf::IntRect(0, 0, CAT_WIDTH, CAT_HEIGHT);
-    const sf::Vector2f start_pos = sf::Vector2f(150, 200 - CAT_HEIGHT - 1);
+    const sf::Vector2f start_pos = sf::Vector2f(CAT_START_X * CAT_WIDTH, CAT_START_Y * CAT_HEIGHT);
     const sf::Vector2i size = sf::Vector2i(CAT_WIDTH, CAT_HEIGHT);
     const sf::FloatRect rect = sf::FloatRect(start_pos, (sf::Vector2f) size);
     const sf::FloatRect collision_rect = sf::FloatRect(CAT_WIDTH - 12 - 1, CAT_HEIGHT - 10 - 1, 12, 10);

@@ -8,7 +8,7 @@ set(CMAKE_BUILD_TYPE Debug)
 
 find_package(SFML 2.5 COMPONENTS system window graphics network audio REQUIRED)
 
-include_directories(${CMAKE_SOURCE_DIR}/src)
+include_directories(${CMAKE_SOURCE_DIR}/src, ${CMAKE_SOURCE_DIR}/deps)
 
 file(GLOB SOURCES ${CMAKE_SOURCE_DIR}/src/*.cpp)
 file(GLOB BUILD_DEPS ${CMAKE_SOURCE_DIR}/deps/*.cpp)
