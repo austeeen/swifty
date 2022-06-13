@@ -6,7 +6,8 @@ camera(CAMERA::view_rect),
 tile_map(std::make_shared<TileMap>("res/new_basic_level.tmx"))
 {
     window.setKeyRepeatEnabled(false);
-    GameObjectAsset cat_ast;
+    ObjectConfig cat_cfg("res/cat.cfg");
+    GameObjectAsset cat_ast(cat_cfg);
     player = std::make_shared<GameObject>(cat_ast);
 
     tile_map->build();
@@ -53,23 +54,23 @@ void Game::__inputUpdate()
                     case sf::Keyboard::Left: { player->moving(DIR_LEFT); break; }
                     case sf::Keyboard::Right: { player->moving(DIR_RIGHT); break; }
 
-                    case sf::Keyboard::A: { player->increase(PHY::mass); break; }
-                    case sf::Keyboard::Z: { player->decrease(PHY::mass); break; }
+                    case sf::Keyboard::A: { player->increase(BodyPhysics::mass); break; }
+                    case sf::Keyboard::Z: { player->decrease(BodyPhysics::mass); break; }
 
-                    case sf::Keyboard::S: { player->increase(PHY::speed); break; }
-                    case sf::Keyboard::X: { player->decrease(PHY::speed); break; }
+                    case sf::Keyboard::S: { player->increase(BodyPhysics::speed); break; }
+                    case sf::Keyboard::X: { player->decrease(BodyPhysics::speed); break; }
 
-                    case sf::Keyboard::D: { player->increase(PHY::max_x_vel); break; }
-                    case sf::Keyboard::C: { player->decrease(PHY::max_x_vel); break; }
+                    case sf::Keyboard::D: { player->increase(BodyPhysics::max_x_vel); break; }
+                    case sf::Keyboard::C: { player->decrease(BodyPhysics::max_x_vel); break; }
 
-                    case sf::Keyboard::F: { player->increase(PHY::jump_power); break; }
-                    case sf::Keyboard::V: { player->decrease(PHY::jump_power); break; }
+                    case sf::Keyboard::F: { player->increase(BodyPhysics::jump_power); break; }
+                    case sf::Keyboard::V: { player->decrease(BodyPhysics::jump_power); break; }
 
-                    case sf::Keyboard::H: { player->increase(PHY::friction); break; }
-                    case sf::Keyboard::N: { player->decrease(PHY::friction); break; }
+                    case sf::Keyboard::H: { player->increase(BodyPhysics::damping); break; }
+                    case sf::Keyboard::N: { player->decrease(BodyPhysics::damping); break; }
 
-                    case sf::Keyboard::J: { player->increase(PHY::gravity); break; }
-                    case sf::Keyboard::M: { player->decrease(PHY::gravity); break; }
+                    case sf::Keyboard::J: { player->increase(BodyPhysics::gravity); break; }
+                    case sf::Keyboard::M: { player->decrease(BodyPhysics::gravity); break; }
                     default: { break; }
                 }
                 break;

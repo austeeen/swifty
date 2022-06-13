@@ -38,11 +38,11 @@ void GameObject::stop(const int dir)
 {
     cmpnt<RigidBody>()->stopDirection(dir);
 }
-void GameObject::increase(const int cf)
+void GameObject::increase(const BodyPhysics cf)
 {
     cmpnt<RigidBody>()->increase(cf);
 }
-void GameObject::decrease(const int cf)
+void GameObject::decrease(const BodyPhysics cf)
 {
     cmpnt<RigidBody>()->decrease(cf);
 }

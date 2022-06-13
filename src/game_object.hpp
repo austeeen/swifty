@@ -18,8 +18,8 @@ public:
     void terminateJump();
     void moving(const int dir);
     void stop(const int dir);
-    void increase(const int cf);
-    void decrease(const int cf);
+    void increase(const BodyPhysics cf);
+    void decrease(const BodyPhysics cf);
     void onColliding(const COLLIDER::group grp, const sf::Vector2f offset);
     const GameObjectAsset& getAsset() const;
     const sf::Vector2f getPosition() const;

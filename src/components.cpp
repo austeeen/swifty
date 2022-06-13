@@ -166,7 +166,7 @@ const sf::IntRect Animator::getFrameRect() const
 /**************************************************************************************************/
 
 RigidBody::RigidBody(GameObject* obj):
-Component(obj), f_grav(0.0f), f_fric(0.0f), f_jump(0.0f), f_move(0.0f),
+Component(obj), f_grav(0.0f), f_damp(0.0f), f_jump(0.0f), f_move(0.0f),
 wants_to_jump(false), jumped_this_frame(false), grounded(false),
 max_x_vel(0), moving_left(0), moving_right(0)
 {}
@@ -183,7 +183,7 @@ void RigidBody::setUp()
     max_x_vel = ast.max_x_vel;
     jump_power = ast.jump_power;
     acl_gravity = ast.acl_gravity;
-    friction = ast.friction;
+    damping = ast.damping;
     wants_to_jump = false;
     jumped_this_frame = false;
     grounded = true;
@@ -278,39 +278,38 @@ const sf::FloatRect RigidBody::getRect() const
 {
     return this->collision_rect;
 }
-void RigidBody::increase(const int cf)
+void RigidBody::increase(const BodyPhysics cf)
 {
     switch(cf) {
-        case PHY::mass: { mass += 10; break; }
-        case PHY::speed: { speed += 1; break; }
-        case PHY::max_x_vel: { max_x_vel += 5; break; }
-        case PHY::jump_power: { jump_power += 1; break; }
-        case PHY::gravity: { acl_gravity += 1; break; }
-        case PHY::friction: { friction += 1; break; }
+        case BodyPhysics::mass: { mass += 10; break; }
+        case BodyPhysics::speed: { speed += 1; break; }
+        case BodyPhysics::max_x_vel: { max_x_vel += 5; break; }
+        case BodyPhysics::jump_power: { jump_power += 1; break; }
+        case BodyPhysics::gravity: { acl_gravity += 1; break; }
+        case BodyPhysics::damping: { damping += 1; break; }
     }
     updateForces();
 }
-void RigidBody::decrease(const int cf)
+void RigidBody::decrease(const BodyPhysics cf)
 {
     switch(cf) {
-        case PHY::mass: { mass -= 10; break; }
-        case PHY::speed: { speed -= 1; break; }
-        case PHY::max_x_vel: { max_x_vel -= 5; break; }
-        case PHY::jump_power: { jump_power -= 1; break; }
-        case PHY::gravity: { acl_gravity -= 1; break; }
-        case PHY::friction: { friction -= 1; break; }
+        case BodyPhysics::mass: { mass -= 10; break; }
+        case BodyPhysics::speed: { speed -= 1; break; }
+        case BodyPhysics::max_x_vel: { max_x_vel -= 5; break; }
+        case BodyPhysics::jump_power: { jump_power -= 1; break; }
+        case BodyPhysics::gravity: { acl_gravity -= 1; break; }
+        case BodyPhysics::damping: { damping -= 1; break; }
     }
     updateForces();
 }
 void RigidBody::updateForces()
 {
     f_grav = acl_gravity * mass;
-    f_fric = f_grav * friction;
-    // f_fric = friction;
+    f_damp = damping;
     f_jump = jump_power * 100 / mass;
     f_move = speed * mass * 100;
-    printf("[RigidBody] mass: %d | speed: %d | max x vel %d | jump power %d | friction: %f |  gravity: %f\n",
-            mass, speed, max_x_vel, jump_power, friction, acl_gravity);
+    printf("[RigidBody] mass: %d | speed: %d | max x vel %d | jump power %d | damping: %f |  gravity: %f\n",
+            mass, speed, max_x_vel, jump_power, damping, acl_gravity);
 }
 /*
 Physics::Physics(GameObject* obj): Component(obj)
@@ -324,9 +323,9 @@ Physics::Physics(GameObject* obj): Component(obj)
     memset(vel, 0.f, sizeof(vel));
     memset(acl, 0.f, sizeof(acl));
     memset(sgn, 0, sizeof(sgn));
-    states[PHY::stateID::grounded] = std::make_shared<GroundedState>(this);
-    states[PHY::stateID::in_air] = std::make_shared<InAirState>(this);
-    cur_state = PHY::stateID::grounded;
+    states[BodyPhysics::stateID::grounded] = std::make_shared<GroundedState>(this);
+    states[BodyPhysics::stateID::in_air] = std::make_shared<InAirState>(this);
+    cur_state = BodyPhysics::stateID::grounded;
 }
 void Physics::setUp()
 {
@@ -352,8 +351,8 @@ void Physics::update(const float dt)
 }
 bool Physics::jump()
 {
-    if (cur_state != PHY::stateID::in_air) {
-        cur_state = PHY::stateID::in_air;
+    if (cur_state != BodyPhysics::stateID::in_air) {
+        cur_state = BodyPhysics::stateID::in_air;
         states[cur_state]->enter();
         acl[DIR_UP] = force;
         return true;
@@ -362,7 +361,7 @@ bool Physics::jump()
 }
 bool Physics::terminateJump()
 {
-    if (cur_state == PHY::stateID::in_air) {
+    if (cur_state == BodyPhysics::stateID::in_air) {
         if (vel[DIR_UP] > terminal_vel) {
             vel[DIR_UP] = terminal_vel;
             return true;
@@ -376,11 +375,11 @@ bool Physics::isMoving() const
 }
 bool Physics::isGrounded() const
 {
-    return cur_state == PHY::stateID::grounded;
+    return cur_state == BodyPhysics::stateID::grounded;
 }
 void Physics::setGrounded()
 {
-    cur_state = PHY::stateID::grounded;
+    cur_state = BodyPhysics::stateID::grounded;
 }
 void Physics::move(const int dir)
 {
@@ -399,18 +398,18 @@ void Physics::calculateCoefficients()
 void Physics::increase(const int cf)
 {
     switch(cf) {
-        case PHY::weight: { weight += 2; break; }
-        case PHY::speed: { speed += 5; break; }
-        case PHY::damping: { damping += 0.1f; break; }
+        case BodyPhysics::weight: { weight += 2; break; }
+        case BodyPhysics::speed: { speed += 5; break; }
+        case BodyPhysics::damping: { damping += 0.1f; break; }
     }
     calculateCoefficients();
 }
 void Physics::decrease(const int cf)
 {
     switch(cf) {
-        case PHY::weight: { weight -= 2; break; }
-        case PHY::speed: { speed -= 5; break; }
-        case PHY::damping: { damping -= 0.1f; break; }
+        case BodyPhysics::weight: { weight -= 2; break; }
+        case BodyPhysics::speed: { speed -= 5; break; }
+        case BodyPhysics::damping: { damping -= 0.1f; break; }
     }
     calculateCoefficients();
 }

@@ -92,10 +92,6 @@ private:
 
 /**************************************************************************************************/
 
-struct forces {
-    float up, down, left, right, friction;
-};
-
 class RigidBody: public Component
 {
 public:
@@ -114,12 +110,12 @@ public:
     const sf::Vector2f getPosition() const;
     const sf::Vector2i getSize() const;
     const sf::FloatRect getRect() const;
-    void increase(const int cf);
-    void decrease(const int cf);
+    void increase(const BodyPhysics cf);
+    void decrease(const BodyPhysics cf);
 
 protected:
     friend class Physics2DSystem;
-    float f_grav, f_fric, f_jump, f_move;
+    float f_grav, f_jump, f_move, f_damp;
     sf::Vector2f vel, acl;
     bool wants_to_jump, jumped_this_frame, grounded;
     int max_x_vel, moving_left, moving_right;
@@ -129,8 +125,7 @@ private:
 
     sf::FloatRect position_rect, collision_rect;
     int mass, speed, jump_power;
-    float acl_gravity, friction;
-    // forces frc;
+    float acl_gravity, damping;
 };
 
 #endif // ANIMATOR_HPP
