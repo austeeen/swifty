@@ -6,6 +6,10 @@ void val(std::string& value, rx::xml_node<> *node)
 {
   value = node->value();
 }
+void attr(float &dst, const char* attr_name, rx::xml_node<> *node)
+{
+  dst = std::atof(node->first_attribute(attr_name)->value());
+}
 void attr(int &dst, const char* attr_name, rx::xml_node<> *node)
 {
   dst = std::atoi(node->first_attribute(attr_name)->value());
@@ -225,3 +229,30 @@ TileSet* TileMap::getTileset(const int cur_gid)
 }
 
 /******************************************************************************/
+
+ObjectConfig::ObjectConfig(const char* filepath)
+{
+    std::ifstream file(filepath);
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    file.close();
+    std::string content(buffer.str());
+
+    doc = new rx::xml_document<>();
+    doc->parse<0>(&content[0]);
+
+    rx::xml_node<> *cat = doc->first_node();
+    rx::xml_node<> *phys = cat->first_node("physics");
+
+    attr(speed, "speed", phys);
+    attr(mass, "mass", phys);
+    attr(max_x_vel, "maxvel", phys);
+    attr(jump_power, "jump", phys);
+    attr(acl_gravity, "grav", phys);
+    attr(damping, "damping", phys);
+}
+ObjectConfig::~ObjectConfig()
+{
+    delete doc;
+    doc = nullptr;
+}

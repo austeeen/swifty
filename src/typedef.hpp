@@ -15,17 +15,9 @@ namespace COLLIDER
     };
 }
 
-namespace PHY
-{
-    const int mass = 0;
-    const int speed = 1;
-    const int max_x_vel = 2;
-    const int gravity = 3;
-    const int friction = 4;
-    const int jump_power = 5;
-    enum class stateID { grounded, in_air };
 
-}
+enum class BodyPhysics { mass, speed, max_x_vel, gravity, damping, jump_power };
+enum class BodyState { grounded, in_air };
 
 struct animconfig {
     int row, num_frames;

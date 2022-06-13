@@ -1,5 +1,5 @@
-#ifndef FCT_RSRCS_HPP
-#define FCT_RSRCS_HPP
+#ifndef RSRC_TILED_HPP
+#define RSRC_TILED_HPP
 
 #include "common.hpp"
 
@@ -58,5 +58,23 @@ public:
   rx::xml_document<>* doc;
 };
 
+/******************************************************************************/
 
-#endif // FCT_RSRCS_HPP
+class ObjectConfig
+{
+public:
+  ObjectConfig(const char* filepath);
+  ~ObjectConfig();
+  void build();
+
+  rx::xml_document<>* doc;
+  int speed;
+  int mass;
+  int max_x_vel;
+  int jump_power;
+  float acl_gravity;
+  float friction;
+  float damping;
+};
+
+#endif // RSRC_TILED_HPP

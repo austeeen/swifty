@@ -6,12 +6,14 @@ void Physics2DSystem::update(std::shared_ptr<RigidBody> obj_body, const float dt
     const int in_x_motion = obj_body->moving_right - obj_body->moving_left;
     // ACCELERATION -- X
     obj_body->acl.x = in_x_motion * obj_body->f_move;
-    // should ignore friction when in air
+
+    /*
     if (obj_body->vel.x > 0.f) {
         obj_body->acl.x -= obj_body->f_fric;
     } else if (obj_body->vel.x < 0) {
         obj_body->acl.x += obj_body->f_fric;
     }
+    */
 
     // ACCELERATION -- Y
     obj_body->acl.y = obj_body->f_grav;
@@ -36,6 +38,9 @@ void Physics2DSystem::update(std::shared_ptr<RigidBody> obj_body, const float dt
             }
         } else if (fabs(obj_body->vel.x) < close_to_zero) {
             obj_body->vel.x = 0.f;
+        } else {
+            // should ignore damping horizontally when in air
+            obj_body->vel.x = obj_body->vel.x / (1 + obj_body->f_damp * dt);
         }
     }
 
