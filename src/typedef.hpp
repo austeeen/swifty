@@ -26,8 +26,6 @@ struct animconfig {
     bool one_shot = false;
     bool hold_last_frame = false;
     int end_early_frame = 0;
-    // std::vector<int> repeat_frames;
-    // int repeat_count = 0;
 };
 
 #endif // TYPE_DEF_HPP

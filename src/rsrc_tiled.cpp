@@ -187,6 +187,8 @@ TileMap::TileMap(const char* filepath)
         }
         node = node->next_sibling();
     }
+    delete doc;
+    doc = nullptr;
 }
 TileMap::~TileMap()
 {
@@ -205,8 +207,9 @@ TileMap::~TileMap()
     }
     object_groups.clear();
 
-    delete doc;
-    doc = nullptr;
+    if (doc != nullptr) {
+        delete doc;
+    }
 }
 void TileMap::build()
 {
@@ -230,7 +233,7 @@ TileSet* TileMap::getTileset(const int cur_gid)
 
 /******************************************************************************/
 
-ObjectConfig::ObjectConfig(const char* filepath)
+TileObject::TileObject(const char* filepath)
 {
     std::ifstream file(filepath);
     std::stringstream buffer;
@@ -250,9 +253,13 @@ ObjectConfig::ObjectConfig(const char* filepath)
     attr(jump_power, "jump", phys);
     attr(acl_gravity, "grav", phys);
     attr(damping, "damping", phys);
-}
-ObjectConfig::~ObjectConfig()
-{
+
     delete doc;
     doc = nullptr;
+}
+TileObject::~TileObject()
+{
+    if (doc != nullptr) {
+        delete doc;
+    }
 }
