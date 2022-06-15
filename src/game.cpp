@@ -6,8 +6,9 @@ camera(CAMERA::view_rect),
 tile_map(std::make_shared<TileMap>("res/new_basic_level.tmx"))
 {
     window.setKeyRepeatEnabled(false);
-    ObjectConfig cat_cfg("res/cat.cfg");
-    GameObjectAsset cat_ast(cat_cfg);
+
+    TileObject cat_res("res/cat.tsx");
+    GameObjectAsset cat_ast(cat_res);
     player = std::make_shared<GameObject>(cat_ast);
 
     tile_map->build();

@@ -3,14 +3,13 @@
 
 /******************************************************************************/
 
-void loadXML(const char *fp, std::string& content, rx::xml_document<>* doc)
+void loadXML(const char *fp, std::string &content, rx::xml_document<>* doc)
 {
     std::ifstream file(fp);
     std::stringstream buffer;
     buffer << file.rdbuf();
     file.close();
     content = buffer.str();
-    doc = new rx::xml_document<>();
     doc->parse<0>(&content[0]);
 }
 
@@ -51,13 +50,19 @@ std::vector<float> split2(const std::string &s, char delim)
     return result;
 }
 
-template <> std::string attr(const rx::xml_node<> *n, const char *key)
+template <> bool attr(const rx::xml_node<> *n, const char *key)
 {
-    char *n_attr = n->first_attribute(key)->value();
-    if(!n_attr) {
-        return "";
+    rx::xml_attribute<> *n_attr = n->first_attribute(key);
+    if (n_attr == nullptr) {
+        throw std::out_of_range(key);
     }
-    return std::string(n_attr);
+    char *c_attr = n_attr->value();
+    if(std::string(c_attr) == "false") {
+        return false;
+    } else if (std::string(c_attr) == "true") {
+        return true;
+    }
+    throw std::invalid_argument(key);
 }
 
 /******************************************************************************/
@@ -69,7 +74,6 @@ render_texture(new sf::RenderTexture())
     id = attr<int>(node, "id");
     size.x = attr<int>(node, "width");
     size.y = attr<int>(node, "height");
-
     rx::xml_node<> *data = node->first_node("data");
     gidstr = data->value();
 }
@@ -129,12 +133,12 @@ ObjectGroup::ObjectGroup(rx::xml_node<> *node)
 
     rx::xml_node<> *obj_node = node->first_node();
     while (obj_node) {
-        int obj_id = attr<int>(node, "id");
+        int obj_id = attr<int>(obj_node, "id");
         sf::IntRect rect;
-        rect.left = attr<int>(node, "x");
-        rect.top = attr<int>(node, "y");
-        rect.width = attr<int>(node, "width");
-        rect.height = attr<int>(node, "height");
+        rect.left = attr<int>(obj_node, "x");
+        rect.top = attr<int>(obj_node, "y");
+        rect.width = attr<int>(obj_node, "width");
+        rect.height = attr<int>(obj_node, "height");
         objects[obj_id] = rect;
         obj_node = obj_node->next_sibling();
     }
@@ -151,8 +155,8 @@ TileSet::TileSet(rx::xml_node<> *node)
 
     rx::xml_node<> *image = node->first_node();
     img_src = attr<std::string>(image, "source");
-    imagesize.x = attr<int>(image, "tilewidth");
-    imagesize.y = attr<int>(image, "tileheight");
+    imagesize.x = attr<int>(image, "width");
+    imagesize.y = attr<int>(image, "height");
 
     img_texture.loadFromFile("res/" + img_src);
     render_states.texture = &img_texture;
@@ -160,10 +164,13 @@ TileSet::TileSet(rx::xml_node<> *node)
 
 TileMap::TileMap(const char* filepath)
 {
-    rx::xml_document<>* doc;
-    std::string content;
+    rx::xml_document<>* doc = new rx::xml_document<>();
+    std::string content = "";
     loadXML(filepath, content, doc);
-
+    if (doc == nullptr || content == "") {
+        std::cout << "tile map construction failed" << std::endl;
+        return;
+    }
     rx::xml_node<> *map = doc->first_node();
     mapsize.x = attr<int>(map, "width");
     mapsize.y = attr<int>(map, "height");
@@ -227,9 +234,13 @@ TileSet* TileMap::getTileset(const int cur_gid)
 
 TileObject::TileObject(const char* filepath)
 {
-    rx::xml_document<>* doc;
-    std::string content;
+    rx::xml_document<>* doc = new rx::xml_document<>();
+    std::string content = "";
     loadXML(filepath, content, doc);
+    if (doc == nullptr || content == "") {
+        std::cout << "tile object construction failed" << std::endl;
+        return;
+    }
 
     rx::xml_node<> *ts_node = doc->first_node("tileset");
     name = attr<std::string>(ts_node, "name");
@@ -255,30 +266,53 @@ TileObject::TileObject(const char* filepath)
         node = node->next_sibling();
     }
 
+    node = ts_node->first_node();
+    while(node != nullptr) {
+        std::string anim_roll = attr_if<std::string>(node, "type");
+        if (anim_roll == "idle") {
+            addRoll(animation_rolls[AnimationState::idle], node);
+        } else if (anim_roll == "moving") {
+            addRoll(animation_rolls[AnimationState::moving], node);
+        } else if (anim_roll == "jump") {
+            addRoll(animation_rolls[AnimationState::jumping], node);
+        }
+        node = node->next_sibling();
+    }
+
     delete doc;
+}
+TileObject::~TileObject()
+{
+    tile_tbl.clear();
+    animation_rolls.clear();
 }
 void TileObject::getProperties(rx::xml_node<> *all_properties)
 {
     std::string prp_type, prp_name;
-    rx::xml_node<> *prp = all_properties->first_node();
+    rx::xml_node<> *prp = all_properties->first_node("property");
     while(prp != nullptr) {
         prp_type = attr<std::string>(prp, "type");
         prp_name = attr<std::string>(prp, "name");
         if (prp_name == "config") {
-                if (prp_type == "file") {
-                    std::string cfg_fp = attr<std::string>(prp, "value");
-                    loadConfig(cfg_fp.c_str());
+            if (prp_type == "file") {
+                std::string cfg_fp = attr<std::string>(prp, "value");
+                loadConfig(cfg_fp.c_str());
             }
         }
         prp = prp->next_sibling();
     }
 }
-void TileObject::loadConfig(const char *cfg_fp)
+void TileObject::loadConfig(const char *filepath)
 {
-    rx::xml_document<>* doc;
-    std::string content;
-    loadXML(cfg_fp, content, doc);
-    rx::xml_node<> *phys = doc->first_node("physics");
+    rx::xml_document<>* doc = new rx::xml_document<>();
+    std::string content = "";
+    loadXML(filepath, content, doc);
+    if (doc == nullptr || content == "") {
+        std::cout << "tile object config construction failed" << std::endl;
+        return;
+    }
+    rx::xml_node<> *cfg = doc->first_node("config");
+    rx::xml_node<> *phys = cfg->first_node("physics");
     speed = attr<int>(phys, "speed");
     mass = attr<int>(phys, "mass");
     max_x_vel = attr<int>(phys, "maxvel");
@@ -288,9 +322,52 @@ void TileObject::loadConfig(const char *cfg_fp)
 }
 void TileObject::addTile(rx::xml_node<> *node)
 {
+    std::shared_ptr<TileFrame> tile = std::make_shared<TileFrame>();
+    tile->duration = 0.f;
+    int gid = attr<int>(node, "id");
+    tile->gid = gid;
+    tile->texture_rect = sf::IntRect((gid % columns) * tilesize.x, (gid / columns) * tilesize.y,
+                                    tilesize.x, tilesize.y);
+    rx::xml_node<>* c_rects = node->first_node("objectgroup")->first_node("object");
+    while(c_rects != nullptr) {
+        tile->collision_rects.push_back(sf::FloatRect(
+            attr<float>(c_rects, "x"), attr<float>(c_rects, "y"),
+            attr<float>(c_rects, "width"), attr<float>(c_rects, "height")
+        ));
+        c_rects = c_rects->next_sibling();
+    }
+    tile_tbl[gid] = tile;
 
+    std::string anim_roll = attr_if<std::string>(node, "type");
+    if (anim_roll == "idle") {
+        animation_rolls[AnimationState::idle] = std::make_shared<AnimRoll>();
+    } else if (anim_roll == "moving") {
+        animation_rolls[AnimationState::moving] = std::make_shared<AnimRoll>();
+    } else if (anim_roll == "jump") {
+        animation_rolls[AnimationState::jumping] = std::make_shared<AnimRoll>();
+    }
 }
-void TileObject::addRoll(rx::xml_node<> *node)
+void TileObject::addRoll(std::shared_ptr<AnimRoll> roll, rx::xml_node<> *node)
 {
+    rx::xml_node<> *prp = node->first_node("properties")->first_node("property");
+    while(prp != nullptr) {
+        std::string prp_name = attr<std::string>(prp, "name");
+        if (prp_name == "end_early") {
+            roll->end_early_frame = attr_if<int>(prp, "value");
+        } else if (prp_name == "hold_last") {
+            roll->hold_last_frame = attr_if<bool>(prp, "value");
+        } else if (prp_name == "one_shot") {
+            roll->one_shot = attr_if<bool>(prp, "value");
+        }
+        prp = prp->next_sibling();
+    }
 
+    rx::xml_node<> *frame_entry = node->first_node("animation")->first_node("frame");
+    while(frame_entry != nullptr) {
+        int gid = attr<int>(frame_entry, "tileid");
+        std::shared_ptr<TileFrame> frame = tile_tbl[gid];
+        frame->duration = attr<float>(frame_entry, "duration") * 0.001f;
+        roll->frames.push_back(frame);
+        frame_entry = frame_entry->next_sibling();
+    }
 }

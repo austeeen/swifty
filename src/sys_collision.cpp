@@ -20,11 +20,13 @@ void CollisionSystem::checkCollisions()
 }
 void CollisionSystem::checkColliding(std::shared_ptr<GameObject> obj, std::shared_ptr<Boundary> bnd)
 {
-    sf::FloatRect objRect = obj->getRect();
-    sf::FloatRect bndRect = bnd->getRect();
+    std::vector<sf::FloatRect> object_rects = obj->getRects();
+    sf::FloatRect bnd_rect = bnd->getRect();
 
-    if (objRect.intersects(bndRect)) {
-        obj->onColliding(bnd->getColliderGroup(), clip(objRect, bndRect));
+    for (auto& obj_rect : object_rects) {
+        if (obj_rect.intersects(bnd_rect)) {
+            obj->onColliding(bnd->getColliderGroup(), clip(obj_rect, bnd_rect));
+        }
     }
 }
 sf::Vector2f CollisionSystem::clip(sf::FloatRect &a, sf::FloatRect &b)

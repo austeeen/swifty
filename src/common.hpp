@@ -10,6 +10,7 @@
 #include <string.h> // memset
 #include <typeindex>
 #include <typeinfo>
+#include <stdexcept>
 #include <SFML/Graphics.hpp>
 #include "rapidxml/rapidxml.hpp"
 

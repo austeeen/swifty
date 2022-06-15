@@ -15,17 +15,7 @@ namespace COLLIDER
     };
 }
 
-
 enum class BodyPhysics { mass, speed, max_x_vel, gravity, damping, jump_power };
 enum class BodyState { grounded, in_air };
-
-struct animconfig {
-    int row, num_frames;
-    float dur;
-    std::vector<int> frames;
-    bool one_shot = false;
-    bool hold_last_frame = false;
-    int end_early_frame = 0;
-};
 
 #endif // TYPE_DEF_HPP

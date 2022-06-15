@@ -19,17 +19,16 @@ Component(obj), cur_rect(0, 0, 0, 0), facing_right(true)
 {}
 void Sprite::setUp()
 {
-    img_texture.loadFromFile(obj->getAsset().img_fp);
-    cur_rect = obj->getAsset().start_texture_rect;
-    sprite.setTexture(img_texture);
-    sprite.setTextureRect(cur_rect);
+    sprite.setTexture(obj->getAsset().img_texture);
+    body = obj->cmpnt<RigidBody>();
 }
-void Sprite::setTextureRect(sf::IntRect texture_rect)
+void Sprite::setTextureRect(const sf::IntRect &texture_rect)
 {
     cur_rect = texture_rect;
     if (!facing_right) {
         cur_rect.left += cur_rect.width;
         cur_rect.width = -cur_rect.width;
+        body->updateFacing(facing_right);
     }
     sprite.setTextureRect(cur_rect);
 }
@@ -47,23 +46,15 @@ void Sprite::render(sf::RenderWindow &window)
 
 /**************************************************************************************************/
 
-Frame::Frame(const float dur, const int row, const int indx, sf::Vector2i size):
-duration(dur), texture_rect(indx * size.x, row * size.y, size.x, size.y)
-{}
-
-Roll::Roll()
-{}
-Roll::Roll(animconfig cfg, sf::Vector2i size): cfg(cfg), frame_indx(0), frame_time(0.0f)
+Roll::Roll(std::shared_ptr<AnimRoll> roll):
+    frame_indx(0),
+    frame_time(0.0f),
+    one_shot(roll->one_shot),
+    hold_last_frame(roll->hold_last_frame),
+    end_early_frame(roll->end_early_frame),
+    frames(roll->frames)
 {
-    if (cfg.frames.size() == 0) {
-        for (int i = 0; i < cfg.num_frames; ++i) {
-            frames.push_back(Frame(cfg.dur, cfg.row, i, size));
-        }
-    } else {
-        for (int i : cfg.frames) {
-            frames.push_back(Frame(cfg.dur, cfg.row, i, size));
-        }
-    }
+    num_frames = roll->frames.size();
 }
 void Roll::reset()
 {
@@ -75,17 +66,17 @@ RollState Roll::nextFrame(const float dt)
     RollState ret_state = RollState::none;
 
     frame_time += dt;
-    if (frames[frame_indx].duration < frame_time) {
+    if (frames[frame_indx]->duration < frame_time) {
         frame_indx ++;
         frame_time = 0.0f;
         ret_state = RollState::next;
     }
 
-    if (frame_indx == cfg.num_frames) {
-        if (cfg.one_shot) {
+    if (frame_indx == num_frames) {
+        if (one_shot) {
             ret_state = RollState::done;
         }
-        if (cfg.hold_last_frame) {
+        if (hold_last_frame) {
             ret_state = RollState::none;
             frame_indx --;
         } else {
@@ -96,29 +87,36 @@ RollState Roll::nextFrame(const float dt)
 }
 void Roll::triggerEarlyExit()
 {
-    if (frame_indx < cfg.end_early_frame) {
-        frame_indx = cfg.end_early_frame;
+    if (frame_indx < end_early_frame) {
+        frame_indx = end_early_frame;
         frame_time = 0.0f;
     }
 }
 const sf::IntRect Roll::getFrameRect() const
 {
-    return frames[frame_indx].texture_rect;
+    return frames[frame_indx]->texture_rect;
+}
+const std::vector<sf::FloatRect>& Roll::getCollisionRects() const
+{
+    return frames[frame_indx]->collision_rects;
 }
 
 Animator::Animator(GameObject* obj):
-Component(obj),
-spr(nullptr),
-cur(AnimationState::idle),
-prev(AnimationState::idle)
+    Component(obj),
+    spr(nullptr),
+    cur(AnimationState::idle),
+    prev(AnimationState::idle)
 {}
 void Animator::setUp()
 {
     spr = obj->cmpnt<Sprite>();
+    body = obj->cmpnt<RigidBody>();
     GameObjectAsset ast = obj->getAsset();
-    animations[AnimationState::idle] = std::make_shared<Roll>(ast.idle_cfg, ast.size);
-    animations[AnimationState::moving] = std::make_shared<Roll>(ast.moving_cfg, ast.size);
-    animations[AnimationState::jumping] = std::make_shared<Roll>(ast.jumping_cfg, ast.size);
+    for (auto& [id, roll] : ast.animation_rolls) {
+        animations[id] = new Roll(roll);
+    }
+    spr->setTextureRect(animations[cur]->getFrameRect());
+    body->setCollisionRects(animations[cur]->getCollisionRects());
 }
 void Animator::update(const float dt)
 {
@@ -127,6 +125,7 @@ void Animator::update(const float dt)
         case RollState::none: break;
         case RollState::next: {
             spr->setTextureRect(animations[cur]->getFrameRect());
+            body->setCollisionRects(animations[cur]->getCollisionRects());
             break;
         }
         case RollState::done: {
@@ -139,8 +138,9 @@ void Animator::update(const float dt)
 }
 void Animator::setState(AnimationState next_state)
 {
-    if (cur == next_state)
+    if (cur == next_state) {
         return;
+    }
 
     auto anim = animations[next_state];
     if (anim) {
@@ -166,18 +166,22 @@ const sf::IntRect Animator::getFrameRect() const
 /**************************************************************************************************/
 
 RigidBody::RigidBody(GameObject* obj):
-Component(obj), f_grav(0.0f), f_damp(0.0f), f_jump(0.0f), f_move(0.0f),
-wants_to_jump(false), jumped_this_frame(false), grounded(false),
-max_x_vel(0), moving_left(0), moving_right(0)
+    Component(obj),
+    f_grav(0.0f),
+    f_damp(0.0f),
+    f_jump(0.0f),
+    f_move(0.0f),
+    wants_to_jump(false),
+    jumped_this_frame(false),
+    grounded(false),
+    max_x_vel(0),
+    moving_left(0),
+    moving_right(0)
 {}
 void RigidBody::setUp()
 {
     GameObjectAsset ast = obj->getAsset();
     position_rect = ast.rect;
-    collision_rect = ast.collision_rect;
-    collision_rect.left += position_rect.left;
-    collision_rect.top += position_rect.top;
-
     mass = ast.mass;
     speed = ast.speed;
     max_x_vel = ast.max_x_vel;
@@ -201,10 +205,12 @@ void RigidBody::render(sf::RenderWindow &window)
     r.setSize(sf::Vector2f(position_rect.width, position_rect.height));
     window.draw(r);
 
-    r.setOutlineColor(sf::Color::Cyan);
-    r.setPosition(collision_rect.left, collision_rect.top);
-    r.setSize(sf::Vector2f(collision_rect.width, collision_rect.height));
-    window.draw(r);
+    for (auto& col_rect : collision_rects) {
+        r.setOutlineColor(sf::Color::Cyan);
+        r.setPosition(col_rect.left, col_rect.top);
+        r.setSize(sf::Vector2f(col_rect.width, col_rect.height));
+        window.draw(r);
+    }
 }
 void RigidBody::setDirection(const int dir)
 {
@@ -232,13 +238,17 @@ void RigidBody::updatePosition(const float x, const float y)
 {
     position_rect.left += x;
     position_rect.top += y;
-    collision_rect.left += x;
-    collision_rect.top += y;
+    for (auto& col_rect : collision_rects) {
+        col_rect.left += x;
+        col_rect.top += y;
+    }
 }
 void RigidBody::collidingXAxis(const float x_offset)
 {
     position_rect.left += x_offset;
-    collision_rect.left += x_offset;
+    for (auto& col_rect : collision_rects) {
+        col_rect.left += x_offset;
+    }
     // vel.x = 0;
     if (vel.y < 0) {
         vel.y = ((int) vel.y) + 1;
@@ -247,7 +257,9 @@ void RigidBody::collidingXAxis(const float x_offset)
 void RigidBody::collidingYAxis(const float y_offset)
 {
     position_rect.top += y_offset;
-    collision_rect.top += y_offset;
+    for (auto& col_rect : collision_rects) {
+        col_rect.top += y_offset;
+    }
 
     // only kill y velocity if the collision is opposing the current velocity so we don't cancel
     // initial jump velocity
@@ -266,6 +278,23 @@ bool RigidBody::isMoving() const
 {
     return moving_right - moving_left;
 }
+void RigidBody::setCollisionRects(const std::vector<sf::FloatRect>& rects)
+{
+    collision_rects.clear();
+    collision_rects = rects;
+    for (auto& col_rect : collision_rects) {
+        col_rect.left = position_rect.left + col_rect.left;
+        col_rect.top = position_rect.top + col_rect.top;
+    }
+}
+void RigidBody::updateFacing(bool facing_right)
+{
+    if (!facing_right) {
+        for (auto& col_rect : collision_rects) {
+            col_rect.left = (position_rect.left + position_rect.width) - (col_rect.left - position_rect.left);
+        }
+    }
+}
 const sf::Vector2f RigidBody::getPosition() const
 {
     return sf::Vector2f(position_rect.left, position_rect.top);
@@ -274,9 +303,9 @@ const sf::Vector2i RigidBody::getSize() const
 {
     return sf::Vector2i(position_rect.width, position_rect.height);
 }
-const sf::FloatRect RigidBody::getRect() const
+const std::vector<sf::FloatRect>& RigidBody::getRects() const
 {
-    return this->collision_rect;
+    return this->collision_rects;
 }
 void RigidBody::increase(const BodyPhysics cf)
 {

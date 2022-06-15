@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tileset version="1.8" tiledversion="1.8.5" name="cat" tilewidth="16" tileheight="16" tilecount="56" columns="8">
  <properties>
-  <property name="config" type="file" value="cat.cfg"/>
+  <property name="config" type="file" value="res/cat.cfg"/>
  </properties>
  <image source="elthen/cat-16x16.png" width="128" height="112"/>
  <tile id="0" type="idle">

@@ -4,6 +4,7 @@
 #include "common.hpp"
 #include "typedef.hpp"
 #include "sys_physics_2d.hpp"
+#include "rsrc_tiled.hpp"
 
 class GameObject;
 
@@ -32,7 +33,7 @@ public:
     void update(const float dt) override;
     void render(sf::RenderWindow &window) override;
 
-    void setTextureRect(const sf::IntRect texture_rect);
+    void setTextureRect(const sf::IntRect& texture_rect);
     void setFacing(bool facing_right);
 
 private:
@@ -40,35 +41,29 @@ private:
     sf::IntRect cur_rect;
     bool facing_right;
     sf::Sprite sprite;
+    std::shared_ptr<RigidBody> body;
 };
 
 /**************************************************************************************************/
 
-enum class AnimationState { idle, moving, jumping };
 enum class RollState { none, next, done };
-
-struct Frame
-{
-    Frame(const float dur, const int row, const int indx, sf::Vector2i size);
-    const float duration;
-    const sf::IntRect texture_rect;
-};
 
 class Roll
 {
 public:
-    Roll();
-    Roll(animconfig roll_cfg, sf::Vector2i size);
+    Roll(std::shared_ptr<AnimRoll> roll);
     void reset();
     RollState nextFrame(const float dt);
     void triggerEarlyExit();
     const sf::IntRect getFrameRect() const;
+    const std::vector<sf::FloatRect>& getCollisionRects() const;
 
 private:
-    animconfig cfg;
-    int frame_indx;
+    int frame_indx, num_frames;
     float frame_time;
-    std::vector<Frame> frames;
+    bool one_shot, hold_last_frame;
+    int end_early_frame;
+    std::vector<std::shared_ptr<TileFrame>> frames;
 };
 
 class Animator: public Component
@@ -77,8 +72,6 @@ public:
     Animator(GameObject* obj);
     void setUp() override;
     void update(const float dt) override;
-
-    void addAnimation(AnimationState state, std::shared_ptr<Roll> roll);
     void setState(AnimationState s);
     void endEarly();
     const AnimationState& getState() const;
@@ -86,7 +79,8 @@ public:
 
 private:
     std::shared_ptr<Sprite> spr;
-    std::map<AnimationState, std::shared_ptr<Roll>> animations;
+    std::shared_ptr<RigidBody> body;
+    std::map<AnimationState, Roll*> animations;
     AnimationState cur, prev;
 };
 
@@ -107,15 +101,17 @@ public:
     void collidingYAxis(const float y_offset);
     bool isGrounded() const;
     bool isMoving() const;
+    void setCollisionRects(const std::vector<sf::FloatRect>& rects);
+    void updateFacing(bool facing_right);
     const sf::Vector2f getPosition() const;
     const sf::Vector2i getSize() const;
-    const sf::FloatRect getRect() const;
+    const std::vector<sf::FloatRect>& getRects() const;
     void increase(const BodyPhysics cf);
     void decrease(const BodyPhysics cf);
 
 protected:
     friend class Physics2DSystem;
-    float f_grav, f_jump, f_move, f_damp;
+    float f_grav, f_damp, f_jump, f_move;
     sf::Vector2f vel, acl;
     bool wants_to_jump, jumped_this_frame, grounded;
     int max_x_vel, moving_left, moving_right;
@@ -123,7 +119,8 @@ protected:
 private:
     void updateForces();
 
-    sf::FloatRect position_rect, collision_rect;
+    sf::FloatRect position_rect;
+    std::vector<sf::FloatRect> collision_rects;
     int mass, speed, jump_power;
     float acl_gravity, damping;
 };

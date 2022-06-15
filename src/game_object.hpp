@@ -24,7 +24,7 @@ public:
     const GameObjectAsset& getAsset() const;
     const sf::Vector2f getPosition() const;
     const sf::Vector2i getSize() const;
-    const sf::FloatRect getRect() const;
+    const std::vector<sf::FloatRect>& getRects() const;
     const COLLIDER::group getColliderGroup() const;
 
     template <typename T> std::shared_ptr<T> cmpnt() const {

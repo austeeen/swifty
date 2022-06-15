@@ -95,9 +95,9 @@ const sf::Vector2i GameObject::getSize() const
 {
     return cmpnt<RigidBody>()->getSize();
 }
-const sf::FloatRect GameObject::getRect() const
+const std::vector<sf::FloatRect>& GameObject::getRects() const
 {
-    return cmpnt<RigidBody>()->getRect();
+    return cmpnt<RigidBody>()->getRects();
 }
 const COLLIDER::group GameObject::getColliderGroup() const
 {

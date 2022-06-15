@@ -9,12 +9,23 @@ void split(const std::string &s, char delim, std::vector<std::string> &result);
 
 template<class T> T attr(const rx::xml_node<> *n, const char* key)
 {
-    char *n_attr = n->first_attribute(key)->value();
+    rx::xml_attribute<> *n_attr = n->first_attribute(key);
     T val;
-    if(!n_attr) {
+    if (n_attr == nullptr) {
+        throw std::out_of_range(key);
+    }
+    std::istringstream ss(n_attr->value());
+    ss >> val;
+    return val;
+}
+template<class T> T attr_if(const rx::xml_node<> *n, const char* key)
+{
+    rx::xml_attribute<> *n_attr = n->first_attribute(key);
+    T val;
+    if (n_attr == nullptr) {
         return val;
     }
-    std::istringstream ss(n_attr);
+    std::istringstream ss(n_attr->value());
     ss >> val;
     return val;
 }
@@ -71,43 +82,45 @@ public:
 
 /******************************************************************************/
 
-
-struct TileEntry {
-    const int gid;
+struct TileFrame {
+    int gid;
     sf::IntRect texture_rect;
-    std::vector<sf::IntRect> collision_rects;
+    std::vector<sf::FloatRect> collision_rects;
+    float duration;
 };
 
-struct FrameEntry {
-    const int frame_gid;
-    const int duration; // ms
+enum class AnimationState { idle, moving, jumping };
+
+struct AnimRoll {
+    std::vector<std::shared_ptr<TileFrame>> frames;
+    bool one_shot = false;
+    bool hold_last_frame = false;
+    int end_early_frame = 0;
 };
 
 class TileObject
 {
 public:
     TileObject(const char* filepath);
+    ~TileObject();
     void getProperties(rx::xml_node<>* node);
     void loadConfig(const char *cfg_fp);
     void addTile(rx::xml_node<>* node);
-    void addRoll(rx::xml_node<>* node);
+    void addRoll(std::shared_ptr<AnimRoll> roll, rx::xml_node<>* node);
 
     std::string name, img_src;
     int tilecount, columns, totaltiles;
     sf::Vector2i tilesize, imagesize;
     sf::Texture img_texture;
     sf::RenderStates render_states;
-
-    std::map<const int, TileEntry> tile_tbl;
-    std::map<const std::string, std::vector<FrameEntry>> animation_rolls;
-
+    std::map<const int, std::shared_ptr<TileFrame>> tile_tbl;
+    std::map<AnimationState, std::shared_ptr<AnimRoll>> animation_rolls;
     std::string cfg_fp;
     int speed;
     int mass;
     int max_x_vel;
     int jump_power;
     float acl_gravity;
-    float friction;
     float damping;
 };
 
