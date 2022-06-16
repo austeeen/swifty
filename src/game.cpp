@@ -32,7 +32,6 @@ void Game::setUp()
 void Game::update()
 {
     dt = frame_clock.restart().asSeconds();
-    // sleep(0.5f);
     __inputUpdate();
     __gameUpdate();
     __lateUpdate();
@@ -52,8 +51,8 @@ void Game::__inputUpdate()
                     case sf::Keyboard::Q: { window.close(); break; }
                     case sf::Keyboard::Escape: { window.close(); break; }
                     case sf::Keyboard::Space: { player->jump(); break; }
-                    case sf::Keyboard::Left: { player->moving(DIR_LEFT); break; }
-                    case sf::Keyboard::Right: { player->moving(DIR_RIGHT); break; }
+                    case sf::Keyboard::Left: { player->move(Dir4::left); break; }
+                    case sf::Keyboard::Right: { player->move(Dir4::right); break; }
 
                     case sf::Keyboard::A: { player->increase(BodyPhysics::mass); break; }
                     case sf::Keyboard::Z: { player->decrease(BodyPhysics::mass); break; }
@@ -79,10 +78,10 @@ void Game::__inputUpdate()
             }
             case sf::Event::KeyReleased: {
                 switch (event.key.code) {
-                    case sf::Keyboard::Up: { player->stop(DIR_UP); break; }
-                    case sf::Keyboard::Down: { player->stop(DIR_DOWN); break; }
-                    case sf::Keyboard::Left: { player->stop(DIR_LEFT); break; }
-                    case sf::Keyboard::Right: { player->stop(DIR_RIGHT); break; }
+                    case sf::Keyboard::Up: { player->stop(Dir4::up); break; } // no op
+                    case sf::Keyboard::Down: { player->stop(Dir4::down); break; }  // no op
+                    case sf::Keyboard::Left: { player->stop(Dir4::left); break; }
+                    case sf::Keyboard::Right: { player->stop(Dir4::right); break; }
                     case sf::Keyboard::Space: { player->terminateJump(); break; }
                     default: { break; }
                 }
@@ -99,7 +98,7 @@ void Game::__gameUpdate()
 }
 void Game::__lateUpdate()
 {
-    collision_system.handleCollisions();
+    player->lateUpdate();
     camera.setCenter(player->getPosition());
     camera.applyView(window);
 }

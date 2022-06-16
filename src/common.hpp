@@ -13,7 +13,7 @@
 #include <stdexcept>
 #include <SFML/Graphics.hpp>
 #include "rapidxml/rapidxml.hpp"
-
 namespace rx = rapidxml;
+#include "typedefs.hpp"
 
 #endif // COMMON_HPP

@@ -82,30 +82,6 @@ public:
 
 /******************************************************************************/
 
-enum class ColliderType { generic, body };
-
-struct CollisionRect {
-    sf::Vector2f offset;
-    sf::FloatRect rect;
-    ColliderType type;
-};
-
-struct TileFrame {
-    int gid;
-    sf::IntRect texture_rect;
-    std::vector<CollisionRect> collision_rects;
-    float duration;
-};
-
-enum class AnimationState { idle, moving, jumping };
-
-struct AnimRoll {
-    std::vector<std::shared_ptr<TileFrame>> frames;
-    bool one_shot = false;
-    bool hold_last_frame = false;
-    int end_early_frame = 0;
-};
-
 class TileObject
 {
 public:
@@ -122,7 +98,7 @@ public:
     sf::Texture img_texture;
     sf::RenderStates render_states;
     std::map<const int, std::shared_ptr<TileFrame>> tile_tbl;
-    std::map<AnimationState, std::shared_ptr<AnimRoll>> animation_rolls;
+    std::map<ObjectState, std::shared_ptr<AnimRoll>> animation_rolls;
     std::string cfg_fp;
     int speed;
     int mass;

@@ -63,11 +63,13 @@ const std::vector<CollisionRect>& Roll::getCollisionRects() const
     return frames.at(frame_indx)->collision_rects;
 }
 
+/**************************************************************************************************/
+
 Animator::Animator(GameObject* obj):
     Component(obj),
     spr(nullptr),
-    cur(AnimationState::idle),
-    prev(AnimationState::idle)
+    cur(ObjectState::idle),
+    prev(ObjectState::idle)
 {}
 void Animator::build()
 {
@@ -80,8 +82,7 @@ void Animator::build()
 }
 void Animator::setUp()
 {
-    spr->setTextureRect(animations[cur]->getFrameRect());
-    body->setCollisionRects(animations[cur]->getCollisionRects());
+    updateObject();
 }
 void Animator::update(const float dt)
 {
@@ -89,8 +90,7 @@ void Animator::update(const float dt)
     {
         case RollState::none: break;
         case RollState::next: {
-            spr->setTextureRect(animations[cur]->getFrameRect());
-            body->setCollisionRects(animations[cur]->getCollisionRects());
+            updateObject();
             break;
         }
         case RollState::done: {
@@ -101,19 +101,17 @@ void Animator::update(const float dt)
             break;
     }
 }
-void Animator::setState(AnimationState next_state)
+void Animator::setState(ObjectState next_state)
 {
     if (cur == next_state) {
         return;
     }
-
     if (animations.count(next_state) > 0) {
         animations[next_state]->reset();
         animations[cur]->reset();
         prev = cur;
         cur = next_state;
-        spr->setTextureRect(animations[cur]->getFrameRect());
-        body->setCollisionRects(animations[cur]->getCollisionRects());
+        updateObject();
     }
 }
 void Animator::setPrevState()
@@ -126,19 +124,23 @@ void Animator::setPrevState()
         animations[prev]->reset();
         animations[cur]->reset();
         cur = prev;
-        spr->setTextureRect(animations[cur]->getFrameRect());
-        body->setCollisionRects(animations[cur]->getCollisionRects());
+        updateObject();
     }
 }
 void Animator::endEarly()
 {
     animations[cur]->triggerEarlyExit();
 }
-const AnimationState& Animator::getState() const
+const ObjectState& Animator::getState() const
 {
     return cur;
 }
 const sf::IntRect Animator::getFrameRect() const
 {
     return animations.at(cur)->getFrameRect();
+}
+void Animator::updateObject()
+{
+    spr->setTextureRect(animations[cur]->getFrameRect());
+    body->setCollisionRects(animations[cur]->getCollisionRects());
 }

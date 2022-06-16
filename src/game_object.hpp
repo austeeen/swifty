@@ -3,11 +3,11 @@
 
 #include "common.hpp"
 #include "assets.hpp"
-#include "typedef.hpp"
 #include "c_base.hpp"
 #include "c_sprite.hpp"
 #include "c_rigid_body.hpp"
 #include "c_animator.hpp"
+
 
 class GameObject
 {
@@ -17,20 +17,21 @@ public:
     void update(const float dt);
     void lateUpdate();
     void render(sf::RenderWindow &window);
+
+    void move(const Dir4);
+    void stop(const Dir4);
     void jump();
     void terminateJump();
-    void moving(const int dir);
-    void stop(const int dir);
+
     void increase(const BodyPhysics cf);
     void decrease(const BodyPhysics cf);
     void toggleRects();
-    void onColliding(const COLLIDER::group grp, const ColliderType type, const sf::Vector2f& offset);
 
     const GameObjectAsset& getAsset() const;
     const sf::Vector2f getPosition() const;
     const sf::Vector2i getSize() const;
     const std::vector<CollisionRect>& getRects() const;
-    const COLLIDER::group getColliderGroup() const;
+    const CollisionGroup getColliderGroup() const;
 
     template <typename T> std::shared_ptr<T> cmpnt() const {
         if (cmpts.count(typeid(T)) == 0)
@@ -39,7 +40,10 @@ public:
     }
 
 protected:
-    COLLIDER::group col_group;
+    // std::map<const ObjectState, std::unique_ptr<StateBase>> states;
+    ObjectState cur_state;
+
+    CollisionGroup col_group;
     std::map<std::type_index, std::shared_ptr<Component>> cmpts;
     GameObjectAsset ast;
 };
@@ -55,12 +59,12 @@ public:
     const sf::Vector2f getPosition() const;
     const sf::Vector2f getSize() const;
     const sf::FloatRect getRect() const;
-    const COLLIDER::group getColliderGroup() const;
+    const CollisionGroup getColliderGroup() const;
 
 private:
-    COLLIDER::group col_group;
-    sf::RectangleShape shape;
+    CollisionGroup col_group;
     sf::IntRect rect;
+    sf::RectangleShape shape;
     sf::Color color;
 };
 
