@@ -4,7 +4,6 @@ GameObjectAsset::GameObjectAsset(const TileObject& obj):
     img_texture(obj.img_texture),
     size(obj.tilesize),
     rect(sf::Vector2f(0, 0), (sf::Vector2f) obj.tilesize),
-    collision_rect(sf::Vector2f(0, 0), (sf::Vector2f) obj.tilesize),
     speed(obj.speed),
     mass(obj.mass),
     max_x_vel(obj.max_x_vel),

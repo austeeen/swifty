@@ -2,8 +2,6 @@
 #define CMP_BASE_HPP
 
 #include "common.hpp"
-#include "typedef.hpp"
-#include "sys_physics_2d.hpp"
 #include "rsrc_tiled.hpp"
 
 class GameObject;

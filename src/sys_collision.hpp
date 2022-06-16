@@ -6,7 +6,7 @@
 
 struct CollisionEvent {
     std::shared_ptr<GameObject> colliding_object;
-    COLLIDER::group grp;
+    CollisionGroup grp;
     ColliderType type;
     sf::Vector2f clipped_offset;
 };
@@ -18,10 +18,8 @@ public:
     void add(std::shared_ptr<GameObject> obj);
     void add(std::shared_ptr<Boundary> bnd);
     void checkCollisions();
-    void handleCollisions();
 
 private:
-    void checkColliding(std::shared_ptr<GameObject> obj, std::shared_ptr<Boundary> bnd);
     sf::Vector2f clip(const sf::FloatRect& a, const sf::FloatRect& b);
 
     std::vector<CollisionEvent> collision_events;

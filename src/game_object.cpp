@@ -1,8 +1,16 @@
 #include "game_object.hpp"
 
 GameObject::GameObject(const GameObjectAsset ast):
-col_group(COLLIDER::group::object), ast(ast)
+col_group(CollisionGroup::object), ast(ast)
 {
+    /*
+    states[ObjectState::idle] = std::make_unique<IdleState>(this);
+    states[ObjectState::running] = std::make_unique<RunningState>(this);
+    states[ObjectState::jumping] = std::make_unique<JumpingState>(this);
+    states[ObjectState::falling] = std::make_unique<FallingState>(this);
+    // states[ObjectState::wallsliding] = std::make_unique<WallSlidingState>(this);
+    */
+
     cmpts[typeid(Sprite)] = std::make_shared<Sprite>(this);
     cmpts[typeid(RigidBody)] = std::make_shared<RigidBody>(this);
     cmpts[typeid(Animator)] = std::make_shared<Animator>(this);
@@ -12,9 +20,56 @@ void GameObject::setUp()
     for (auto [cmpnt_t, cmpnt] : cmpts) {
         cmpnt->build();
     }
+
+    cur_state = ObjectState::idle;
+    this->cmpnt<Animator>()->setState(cur_state);
+    this->cmpnt<RigidBody>()->setState(cur_state);
+
     for (auto [cmpnt_t, cmpnt] : cmpts) {
         cmpnt->setUp();
     }
+}
+void GameObject::update(const float dt)
+{
+    ObjectState next = this->cmpnt<RigidBody>()->getState();
+    if (next != cur_state) {
+        // printf("%s -> %s\n", out::toStr(cur_state).c_str(), out::toStr(next).c_str());
+        cur_state = next;
+        this->cmpnt<Animator>()->setState(cur_state);
+        this->cmpnt<RigidBody>()->setState(cur_state);
+    }
+    this->cmpnt<Animator>()->update(dt);
+    this->cmpnt<RigidBody>()->update(dt);
+}
+void GameObject::lateUpdate()
+{
+
+}
+void GameObject::render(sf::RenderWindow &window)
+{
+    for (auto [cmpnt_t, cmpnt] : cmpts) {
+        cmpnt->render(window);
+    }
+}
+void GameObject::move(const Dir4 dir)
+{
+    switch(dir) {
+        case Dir4::left: {
+            cmpnt<Sprite>()->setFacing(false);
+            cmpnt<RigidBody>()->setDirection(dir);
+            break;
+        }
+        case Dir4::right: {
+            cmpnt<Sprite>()->setFacing(true);
+            cmpnt<RigidBody>()->setDirection(dir);
+            break;
+        }
+        default: break;
+    }
+}
+void GameObject::stop(const Dir4 dir)
+{
+    cmpnt<RigidBody>()->stopDirection(dir);
 }
 void GameObject::jump()
 {
@@ -22,32 +77,12 @@ void GameObject::jump()
 }
 void GameObject::terminateJump()
 {
+    cmpnt<RigidBody>()->terminateJump();
     /*
     if(cmpnt<RigidBody>()->terminateJump()) {
         cmpnt<Animator>()->endEarly();
     }
     */
-}
-void GameObject::moving(const int dir)
-{
-    switch(dir) {
-        case DIR_LEFT: {
-            cmpnt<Sprite>()->setFacing(false);
-            cmpnt<RigidBody>()->setFacing(false);
-            break;
-        }
-        case DIR_RIGHT: {
-            cmpnt<Sprite>()->setFacing(true);
-            cmpnt<RigidBody>()->setFacing(true);
-            break;
-        }
-        default: break;
-    }
-    cmpnt<RigidBody>()->setDirection(dir);
-}
-void GameObject::stop(const int dir)
-{
-    cmpnt<RigidBody>()->stopDirection(dir);
 }
 void GameObject::increase(const BodyPhysics cf)
 {
@@ -60,46 +95,6 @@ void GameObject::decrease(const BodyPhysics cf)
 void GameObject::toggleRects()
 {
     cmpnt<RigidBody>()->toggleDisplayBody();
-}
-void GameObject::update(const float dt)
-{
-    for (auto [cmpnt_t, cmpnt] : cmpts) {
-        cmpnt->update(dt);
-    }
-    if (cmpnt<RigidBody>()->isGrounded()) {
-        if (cmpnt<RigidBody>()->isMoving()) {
-            cmpnt<Animator>()->setState(AnimationState::moving);
-        } else {
-            cmpnt<Animator>()->setState(AnimationState::idle);
-        }
-    } else {
-        cmpnt<Animator>()->setState(AnimationState::jumping);
-    }
-}
-void GameObject::lateUpdate()
-{
-
-}
-void GameObject::render(sf::RenderWindow &window)
-{
-    for (auto [cmpnt_t, cmpnt] : cmpts) {
-        cmpnt->render(window);
-    }
-}
-void GameObject::onColliding(const COLLIDER::group grp, const ColliderType type, const sf::Vector2f &offset)
-{
-    if (abs(offset.x) < abs(offset.y)) {
-        cmpnt<RigidBody>()->collidingXAxis(offset.x);
-    }
-    else {
-        cmpnt<RigidBody>()->collidingYAxis(offset.y);
-        if (offset.y < 0.0 &&
-            !cmpnt<RigidBody>()->jumpedThisFrame() &&
-            !cmpnt<RigidBody>()->isGrounded() &&
-            type == ColliderType::body) {
-            cmpnt<RigidBody>()->setGrounded(true);
-        }
-    }
 }
 const GameObjectAsset& GameObject::getAsset() const
 {
@@ -117,7 +112,7 @@ const std::vector<CollisionRect>& GameObject::getRects() const
 {
     return cmpnt<RigidBody>()->getRects();
 }
-const COLLIDER::group GameObject::getColliderGroup() const
+const CollisionGroup GameObject::getColliderGroup() const
 {
     return this->col_group;
 }
@@ -125,7 +120,9 @@ const COLLIDER::group GameObject::getColliderGroup() const
 /**************************************************************************************************/
 
 Boundary::Boundary(const sf::IntRect rect):
-col_group(COLLIDER::group::floor), shape(sf::Vector2f(rect.width, rect.height)), rect(rect)
+    col_group(CollisionGroup::floor),
+    rect(rect),
+    shape(sf::Vector2f(rect.width, rect.height))
 {
     shape.setPosition(rect.left, rect.top);
 }
@@ -150,7 +147,7 @@ const sf::FloatRect Boundary::getRect() const
 {
     return (sf::FloatRect) rect;
 }
-const COLLIDER::group Boundary::getColliderGroup() const
+const CollisionGroup Boundary::getColliderGroup() const
 {
     return this->col_group;
 }

@@ -7,28 +7,25 @@
 class Body2D {
 public:
     Body2D(GameObject* ast);
+    void setColliders(const std::vector<CollisionRect>& rects);
+    void move(const float x, const float y);
+    void updateFacing(const Dir4 next_facing);
+    void xCollision(const float offset);
+    void yCollision(const float offset);
     void render(sf::RenderWindow &window);
+
     const sf::Vector2f getPosition() const;
     const sf::Vector2i getSize() const;
     const std::vector<CollisionRect>& getRects() const;
 
-protected:
-    friend class RigidBody;
-    void setColliders(const std::vector<CollisionRect>& rects);
-    void move(const float x, const float y);
-    void updateColliders();
-
-    void xCollision(const float offset);
-    void yCollision(const float offset);
-
-    void setFacing(bool facing);
-    void reverseXaxis();
-    void resetXaxis();
-
 private:
+    void updateColliders();
+    void faceLeft();
+    void faceRight();
     sf::RectangleShape createShape(sf::Color c);
 
-    bool facing_right;
+    Dir4 cur_facing;
+    
     sf::FloatRect position_rect;
     std::vector<CollisionRect> collision_rects;
     sf::RectangleShape pos_shape;
@@ -43,16 +40,16 @@ public:
     void setUp() override;
     void update(const float dt);
     void render(sf::RenderWindow &window) override;
-    void setDirection(const int dir);
-    void stopDirection(const int dir);
+
+    void setState(ObjectState state);
+
+    void setDirection(const Dir4);
+    void stopDirection(const Dir4);
     void jump();
-    void setGrounded(bool is_grounded);
-    void updatePosition(const float x, const float y);
-    void collidingXAxis(const float x_offset);
-    void collidingYAxis(const float y_offset);
-    bool isGrounded() const;
-    bool isMoving() const;
-    bool jumpedThisFrame() const;
+    void terminateJump();
+    const ObjectState getState() const;
+    void onColliding(const sf::Vector2f offset, ColliderType type);
+
     void setCollisionRects(const std::vector<CollisionRect>& rects);
     void setFacing(bool facing);
 
@@ -61,21 +58,19 @@ public:
     void toggleDisplayBody();
 
     const sf::Vector2f getPosition() const;
+    const sf::Vector2f getVelocity() const;
     const sf::Vector2i getSize() const;
     const std::vector<CollisionRect>& getRects() const;
 
 private:
     void updateForces();
 
-    const float close_to_zero = 0.1;
-    float f_grav, f_damp, f_jump, f_move;
-    sf::Vector2f vel, acl;
-    bool wants_to_jump, jumped_this_frame, grounded;
-    int max_x_vel, moving_left, moving_right;
-    bool display_body;
+    ObjectState cur_state;
     std::shared_ptr<Body2D> body;
-    int mass, speed, jump_power;
-    float acl_gravity, damping;
+    float f_grav, f_damp, f_jump, f_move, acl_gravity, damping;
+    int max_x_vel, moving_left, moving_right, mass, speed, jump_power;
+    bool display_body;
+    sf::Vector2f vel, acl, collision_offset;
 };
 
 #endif // CMP_RIGID_BODY_HPP

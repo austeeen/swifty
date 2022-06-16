@@ -6,8 +6,6 @@
 class Sprite;
 class RigidBody;
 
-enum class RollState { none, next, done };
-
 class Roll
 {
 public:
@@ -33,17 +31,18 @@ public:
     void build() override;
     void setUp() override;
     void update(const float dt) override;
-    void setState(AnimationState s);
+    void setState(ObjectState s);
     void setPrevState();
     void endEarly();
-    const AnimationState& getState() const;
+    const ObjectState& getState() const;
     const sf::IntRect getFrameRect() const;
 
 private:
+    void updateObject();
     std::shared_ptr<Sprite> spr;
     std::shared_ptr<RigidBody> body;
-    std::map<AnimationState, Roll*> animations;
-    AnimationState cur, prev;
+    std::map<ObjectState, Roll*> animations;
+    ObjectState cur, prev;
 };
 
 #endif // CMP_ANIMATOR_HPP

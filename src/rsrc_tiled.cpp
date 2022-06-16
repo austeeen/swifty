@@ -284,11 +284,13 @@ TileObject::TileObject(const char* filepath)
     while(node != nullptr) {
         std::string anim_roll = attr_if<std::string>(node, "type");
         if (anim_roll == "idle") {
-            addRoll(animation_rolls[AnimationState::idle], node);
-        } else if (anim_roll == "moving") {
-            addRoll(animation_rolls[AnimationState::moving], node);
-        } else if (anim_roll == "jump") {
-            addRoll(animation_rolls[AnimationState::jumping], node);
+            addRoll(animation_rolls[ObjectState::idle], node);
+        } else if (anim_roll == "running") {
+            addRoll(animation_rolls[ObjectState::running], node);
+        } else if (anim_roll == "jumping") {
+            addRoll(animation_rolls[ObjectState::jumping], node);
+        } else if (anim_roll == "falling") {
+            addRoll(animation_rolls[ObjectState::falling], node);
         }
         node = node->next_sibling();
     }
@@ -349,11 +351,13 @@ void TileObject::addTile(rx::xml_node<> *node)
         if (type == "body") {
             ct = ColliderType::body;
         }
-        float col_x = attr<float>(c_rects, "x");
-        float col_y = attr<float>(c_rects, "y");
+        float col_x = attr<int>(c_rects, "x");
+        float col_y = attr<int>(c_rects, "y");
+        float col_w = attr<int>(c_rects, "width");
+        float col_h = attr<int>(c_rects, "height");
         tile->collision_rects.push_back({
             sf::Vector2f(col_x, col_y),
-            sf::FloatRect(col_x, col_y, attr<float>(c_rects, "width"), attr<float>(c_rects, "height")),
+            sf::FloatRect(col_x, col_y, col_w, col_h),
             ct
         });
         c_rects = c_rects->next_sibling();
@@ -362,11 +366,13 @@ void TileObject::addTile(rx::xml_node<> *node)
 
     std::string anim_roll = attr_if<std::string>(node, "type");
     if (anim_roll == "idle") {
-        animation_rolls[AnimationState::idle] = std::make_shared<AnimRoll>();
-    } else if (anim_roll == "moving") {
-        animation_rolls[AnimationState::moving] = std::make_shared<AnimRoll>();
-    } else if (anim_roll == "jump") {
-        animation_rolls[AnimationState::jumping] = std::make_shared<AnimRoll>();
+        animation_rolls[ObjectState::idle] = std::make_shared<AnimRoll>();
+    } else if (anim_roll == "running") {
+        animation_rolls[ObjectState::running] = std::make_shared<AnimRoll>();
+    } else if (anim_roll == "jumping") {
+        animation_rolls[ObjectState::jumping] = std::make_shared<AnimRoll>();
+    } else if (anim_roll == "falling") {
+        animation_rolls[ObjectState::falling] = std::make_shared<AnimRoll>();
     }
 }
 void TileObject::addRoll(std::shared_ptr<AnimRoll> roll, rx::xml_node<> *node)
