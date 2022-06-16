@@ -2,6 +2,7 @@
 #define CMP_RIGID_BODY_HPP
 
 #include "c_base.hpp"
+#include <cmath>
 
 class Body2D {
 public:
@@ -40,6 +41,7 @@ public:
     RigidBody(GameObject* obj);
     void build() override;
     void setUp() override;
+    void update(const float dt);
     void render(sf::RenderWindow &window) override;
     void setDirection(const int dir);
     void stopDirection(const int dir);
@@ -62,16 +64,14 @@ public:
     const sf::Vector2i getSize() const;
     const std::vector<CollisionRect>& getRects() const;
 
-protected:
-    friend class Physics2DSystem;
+private:
+    void updateForces();
+
+    const float close_to_zero = 0.1;
     float f_grav, f_damp, f_jump, f_move;
     sf::Vector2f vel, acl;
     bool wants_to_jump, jumped_this_frame, grounded;
     int max_x_vel, moving_left, moving_right;
-
-private:
-    void updateForces();
-
     bool display_body;
     std::shared_ptr<Body2D> body;
     int mass, speed, jump_power;

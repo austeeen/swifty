@@ -95,7 +95,6 @@ void Game::__inputUpdate()
 void Game::__gameUpdate()
 {
     player->update(dt);
-    physics_system.update(player->cmpnt<RigidBody>(), dt);
     collision_system.checkCollisions();
 }
 void Game::__lateUpdate()
@@ -110,11 +109,6 @@ void Game::render()
     for (auto& tile_layer : tile_map->tile_layers) {
         window.draw(sf::Sprite(tile_layer->render_texture->getTexture()));
     }
-    /*
-    for (auto& bndry : boundaries) {
-        bndry->render(window);
-    }
-    */
     player->render(window);
     window.display();
 }

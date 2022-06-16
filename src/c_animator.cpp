@@ -33,7 +33,6 @@ RollState Roll::nextFrame(const float dt)
     }
 
     if (frame_indx == num_frames) {
-        printf("1) frame_indx = %d\n", frame_indx);
         if (one_shot) {
             ret_state = RollState::done;
         }
@@ -42,10 +41,8 @@ RollState Roll::nextFrame(const float dt)
                 ret_state = RollState::none;
             }
             frame_indx --;
-            printf("2a) frame_indx = %d\n", frame_indx);
         } else {
             frame_indx = 0;
-            printf("2b) frame_indx = %d\n", frame_indx);
         }
     }
     return ret_state;
@@ -111,7 +108,6 @@ void Animator::setState(AnimationState next_state)
     }
 
     if (animations.count(next_state) > 0) {
-        printf("(Animator) state switch: %d -> %d\n", (int) cur, (int) next_state);
         animations[next_state]->reset();
         animations[cur]->reset();
         prev = cur;
@@ -127,7 +123,6 @@ void Animator::setPrevState()
     }
 
     if (animations.count(prev) > 0) {
-        printf("(Animator) switch to prev: %d -> %d\n", (int) cur, (int) prev);
         animations[prev]->reset();
         animations[cur]->reset();
         cur = prev;

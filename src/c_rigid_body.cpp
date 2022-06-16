@@ -137,6 +137,45 @@ void RigidBody::setUp()
 {
     updateForces();
 }
+void RigidBody::update(const float dt)
+{
+    // ACCELERATION
+    acl.x = (moving_right - moving_left) * f_move;
+    acl.y = f_grav;
+
+    if (wants_to_jump) {
+        wants_to_jump = false;
+        if (grounded) {
+            jumped_this_frame = true;
+            setGrounded(false);
+            vel.y -= f_jump;
+        }
+    } else {
+        jumped_this_frame = false;
+    }
+
+    // VELOCITY
+    vel.x += acl.x * dt;
+    vel.y += acl.y * dt;
+
+    if (vel.x != 0.f) {
+        if (fabs(vel.x) > max_x_vel) {
+            if (vel.x < 0) {
+                vel.x = -max_x_vel;
+            } else {
+                vel.x = max_x_vel;
+            }
+        } else if (fabs(vel.x) < close_to_zero) {
+            vel.x = 0.f;
+        } else {
+            // should ignore damping horizontally when in air
+            vel.x = vel.x / (1 + f_damp * dt);
+        }
+    }
+
+    updatePosition(vel.x * dt, vel.y * dt);
+}
+
 void RigidBody::render(sf::RenderWindow &window)
 {
     if (display_body) {

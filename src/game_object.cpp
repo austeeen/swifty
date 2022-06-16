@@ -96,9 +96,7 @@ void GameObject::onColliding(const COLLIDER::group grp, const ColliderType type,
         if (offset.y < 0.0 &&
             !cmpnt<RigidBody>()->jumpedThisFrame() &&
             !cmpnt<RigidBody>()->isGrounded() &&
-            type == ColliderType::body)
-        {
-            printf("(onColliding) ground collision, setting grounded...\n");
+            type == ColliderType::body) {
             cmpnt<RigidBody>()->setGrounded(true);
         }
     }
