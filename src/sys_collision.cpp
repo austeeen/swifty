@@ -18,18 +18,27 @@ void CollisionSystem::checkCollisions()
         }
     }
 }
+void CollisionSystem::handleCollisions()
+{
+    for (auto& evt : collision_events) {
+        evt.colliding_object->onColliding(evt.grp, evt.type, evt.clipped_offset);
+    }
+    collision_events.clear();
+}
 void CollisionSystem::checkColliding(std::shared_ptr<GameObject> obj, std::shared_ptr<Boundary> bnd)
 {
-    std::vector<sf::FloatRect> object_rects = obj->getRects();
+    const std::vector<CollisionRect> object_rects = obj->getRects();
     sf::FloatRect bnd_rect = bnd->getRect();
 
     for (auto& obj_rect : object_rects) {
-        if (obj_rect.intersects(bnd_rect)) {
-            obj->onColliding(bnd->getColliderGroup(), clip(obj_rect, bnd_rect));
+        if (obj_rect.rect.intersects(bnd_rect)) {
+            collision_events.push_back(CollisionEvent{
+                obj, bnd->getColliderGroup(), obj_rect.type, clip(obj_rect.rect, bnd_rect)
+            });
         }
     }
 }
-sf::Vector2f CollisionSystem::clip(sf::FloatRect &a, sf::FloatRect &b)
+sf::Vector2f CollisionSystem::clip(const sf::FloatRect &a, const sf::FloatRect &b)
 {
     float dx = 0.0, dy = 0.0;
 

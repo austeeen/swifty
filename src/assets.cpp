@@ -1,24 +1,5 @@
 #include "assets.hpp"
 
-/*
-std::string name, img_src;
-int tilecount, columns, totaltiles;
-sf::Vector2i tilesize, imagesize;
-sf::Texture img_texture;
-sf::RenderStates render_states;
-
-std::map<const int, TileEntry*> tile_tbl;
-std::map<const std::string, AnimRoll*> animation_rolls;
-
-std::string cfg_fp;
-int speed;
-int mass;
-int max_x_vel;
-int jump_power;
-float acl_gravity;
-float damping;
-*/
-
 GameObjectAsset::GameObjectAsset(const TileObject& obj):
     img_texture(obj.img_texture),
     size(obj.tilesize),

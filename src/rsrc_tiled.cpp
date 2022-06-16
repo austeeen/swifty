@@ -64,6 +64,20 @@ template <> bool attr(const rx::xml_node<> *n, const char *key)
     }
     throw std::invalid_argument(key);
 }
+template<> bool attr_if(const rx::xml_node<> *n, const char* key)
+{
+    rx::xml_attribute<> *n_attr = n->first_attribute(key);
+    if (n_attr == nullptr) {
+        return false;
+    }
+    char *c_attr = n_attr->value();
+    if(std::string(c_attr) == "false") {
+        return false;
+    } else if (std::string(c_attr) == "true") {
+        return true;
+    }
+    throw std::invalid_argument(key);
+}
 
 /******************************************************************************/
 
@@ -330,10 +344,18 @@ void TileObject::addTile(rx::xml_node<> *node)
                                     tilesize.x, tilesize.y);
     rx::xml_node<>* c_rects = node->first_node("objectgroup")->first_node("object");
     while(c_rects != nullptr) {
-        tile->collision_rects.push_back(sf::FloatRect(
-            attr<float>(c_rects, "x"), attr<float>(c_rects, "y"),
-            attr<float>(c_rects, "width"), attr<float>(c_rects, "height")
-        ));
+        std::string type = attr_if<std::string>(c_rects, "type");
+        ColliderType ct = ColliderType::generic;
+        if (type == "body") {
+            ct = ColliderType::body;
+        }
+        float col_x = attr<float>(c_rects, "x");
+        float col_y = attr<float>(c_rects, "y");
+        tile->collision_rects.push_back({
+            sf::Vector2f(col_x, col_y),
+            sf::FloatRect(col_x, col_y, attr<float>(c_rects, "width"), attr<float>(c_rects, "height")),
+            ct
+        });
         c_rects = c_rects->next_sibling();
     }
     tile_tbl[gid] = tile;

@@ -72,6 +72,7 @@ void Game::__inputUpdate()
 
                     case sf::Keyboard::J: { player->increase(BodyPhysics::gravity); break; }
                     case sf::Keyboard::M: { player->decrease(BodyPhysics::gravity); break; }
+                    case sf::Keyboard::R: { player->toggleRects(); break; }
                     default: { break; }
                 }
                 break;
@@ -95,10 +96,11 @@ void Game::__gameUpdate()
 {
     player->update(dt);
     physics_system.update(player->cmpnt<RigidBody>(), dt);
+    collision_system.checkCollisions();
 }
 void Game::__lateUpdate()
 {
-    collision_system.checkCollisions();
+    collision_system.handleCollisions();
     camera.setCenter(player->getPosition());
     camera.applyView(window);
 }

@@ -11,7 +11,7 @@
    <property name="one_shot" type="bool" value="false"/>
   </properties>
   <objectgroup draworder="index" id="2">
-   <object id="1" x="6" y="10" width="7" height="6"/>
+   <object id="1" type="body" x="6" y="10" width="7" height="6"/>
    <object id="2" x="7" y="5" width="7" height="5"/>
   </objectgroup>
   <animation>
@@ -23,19 +23,19 @@
  </tile>
  <tile id="1">
   <objectgroup draworder="index" id="2">
-   <object id="2" x="6" y="9.97826" width="7" height="6"/>
+   <object id="2" type="body" x="6" y="9.97826" width="7" height="6"/>
    <object id="3" x="7" y="4.97826" width="7" height="5"/>
   </objectgroup>
  </tile>
  <tile id="2">
   <objectgroup draworder="index" id="2">
-   <object id="2" x="6" y="10" width="7" height="6"/>
+   <object id="2" type="body" x="6" y="10" width="7" height="6"/>
    <object id="3" x="7" y="5" width="7" height="5"/>
   </objectgroup>
  </tile>
  <tile id="3">
   <objectgroup draworder="index" id="2">
-   <object id="2" x="6" y="10" width="7" height="6"/>
+   <object id="2" type="body" x="6" y="10" width="7" height="6"/>
    <object id="3" x="7" y="5" width="7" height="5"/>
   </objectgroup>
  </tile>
@@ -46,7 +46,7 @@
    <property name="one_shot" type="bool" value="false"/>
   </properties>
   <objectgroup draworder="index" id="2">
-   <object id="1" x="4.04348" y="9.95652" width="10" height="6"/>
+   <object id="1" type="body" x="4.04348" y="9.95652" width="10" height="6"/>
    <object id="3" x="9" y="6.91304" width="6" height="4.04348"/>
   </objectgroup>
   <animation>
@@ -59,25 +59,25 @@
  </tile>
  <tile id="9">
   <objectgroup draworder="index" id="2">
-   <object id="3" x="4" y="10" width="10" height="6"/>
+   <object id="3" type="body" x="4" y="10" width="10" height="6"/>
    <object id="4" x="9" y="5.93478" width="6" height="4.04348"/>
   </objectgroup>
  </tile>
  <tile id="10">
   <objectgroup draworder="index" id="2">
-   <object id="3" x="4" y="10" width="10" height="6"/>
+   <object id="3" type="body" x="4" y="10" width="10" height="6"/>
    <object id="4" x="9" y="6.8913" width="6" height="4.04348"/>
   </objectgroup>
  </tile>
  <tile id="11">
   <objectgroup draworder="index" id="2">
-   <object id="3" x="4" y="9.91304" width="10" height="6"/>
+   <object id="3" type="body" x="4" y="9.91304" width="10" height="6"/>
    <object id="4" x="9.08696" y="5.97826" width="6" height="4.04348"/>
   </objectgroup>
  </tile>
  <tile id="12">
   <objectgroup draworder="index" id="2">
-   <object id="3" x="4" y="10" width="10" height="6"/>
+   <object id="3" type="body" x="4" y="10" width="10" height="6"/>
    <object id="4" x="8.91304" y="6.8913" width="6" height="4.04348"/>
   </objectgroup>
  </tile>
@@ -85,42 +85,47 @@
   <properties>
    <property name="end_early" type="int" value="2"/>
    <property name="hold_last" type="bool" value="true"/>
-   <property name="one_shot" type="bool" value="true"/>
+   <property name="one_shot" type="bool" value="false"/>
   </properties>
   <objectgroup draworder="index" id="2">
-   <object id="1" x="2.95652" y="10" width="10" height="6"/>
+   <object id="1" type="body" x="2.95652" y="10" width="10" height="6"/>
    <object id="3" x="8.04348" y="7.02174" width="6" height="4.04348"/>
   </objectgroup>
   <animation>
-   <frame tileid="0" duration="1000"/>
-   <frame tileid="16" duration="60"/>
-   <frame tileid="17" duration="100"/>
-   <frame tileid="18" duration="300"/>
+   <frame tileid="17" duration="50"/>
+   <frame tileid="26" duration="200"/>
+   <frame tileid="18" duration="70"/>
    <frame tileid="19" duration="150"/>
   </animation>
  </tile>
  <tile id="17">
   <objectgroup draworder="index" id="2">
-   <object id="1" x="3.91304" y="10.9565" width="9.21743" height="5.04348"/>
+   <object id="1" type="body" x="3.91304" y="10.9565" width="9.21743" height="5.04348"/>
    <object id="3" x="8" y="7.93478" width="6" height="4.04348"/>
   </objectgroup>
  </tile>
  <tile id="18">
   <objectgroup draworder="index" id="2">
-   <object id="1" x="3.86956" y="9.94564" width="9.17395" height="5.04348"/>
+   <object id="1" type="body" x="3.86956" y="9.94564" width="9.17395" height="5.04348"/>
    <object id="2" x="7.91305" y="6.05436" width="6" height="4.04348"/>
   </objectgroup>
  </tile>
  <tile id="19">
   <objectgroup draworder="index" id="2">
-   <object id="1" x="2" y="8.0326" width="9.21743" height="5.04348"/>
-   <object id="2" x="7.08696" y="6.9674" width="6" height="8"/>
+   <object id="1" type="body" x="2" y="8" width="5" height="5"/>
+   <object id="2" type="body" x="7" y="7" width="6" height="6.9375"/>
   </objectgroup>
  </tile>
  <tile id="20">
   <objectgroup draworder="index" id="2">
-   <object id="1" x="4" y="10.9022" width="9.00004" height="5.04348"/>
+   <object id="1" type="body" x="4" y="10.9022" width="9.00004" height="5.04348"/>
    <object id="2" x="8.08696" y="7.88044" width="6" height="4.04348"/>
+  </objectgroup>
+ </tile>
+ <tile id="26">
+  <objectgroup draworder="index" id="2">
+   <object id="1" type="body" x="3.95652" y="6.92662" width="8.06118" height="6.10598"/>
+   <object id="2" x="7.94973" y="2.93615" width="6" height="4.04348"/>
   </objectgroup>
  </tile>
 </tileset>

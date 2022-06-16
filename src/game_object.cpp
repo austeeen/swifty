@@ -4,11 +4,14 @@ GameObject::GameObject(const GameObjectAsset ast):
 col_group(COLLIDER::group::object), ast(ast)
 {
     cmpts[typeid(Sprite)] = std::make_shared<Sprite>(this);
-    cmpts[typeid(Animator)] = std::make_shared<Animator>(this);
     cmpts[typeid(RigidBody)] = std::make_shared<RigidBody>(this);
+    cmpts[typeid(Animator)] = std::make_shared<Animator>(this);
 }
 void GameObject::setUp()
 {
+    for (auto [cmpnt_t, cmpnt] : cmpts) {
+        cmpnt->build();
+    }
     for (auto [cmpnt_t, cmpnt] : cmpts) {
         cmpnt->setUp();
     }
@@ -28,8 +31,16 @@ void GameObject::terminateJump()
 void GameObject::moving(const int dir)
 {
     switch(dir) {
-        case DIR_LEFT: { cmpnt<Sprite>()->setFacing(false); break; }
-        case DIR_RIGHT: { cmpnt<Sprite>()->setFacing(true); break; }
+        case DIR_LEFT: {
+            cmpnt<Sprite>()->setFacing(false);
+            cmpnt<RigidBody>()->setFacing(false);
+            break;
+        }
+        case DIR_RIGHT: {
+            cmpnt<Sprite>()->setFacing(true);
+            cmpnt<RigidBody>()->setFacing(true);
+            break;
+        }
         default: break;
     }
     cmpnt<RigidBody>()->setDirection(dir);
@@ -45,6 +56,10 @@ void GameObject::increase(const BodyPhysics cf)
 void GameObject::decrease(const BodyPhysics cf)
 {
     cmpnt<RigidBody>()->decrease(cf);
+}
+void GameObject::toggleRects()
+{
+    cmpnt<RigidBody>()->toggleDisplayBody();
 }
 void GameObject::update(const float dt)
 {
@@ -71,14 +86,19 @@ void GameObject::render(sf::RenderWindow &window)
         cmpnt->render(window);
     }
 }
-void GameObject::onColliding(const COLLIDER::group grp, const sf::Vector2f offset)
+void GameObject::onColliding(const COLLIDER::group grp, const ColliderType type, const sf::Vector2f &offset)
 {
     if (abs(offset.x) < abs(offset.y)) {
         cmpnt<RigidBody>()->collidingXAxis(offset.x);
     }
     else {
         cmpnt<RigidBody>()->collidingYAxis(offset.y);
-        if (offset.y < 0.0 && !cmpnt<RigidBody>()->isGrounded()) {
+        if (offset.y < 0.0 &&
+            !cmpnt<RigidBody>()->jumpedThisFrame() &&
+            !cmpnt<RigidBody>()->isGrounded() &&
+            type == ColliderType::body)
+        {
+            printf("(onColliding) ground collision, setting grounded...\n");
             cmpnt<RigidBody>()->setGrounded(true);
         }
     }
@@ -95,7 +115,7 @@ const sf::Vector2i GameObject::getSize() const
 {
     return cmpnt<RigidBody>()->getSize();
 }
-const std::vector<sf::FloatRect>& GameObject::getRects() const
+const std::vector<CollisionRect>& GameObject::getRects() const
 {
     return cmpnt<RigidBody>()->getRects();
 }

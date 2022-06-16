@@ -2,9 +2,12 @@
 #define GAMEOBJECT_HPP
 
 #include "common.hpp"
-#include "components.hpp"
 #include "assets.hpp"
 #include "typedef.hpp"
+#include "c_base.hpp"
+#include "c_sprite.hpp"
+#include "c_rigid_body.hpp"
+#include "c_animator.hpp"
 
 class GameObject
 {
@@ -20,11 +23,13 @@ public:
     void stop(const int dir);
     void increase(const BodyPhysics cf);
     void decrease(const BodyPhysics cf);
-    void onColliding(const COLLIDER::group grp, const sf::Vector2f offset);
+    void toggleRects();
+    void onColliding(const COLLIDER::group grp, const ColliderType type, const sf::Vector2f& offset);
+
     const GameObjectAsset& getAsset() const;
     const sf::Vector2f getPosition() const;
     const sf::Vector2i getSize() const;
-    const std::vector<sf::FloatRect>& getRects() const;
+    const std::vector<CollisionRect>& getRects() const;
     const COLLIDER::group getColliderGroup() const;
 
     template <typename T> std::shared_ptr<T> cmpnt() const {

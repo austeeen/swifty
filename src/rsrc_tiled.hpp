@@ -82,10 +82,18 @@ public:
 
 /******************************************************************************/
 
+enum class ColliderType { generic, body };
+
+struct CollisionRect {
+    sf::Vector2f offset;
+    sf::FloatRect rect;
+    ColliderType type;
+};
+
 struct TileFrame {
     int gid;
     sf::IntRect texture_rect;
-    std::vector<sf::FloatRect> collision_rects;
+    std::vector<CollisionRect> collision_rects;
     float duration;
 };
 

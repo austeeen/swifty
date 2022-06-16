@@ -1,5 +1,5 @@
 #include "sys_physics_2d.hpp"
-#include "components.hpp"
+#include "c_rigid_body.hpp"
 
 void Physics2DSystem::update(std::shared_ptr<RigidBody> obj_body, const float dt)
 {
@@ -7,21 +7,20 @@ void Physics2DSystem::update(std::shared_ptr<RigidBody> obj_body, const float dt
     // ACCELERATION -- X
     obj_body->acl.x = in_x_motion * obj_body->f_move;
 
-    /*
-    if (obj_body->vel.x > 0.f) {
-        obj_body->acl.x -= obj_body->f_fric;
-    } else if (obj_body->vel.x < 0) {
-        obj_body->acl.x += obj_body->f_fric;
-    }
-    */
-
     // ACCELERATION -- Y
     obj_body->acl.y = obj_body->f_grav;
+
+    obj_body->jumped_this_frame = false;
     if (obj_body->wants_to_jump) {
         obj_body->wants_to_jump = false;
+        printf("(Physics2DSystem) wants to jump\n");
         if (obj_body->grounded) {
+            obj_body->jumped_this_frame = true;
             obj_body->setGrounded(false);
+            printf("(Physics2DSystem) not grounded\n");
             obj_body->vel.y -= obj_body->f_jump;
+        } else {
+            printf("(Physics2DSystem) not grounded, can't jump\n");
         }
     }
 
