@@ -2,6 +2,7 @@
 #define UTIL_MATH_H
 
 #include <cstdint>
+#include "aabb.hpp"
 
 const int X = 0;
 const int Y = 1;

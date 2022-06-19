@@ -1,14 +1,14 @@
 #ifndef STATES_GAME_OBJECT_HPP
 #define STATES_GAME_OBJECT_HPP
 
-#include "common.hpp"
+#include "../common.hpp"
 
-class GameObject;
+class Player;
 
 class StateBase
 {
 public:
-    StateBase(GameObject* obj): obj(obj) {};
+    StateBase(Player* obj): obj(obj) {};
     virtual void enter() {};
     virtual void exit() {};
     virtual ObjectState next() = 0;
@@ -16,14 +16,14 @@ public:
     virtual void lateUpdate() {};
 
 protected:
-    GameObject* obj;
+    Player* obj;
     ObjectState previous;
 };
 
 class IdleState : public StateBase
 {
 public:
-    IdleState(GameObject* obj);
+    IdleState(Player* obj);
     void enter() override;
     void exit() override;
     ObjectState next() override;
@@ -34,7 +34,7 @@ public:
 class RunningState : public StateBase
 {
 public:
-    RunningState(GameObject* obj);
+    RunningState(Player* obj);
     void enter() override;
     void exit() override;
     ObjectState next() override;
@@ -45,7 +45,7 @@ public:
 class JumpingState : public StateBase
 {
 public:
-    JumpingState(GameObject* obj);
+    JumpingState(Player* obj);
     void enter() override;
     void exit() override;
     ObjectState next() override;
@@ -56,7 +56,7 @@ public:
 class FallingState : public StateBase
 {
 public:
-    FallingState(GameObject* obj);
+    FallingState(Player* obj);
     void enter() override;
     void exit() override;
     ObjectState next() override;

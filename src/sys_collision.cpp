@@ -2,7 +2,7 @@
 
 CollisionSystem::CollisionSystem()
 {}
-void CollisionSystem::add(std::shared_ptr<GameObject> obj)
+void CollisionSystem::add(std::shared_ptr<Player> obj)
 {
     objects.push_back(obj);
 }

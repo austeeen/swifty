@@ -4,7 +4,6 @@
 #include <SFML/Graphics.hpp>
 #include <map>
 #include <memory>
-// #include "rect.hpp"
 
 static const float FLT_ZERO = 0.1;
 

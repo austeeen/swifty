@@ -2,7 +2,6 @@
 #define BITMASK
 
 #include <cstdint>
-#include "exceptions.hpp"
 
 class Bitmask
 {

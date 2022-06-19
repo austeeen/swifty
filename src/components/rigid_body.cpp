@@ -1,7 +1,7 @@
-#include "c_rigid_body.hpp"
-#include "game_object.hpp"
+#include "rigid_body.hpp"
+#include "../objects/player.hpp"
 
-Body2D::Body2D(GameObject* obj):
+Body2D::Body2D(Player* obj):
     cur_facing(Dir4::right)
 {
     GameObjectAsset ast = obj->getAsset();
@@ -111,7 +111,7 @@ sf::RectangleShape Body2D::createShape(sf::Color c)
 
 /**************************************************************************************************/
 
-RigidBody::RigidBody(GameObject* obj):
+RigidBody::RigidBody(Player* obj):
     Component(obj),
     cur_state(ObjectState::idle),
     display_body(false)

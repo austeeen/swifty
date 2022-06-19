@@ -1,7 +1,7 @@
-#include "s_game_object.hpp"
-#include "game_object.hpp"
+#include "player_states.hpp"
+#include "player.hpp"
 
-IdleState::IdleState(GameObject* obj):
+IdleState::IdleState(Player* obj):
     StateBase(obj)
 {}
 void IdleState::enter()
@@ -25,7 +25,7 @@ void IdleState::lateUpdate()
 
 /**************************************************************************************************/
 
-RunningState::RunningState(GameObject* obj):
+RunningState::RunningState(Player* obj):
     StateBase(obj)
 {}
 void RunningState::enter()
@@ -49,7 +49,7 @@ void RunningState::lateUpdate()
 
 /**************************************************************************************************/
 
-JumpingState::JumpingState(GameObject* obj):
+JumpingState::JumpingState(Player* obj):
     StateBase(obj)
 {}
 void JumpingState::enter()
@@ -73,7 +73,7 @@ void JumpingState::lateUpdate()
 
 /**************************************************************************************************/
 
-FallingState::FallingState(GameObject* obj):
+FallingState::FallingState(Player* obj):
     StateBase(obj)
 {}
 void FallingState::enter()

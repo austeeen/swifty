@@ -2,11 +2,11 @@
 #define OBJ_PLAYER_HPP
 
 #include "game_object.hpp"
-#include "assets.hpp"
-#include "c_base.hpp"
-#include "c_sprite.hpp"
-#include "c_rigid_body.hpp"
-#include "c_animator.hpp"
+#include "../assets.hpp"
+#include "../components/component_base.hpp"
+#include "../components/sprite.hpp"
+#include "../components/rigid_body.hpp"
+#include "../components/animator.hpp"
 
 
 class Player: public GameObject

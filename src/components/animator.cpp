@@ -1,7 +1,7 @@
-#include "c_animator.hpp"
-#include "c_sprite.hpp"
-#include "c_rigid_body.hpp"
-#include "game_object.hpp"
+#include "animator.hpp"
+#include "sprite.hpp"
+#include "rigid_body.hpp"
+#include "../objects/player.hpp"
 
 Roll::Roll(std::shared_ptr<AnimRoll> roll):
     frame_indx(0),
@@ -65,7 +65,7 @@ const std::vector<CollisionRect>& Roll::getCollisionRects() const
 
 /**************************************************************************************************/
 
-Animator::Animator(GameObject* obj):
+Animator::Animator(Player* obj):
     Component(obj),
     spr(nullptr),
     cur(ObjectState::idle),

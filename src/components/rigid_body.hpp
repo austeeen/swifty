@@ -1,12 +1,12 @@
 #ifndef CMP_RIGID_BODY_HPP
 #define CMP_RIGID_BODY_HPP
 
-#include "c_base.hpp"
+#include "component_base.hpp"
 #include <cmath>
 
 class Body2D {
 public:
-    Body2D(GameObject* ast);
+    Body2D(Player* ast);
     void setColliders(const std::vector<CollisionRect>& rects);
     void move(const float x, const float y);
     void updateFacing(const Dir4 next_facing);
@@ -25,7 +25,7 @@ private:
     sf::RectangleShape createShape(sf::Color c);
 
     Dir4 cur_facing;
-    
+
     sf::FloatRect position_rect;
     std::vector<CollisionRect> collision_rects;
     sf::RectangleShape pos_shape;
@@ -35,7 +35,7 @@ private:
 class RigidBody: public Component
 {
 public:
-    RigidBody(GameObject* obj);
+    RigidBody(Player* obj);
     void build() override;
     void setUp() override;
     void update(const float dt);
