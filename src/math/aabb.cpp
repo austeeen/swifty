@@ -2,188 +2,173 @@
 
 /**************************************************************************************************/
 /* VAL */
-AABB::val::val(AABB *r, const float v, moveFunc _mf):
-    r(r), mv(v), mf(_mf)
+rect::val::val(rect *r, const float v, void(rect::*_m)(const float)): r(r), mv(v), __move(_m)
 {};
-AABB::val& AABB::val::operator=(const val& v)
+rect::val& rect::val::operator=(const val& v)
 {
-    (r->*mf)((float)v - mv);
-    mv = (float) v;
+    (r->*__move)((float)v - mv);
+    set((float)v);
     return *this;
 }
-AABB::val& AABB::val::operator=(const float v)
+rect::val& rect::val::operator=(const float v)
 {
-    (r->*mf)(v - mv);
-    mv = v;
+    (r->*__move)(v - mv);
+    set(v);
     return *this;
 }
-AABB::val& AABB::val::operator+=(const val& dv)
+rect::val& rect::val::operator+=(const float dv)
 {
-    (r->*mf)((float) dv);
-    mv += (float) dv;
+    (r->*__move)(dv);
+    move(dv);
     return *this;
 }
-AABB::val& AABB::val::operator+=(const float dv)
+rect::val& rect::val::operator-=(const float dv)
 {
-    (r->*mf)(dv);
-    mv += dv;
+    (r->*__move)(-dv);
+    move(-dv);
     return *this;
 }
-AABB::val& AABB::val::operator-=(const val& dv)
-{
-    (r->*mf)(-(float) dv);
-    mv -= (float) dv;
-    return *this;
-}
-AABB::val& AABB::val::operator-=(const float dv)
-{
-    (r->*mf)(-dv);
-    mv -= dv;
-    return *this;
-}
-AABB::val::operator bool() const
-{
-    return mv != 0;
-}
-AABB::val::operator float() const
+rect::val::operator float() const
 {
     return mv;
 }
-AABB::val::operator std::string() const
+std::string rect::val::tostr() const
 {
     return std::to_string(mv);
 }
-void AABB::val::move(const float d)
+void rect::val::move(const float d)
 {
     mv += d;
 }
-void AABB::val::set(const float d)
+void rect::val::set(const float d)
 {
     mv = d;
 }
 
 /* POINT */
 
-AABB::vec::vec(const val& x, const val& y):
-x(x), y(y)
+rect::point::point(val *x, val *y):
+xy{x, y}, x(x), y(y)
 {}
-AABB::vec& AABB::vec::operator=(const AABB::vec& v)
+rect::point& rect::point::operator=(const rect::point& v)
 {
-    x = v.x;
-    y = v.y;
+    *x = *v.x;
+    *y = *v.y;
     return *this;
 }
-AABB::vec::operator bool() const
+std::string rect::point::tostr() const
 {
-    return (float)x != 0 && (float)y != 0;
+    return "(" + x->tostr() + ", " + y->tostr() + ")";
 }
-AABB::vec::operator sf::Vector2f() const
+rect::point::operator sf::Vector2f() const
 {
-    return sf::Vector2f((float) x, (float) y);
+    return sf::Vector2f((float) *x, (float) *y);
 }
-AABB::vec::operator std::string() const
+rect::val& rect::point::operator[](const int i) const
 {
-    return "(" + (std::string) x + ", " + (std::string) y + ")";
+    return *xy[i];
 }
-
 /* RECT */
-
-AABB::AABB(): AABB(0.f, 0.f, 0.f, 0.f)
+rect::rect(): rect(0.f, 0.f, 0.f, 0.f)
 {}
-AABB::AABB(const AABB& r) :
-left      (this, (float)r.left,                         &AABB::__sl ),
-right     (this, (float)r.left + (float)r.width,        &AABB::__sr ),
-top       (this, (float)r.top,                          &AABB::__sb ),
-bottom    (this, (float)r.top  + (float)r.height,       &AABB::__st ),
-width     (this, (float)r.width,                        &AABB::__sw ),
-height    (this, (float)r.height,                       &AABB::__sh ),
-center(val(this, (float)r.left + ((float)r.width / 2),  &AABB::__scx),
-       val(this, (float)r.top  + ((float)r.height / 2), &AABB::__scy)),
-pos       (left, top)
+rect::rect(const float x, const float y, const float w, const float h) :
+left   (this, x,           &rect::__sl ),
+right  (this, x + w,       &rect::__sr ),
+top    (this, y,           &rect::__sb ),
+bottom (this, y + h,       &rect::__st ),
+centerx(this, x + (w / 2), &rect::__scx),
+centery(this, y + (h / 2), &rect::__scy),
+width  (this, w,           &rect::__sw ),
+height (this, h,           &rect::__sh ),
+center(&centerx, &centery),
+pos(&left, &top),
+size(&width, &height)
 {}
-AABB::AABB(const float x, const float y, const float w, const float h) :
-left   (this, x,           &AABB::__sl ),
-right  (this, x + w,       &AABB::__sr ),
-top    (this, y,           &AABB::__sb ),
-bottom (this, y + h,       &AABB::__st ),
-width  (this, w,           &AABB::__sw ),
-height (this, h,           &AABB::__sh ),
-center(val(this, x + (w / 2), &AABB::__scx),
-       val(this, y + (h / 2), &AABB::__scy)),
-pos       (left, top)
+rect::rect(const sf::FloatRect& fr) :
+rect(fr.top, fr.left, fr.width, fr.height)
 {}
-AABB::AABB(const sf::FloatRect& fr) :
-AABB(fr.top, fr.left, fr.width, fr.height)
-{}
-AABB::AABB(const sf::Vector2f &p, const sf::Vector2f &s) :
-AABB(p.x, p.y, s.x, s.y)
+rect::rect(const sf::Vector2f &p, const sf::Vector2f &s) :
+rect(p.x, p.y, s.x, s.y)
 {};
-AABB& AABB::operator=(const AABB &r)
+rect::rect(const std::vector<float> &v) :
+rect(v[0], v[1], v[2], v[3])
+{};
+rect::rect(const rect& r) :
+left   (this, (float)r.left,                         &rect::__sl ),
+right  (this, (float)r.left + (float)r.width,        &rect::__sr ),
+top    (this, (float)r.top,                          &rect::__sb ),
+bottom (this, (float)r.top  + (float)r.height,       &rect::__st ),
+centerx(this, (float)r.left + ((float)r.width / 2),  &rect::__scx),
+centery(this, (float)r.top  + ((float)r.height / 2), &rect::__scy),
+width  (this, (float)r.width,                        &rect::__sw ),
+height (this, (float)r.height,                       &rect::__sh ),
+center(&centerx, &centery),
+pos(&left, &top),
+size(&width, &height)
+{}
+rect& rect::operator=(const rect &r)
 {
     left.set(r.left);
     right.set(r.right);
     top.set(r.top);
+    bottom.set(r.bottom);
+    centerx.set(r.centerx);
+    centery.set(r.centery);
     width.set(r.width);
     height.set(r.height);
-    bottom.set(r.bottom);
-    center.x.set(r.center.x);
-    center.y.set(r.center.y);
     return *this;
 }
-void AABB::setPosition(const sf::Vector2f& p)
+void rect::setPosition(const sf::Vector2f& p)
 {
     this->left = p.x;
     this->top = p.y;
 }
-void AABB::setPosition(const float x, const float y)
+void rect::setPosition(const float x, const float y)
 {
     this->left = x;
     this->top = y;
 }
-void AABB::setSize(const sf::Vector2f& s)
+void rect::setSize(const sf::Vector2f& s)
 {
     this->width = s.x;
     this->height = s.y;
 }
-void AABB::setSize(const float x, const float y)
+void rect::setSize(const float x, const float y)
 {
     this->width = x;
     this->height = y;
 }
-void AABB::setCenter(const sf::Vector2f& c)
+void rect::setCenter(const sf::Vector2f& c)
 {
-    this->center.x = c.x;
-    this->center.y = c.y;
+    this->centerx = c.x;
+    this->centery = c.y;
 }
-void AABB::setCenter(const float x, const float y)
+void rect::setCenter(const float x, const float y)
 {
-    this->center.x = x;
-    this->center.y = y;
+    this->centerx = x;
+    this->centery = y;
 }
-sf::Vector2f AABB::getSize() const
+sf::Vector2f rect::getSize() const
 {
     return sf::Vector2f(width, height);
 }
-sf::Vector2f AABB::getPosition() const
+sf::Vector2f rect::getPosition() const
 {
     return sf::Vector2f(left, top);
 }
-AABB::operator sf::FloatRect() const
+rect::operator sf::FloatRect() const
 {
     return sf::FloatRect(left, top, width, height);
 }
-AABB::operator std::string() const
+rect::operator sf::IntRect() const
 {
-    std::string str;
-    sprintf((char *) &str.c_str()[0], "[%f, %f, %f, %f] (%f, %f)",
-            (float) left, (float) top, (float) right, (float) bottom, (float) width, (float) height);
-    return str;
+    return sf::IntRect(left, top, width, height);
 }
-AABB::operator bool() const
+std::string rect::tostr() const
 {
-    return (float) width != 0 && (float) height != 0;
+    return "[" + left.tostr() + ", " + top.tostr() + ", " + right.tostr() + ", " + bottom.tostr() + "], (" + width.tostr() + ", " + height.tostr() + ")";
 }
-AABB AABB::clip(const AABB &a, const AABB &b)
+rect rect::clip(const rect &a, const rect &b)
 {
     float dx = 0.0, dy = 0.0;
 
@@ -197,9 +182,13 @@ AABB AABB::clip(const AABB &a, const AABB &b)
     } else {
         dy = b.bottom - a.top; // dy > 0
     }
-    return AABB(0.0, 0.0, dx, dy);
+    return rect(0.0, 0.0, dx, dy);
 }
-AABB AABB::clip(const AABB &AABB) const
+rect rect::clip(const rect &rect) const
 {
-    return AABB::clip(*this, AABB);
+    return rect::clip(*this, rect);
+}
+const bool rect::exists() const
+{
+    return !(this->left == 0 && this->top == 0 && this->right == 0 && this->bottom == 0);
 }

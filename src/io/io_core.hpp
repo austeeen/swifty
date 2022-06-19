@@ -1,7 +1,7 @@
 #ifndef IO_CORE_HPP
 #define IO_CORE_HPP
 
-#include "common.hpp"
+#include "../common.hpp"
 
 namespace joy
 {
@@ -39,7 +39,7 @@ namespace io
     const binding right = 1;
     const binding down = 2;
     const binding up = 3;
-    const binding select = 4;
+    const binding jump = 4;
     const binding back = 5;
     const binding menu = 6;
     const binding quit = 7;

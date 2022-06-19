@@ -1,7 +1,7 @@
 #ifndef CMP_ANIMATOR_HPP
 #define CMP_ANIMATOR_HPP
 
-#include "c_base.hpp"
+#include "component_base.hpp"
 
 class Sprite;
 class RigidBody;
@@ -27,7 +27,7 @@ private:
 class Animator: public Component
 {
 public:
-    Animator(GameObject* obj);
+    Animator(Player* obj);
     void build() override;
     void setUp() override;
     void update(const float dt) override;

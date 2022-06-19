@@ -9,7 +9,7 @@ tile_map(std::make_shared<TileMap>("res/new_basic_level.tmx"))
 
     TileObject cat_res("res/cat.tsx");
     GameObjectAsset cat_ast(cat_res);
-    player = std::make_shared<GameObject>(cat_ast);
+    player = std::make_shared<Player>(cat_ast);
 
     tile_map->build();
     for (auto& object_group : tile_map->object_groups) {
@@ -20,6 +20,15 @@ tile_map(std::make_shared<TileMap>("res/new_basic_level.tmx"))
 }
 void Game::setUp()
 {
+    std::vector<int> cons;
+    if (joy::connected_joys(cons)) {
+        printf("%d connected controller(s)", (int) cons.size());
+        io_device = new Joystick(cons);
+    }
+    else {
+        io_device = new Keyboard();
+    }
+
     player->setUp();
     collision_system.add(player);
     for (auto& bnd : boundaries) {
@@ -32,11 +41,37 @@ void Game::setUp()
 void Game::update()
 {
     dt = frame_clock.restart().asSeconds();
-    __inputUpdate();
-    __gameUpdate();
-    __lateUpdate();
+    inputUpdate();
+    eventUpdate();
+    gameUpdate();
+    lateUpdate();
 }
-void Game::__inputUpdate()
+void Game::inputUpdate()
+{
+    io_device->update();
+
+    io::binding b = io_device->get(io::left);
+    if (b == io::pressed_s) {
+        player->move(Dir4::left);
+    } else if (b == io::released_s) {
+        player->stop(Dir4::left);
+    }
+
+    b = io_device->get(io::right);
+    if (b == io::pressed_s) {
+        player->move(Dir4::right);
+    } else if (b == io::released_s) {
+        player->stop(Dir4::right);
+    }
+
+    b = io_device->get(io::jump);
+    if (b == io::pressed_s) {
+        player->jump();
+    } else if (b == io::released_s) {
+        player->terminateJump();
+    }
+}
+void Game::eventUpdate()
 {
     sf::Event event;
     while (window.pollEvent(event)) {
@@ -48,11 +83,7 @@ void Game::__inputUpdate()
             }
             case sf::Event::KeyPressed: {
                 switch (event.key.code) {
-                    case sf::Keyboard::Q: { window.close(); break; }
                     case sf::Keyboard::Escape: { window.close(); break; }
-                    case sf::Keyboard::Space: { player->jump(); break; }
-                    case sf::Keyboard::Left: { player->move(Dir4::left); break; }
-                    case sf::Keyboard::Right: { player->move(Dir4::right); break; }
 
                     case sf::Keyboard::A: { player->increase(BodyPhysics::mass); break; }
                     case sf::Keyboard::Z: { player->decrease(BodyPhysics::mass); break; }
@@ -76,27 +107,16 @@ void Game::__inputUpdate()
                 }
                 break;
             }
-            case sf::Event::KeyReleased: {
-                switch (event.key.code) {
-                    case sf::Keyboard::Up: { player->stop(Dir4::up); break; } // no op
-                    case sf::Keyboard::Down: { player->stop(Dir4::down); break; }  // no op
-                    case sf::Keyboard::Left: { player->stop(Dir4::left); break; }
-                    case sf::Keyboard::Right: { player->stop(Dir4::right); break; }
-                    case sf::Keyboard::Space: { player->terminateJump(); break; }
-                    default: { break; }
-                }
-                break;
-            }
             default: { break; }
         }
     }
 }
-void Game::__gameUpdate()
+void Game::gameUpdate()
 {
     player->update(dt);
     collision_system.checkCollisions();
 }
-void Game::__lateUpdate()
+void Game::lateUpdate()
 {
     player->lateUpdate();
     camera.setCenter(player->getPosition());
@@ -104,7 +124,7 @@ void Game::__lateUpdate()
 }
 void Game::render()
 {
-    window.clear(sf::Color::Blue);
+    window.clear(sf::Color::Black);
     for (auto& tile_layer : tile_map->tile_layers) {
         window.draw(sf::Sprite(tile_layer->render_texture->getTexture()));
     }

@@ -1,14 +1,14 @@
 #ifndef CMP_SPRITE_HPP
 #define CMP_SPRITE_HPP
 
-#include "c_base.hpp"
+#include "component_base.hpp"
 
 class RigidBody;
 
 class Sprite: public Component
 {
 public:
-    Sprite(GameObject* obj);
+    Sprite(Player* obj);
     void build() override;
     void render(sf::RenderWindow &window) override;
     void setTextureRect(const sf::IntRect& texture_rect);

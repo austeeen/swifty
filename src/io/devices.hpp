@@ -1,9 +1,9 @@
 #ifndef IO_DEVICES_HPP
 #define IO_DEVICES_HPP
 
-#include "common.hpp"
+#include "../common.hpp"
+#include "../utils/bitmask.hpp"
 #include "io_core.hpp"
-#include "utils/bitmask.hpp"
 
 class InputDevice
 {

@@ -1,8 +1,7 @@
 #ifndef GAMEOBJECT_HPP
 #define GAMEOBJECT_HPP
 
-#include "common.hpp"
-
+#include "../common.hpp"
 
 class GameObject
 {
