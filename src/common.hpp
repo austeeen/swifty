@@ -15,5 +15,7 @@
 #include "rapidxml/rapidxml.hpp"
 namespace rx = rapidxml;
 #include "typedefs.hpp"
+#include "utils/generics.hpp"
+#include "utils/exceptions.hpp"
 
 #endif // COMMON_HPP

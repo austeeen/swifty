@@ -1,7 +1,7 @@
-#include "game_object.hpp"
+#include "player.hpp"
 
-GameObject::GameObject(const GameObjectAsset ast):
-col_group(CollisionGroup::object), ast(ast)
+Player::Player(const GameObjectAsset ast):
+GameObject(CollisionGroup::object), ast(ast)
 {
     /*
     states[ObjectState::idle] = std::make_unique<IdleState>(this);
@@ -15,7 +15,7 @@ col_group(CollisionGroup::object), ast(ast)
     cmpts[typeid(RigidBody)] = std::make_shared<RigidBody>(this);
     cmpts[typeid(Animator)] = std::make_shared<Animator>(this);
 }
-void GameObject::setUp()
+void Player::setUp()
 {
     for (auto [cmpnt_t, cmpnt] : cmpts) {
         cmpnt->build();
@@ -29,7 +29,7 @@ void GameObject::setUp()
         cmpnt->setUp();
     }
 }
-void GameObject::update(const float dt)
+void Player::update(const float dt)
 {
     ObjectState next = this->cmpnt<RigidBody>()->getState();
     if (next != cur_state) {
@@ -41,17 +41,17 @@ void GameObject::update(const float dt)
     this->cmpnt<Animator>()->update(dt);
     this->cmpnt<RigidBody>()->update(dt);
 }
-void GameObject::lateUpdate()
+void Player::lateUpdate()
 {
 
 }
-void GameObject::render(sf::RenderWindow &window)
+void Player::render(sf::RenderWindow &window)
 {
     for (auto [cmpnt_t, cmpnt] : cmpts) {
         cmpnt->render(window);
     }
 }
-void GameObject::move(const Dir4 dir)
+void Player::move(const Dir4 dir)
 {
     switch(dir) {
         case Dir4::left: {
@@ -67,15 +67,15 @@ void GameObject::move(const Dir4 dir)
         default: break;
     }
 }
-void GameObject::stop(const Dir4 dir)
+void Player::stop(const Dir4 dir)
 {
     cmpnt<RigidBody>()->stopDirection(dir);
 }
-void GameObject::jump()
+void Player::jump()
 {
     cmpnt<RigidBody>()->jump();
 }
-void GameObject::terminateJump()
+void Player::terminateJump()
 {
     cmpnt<RigidBody>()->terminateJump();
     /*
@@ -84,70 +84,31 @@ void GameObject::terminateJump()
     }
     */
 }
-void GameObject::increase(const BodyPhysics cf)
+void Player::increase(const BodyPhysics cf)
 {
     cmpnt<RigidBody>()->increase(cf);
 }
-void GameObject::decrease(const BodyPhysics cf)
+void Player::decrease(const BodyPhysics cf)
 {
     cmpnt<RigidBody>()->decrease(cf);
 }
-void GameObject::toggleRects()
+void Player::toggleRects()
 {
     cmpnt<RigidBody>()->toggleDisplayBody();
 }
-const GameObjectAsset& GameObject::getAsset() const
+const GameObjectAsset& Player::getAsset() const
 {
     return this->ast;
 }
-const sf::Vector2f GameObject::getPosition() const
+const sf::Vector2f Player::getPosition() const
 {
     return cmpnt<RigidBody>()->getPosition();
 }
-const sf::Vector2i GameObject::getSize() const
+const sf::Vector2i Player::getSize() const
 {
     return cmpnt<RigidBody>()->getSize();
 }
-const std::vector<CollisionRect>& GameObject::getRects() const
+const std::vector<CollisionRect>& Player::getRects() const
 {
     return cmpnt<RigidBody>()->getRects();
-}
-const CollisionGroup GameObject::getColliderGroup() const
-{
-    return this->col_group;
-}
-
-/**************************************************************************************************/
-
-Boundary::Boundary(const sf::IntRect rect):
-    col_group(CollisionGroup::floor),
-    rect(rect),
-    shape(sf::Vector2f(rect.width, rect.height))
-{
-    shape.setPosition(rect.left, rect.top);
-}
-Boundary::Boundary(const sf::IntRect rect, const sf::Color c):
-Boundary(rect)
-{
-    shape.setFillColor(color);
-}
-void Boundary::render(sf::RenderWindow &window)
-{
-    window.draw(shape);
-}
-const sf::Vector2f Boundary::getPosition() const
-{
-    return sf::Vector2f(rect.left, rect.top);
-}
-const sf::Vector2f Boundary::getSize() const
-{
-    return sf::Vector2f(rect.width, rect.height);
-}
-const sf::FloatRect Boundary::getRect() const
-{
-    return (sf::FloatRect) rect;
-}
-const CollisionGroup Boundary::getColliderGroup() const
-{
-    return this->col_group;
 }
