@@ -3,6 +3,6 @@
   "gccDefaultCFlags": "-Wall",
   "gccDefaultCppFlags": "-c -Wall -std=c++17 -fsyntax-only",
   "gccErrorLimit": 10,
-  "gccIncludePaths": "-., -../src/*, -../deps/*",
+  "gccIncludePaths": "-., ./src/*, ./deps/*",
   "gccSuppressWarnings": false
 }
