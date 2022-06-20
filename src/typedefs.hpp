@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include <map>
 #include <memory>
+#include <iomanip>
 
 static const float FLT_ZERO = 0.1;
 
@@ -12,8 +13,6 @@ enum class Dir4 {up, down, left, right };
 enum class CollisionGroup { none, floor, object };
 enum class ColliderType { generic, body };
 
-enum class BodyPhysics { mass, speed, max_x_vel, gravity, damping, jump_power };
-
 enum class ObjectState { idle, running, jumping, falling, wallsliding };
 
 enum class RollState { none, next, done };
@@ -21,6 +20,25 @@ enum class RollState { none, next, done };
 namespace out {
     const std::string toStr(const ObjectState s);
 }
+
+struct PhysicsCoeffs {
+    static const int MASS_UNIT = 10;
+    static const int SPEED_UNIT = 1;
+    static const int VEL_UNIT = 5;
+    static const int GRAV_UNIT = 1;
+    static const int DAMP_UNIT = 1;
+    static const int JUMP_UNIT = 1;
+    enum class AsEnum { mass, speed, maxvel, gravity, damping, jump };
+
+    PhysicsCoeffs();
+    PhysicsCoeffs(const PhysicsCoeffs& other);
+
+    int mass, speed, maxvel, jump, gravity, damping;
+    void increase(const AsEnum n);
+    void decrease(const AsEnum n);
+};
+
+std::ostream& operator<<(std::ostream& o, const PhysicsCoeffs& u);
 
 struct CollisionRect {
     sf::Vector2f offset;

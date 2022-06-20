@@ -28,6 +28,6 @@ void Sprite::updateTextureRect()
 }
 void Sprite::render(sf::RenderWindow &window)
 {
-    sprite.setPosition(this->obj->getPosition());
+    sprite.setPosition(this->obj->cmpnt<RigidBody>()->getPosition());
     window.draw(sprite);
 }

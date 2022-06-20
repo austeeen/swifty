@@ -1,0 +1,157 @@
+#include "physics_2D.hpp"
+#include "rigid_body.hpp"
+#include "../objects/player.hpp"
+
+Physics2D::Physics2D(Player* obj):
+    Component(obj),
+    cur_state(ObjectState::idle)
+{}
+void Physics2D::build()
+{
+    body = obj->cmpnt<RigidBody>();
+    GameObjectAsset ast = obj->getAsset();
+    this->u = ast.coeffs;
+    frc.update(u);
+}
+void Physics2D::update(const float dt)
+{
+    // ACCELERATION
+    acl.x = (moving_right - moving_left) * frc.move;
+    acl.y = frc.grav;
+
+    // VELOCITY
+    vel.x += acl.x * dt;
+    vel.y += acl.y * dt;
+
+    if (fabs(vel.x) < FLT_ZERO) {
+        vel.x = 0.f;
+    } else if (vel.x > u.maxvel) {
+        vel.x = u.maxvel;
+    } else if (vel.x < -u.maxvel) {
+        vel.x = -u.maxvel;
+    } else { // apply damping
+        vel.x = vel.x / (1 + frc.damp * dt);
+    }
+    if (fabs(vel.y) < 0.1) {
+        vel.y = 0.f;
+    }
+    // POSITION
+    body->move(vel.x * dt, vel.y * dt);
+}
+void Physics2D::setState(ObjectState state)
+{
+    cur_state = state;
+}
+const ObjectState Physics2D::getState() const
+{
+    ObjectState next_state = cur_state;
+    switch (cur_state) {
+        case ObjectState::jumping: {
+            if (vel.y >= 0.f) {
+                next_state = ObjectState::falling;
+            }
+            break;
+        }
+        case ObjectState::falling: {
+            if (vel.y <= 0.f) {
+                if (moving_right - moving_left) {
+                    next_state = ObjectState::running;
+                } else {
+                    next_state = ObjectState::idle;
+                }
+            } else {
+                next_state = ObjectState::falling;
+            }
+            // else if wall sliding
+            break;
+        }
+        case ObjectState::wallsliding: {
+
+        }
+        default: { // covers running or idle
+            if (moving_right - moving_left) {
+                next_state = ObjectState::running;
+            } else {
+                next_state = ObjectState::idle;
+            }
+            if (vel.y < 0.f) {
+                next_state = ObjectState::jumping;
+            } else if (vel.y > 1.5f) {
+                next_state = ObjectState::falling;
+            }
+
+            break;
+        }
+    }
+    return next_state;
+}
+void Physics2D::setMoving(const Dir4 dir)
+{
+    switch (dir) {
+        case Dir4::left:  { moving_left  = 1; break; }
+        case Dir4::right: { moving_right = 1; break; }
+        default: { break; }
+    }
+}
+void Physics2D::stopMoving(const Dir4 dir)
+{
+    switch (dir) {
+        case Dir4::left: { moving_left = 0; break; }
+        case Dir4::right: { moving_right = 0; break; }
+        default: { break; }
+    }
+}
+void Physics2D::jump()
+{
+    if (cur_state == ObjectState::idle || cur_state == ObjectState::running) {
+        vel.y -= frc.jump;
+    }
+}
+void Physics2D::terminateJump()
+{
+
+}
+void Physics2D::onColliding(const sf::Vector2f offset, ColliderType type)
+{
+    if (fabs(offset.x) < fabs(offset.y)) {
+        body->xCollision(offset.x);
+        vel.x = 0.f;
+    } else {
+        if (cur_state == ObjectState::jumping) {
+            vel.y = 0.f;
+            if (offset.y > 0.f) {
+                body->yCollision(offset.y);
+                // idea -- x velocity takes a hit for 'friction' ?
+            } else {
+                cur_state = ObjectState::falling;
+            }
+        } else {
+            body->yCollision(offset.y);
+            if (type == ColliderType::body) {
+                vel.y = 0.f;
+            }
+        }
+    }
+}
+const sf::Vector2f Physics2D::getVelocity() const
+{
+    return vel;
+}
+void Physics2D::increase(const PhysicsCoeffs::AsEnum cf)
+{
+    u.increase(cf);
+    frc.update(u);
+}
+void Physics2D::decrease(const PhysicsCoeffs::AsEnum cf)
+{
+    u.decrease(cf);
+    frc.update(u);
+}
+void Physics2D::Force2D::update(const PhysicsCoeffs& new_u)
+{
+    grav = new_u.gravity * new_u.mass;
+    damp = new_u.damping;
+    jump = new_u.jump * 100 / new_u.mass;
+    move = new_u.speed * new_u.mass * 100;
+    std::cout << new_u << std::endl;
+}
