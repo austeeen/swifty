@@ -15,9 +15,9 @@ void CollisionSystem::checkCollisions()
     for (auto& obj : objects) {
         for (auto& bnd : boundaries) {
             sf::FloatRect bnd_aabb = bnd->getRect();
-            for (auto& obj_rect : obj->getRects()) {
+            for (auto& obj_rect : obj->cmpnt<RigidBody>()->getRects()) {
                 if (obj_rect.aabb.intersects(bnd_aabb)) {
-                    obj->cmpnt<RigidBody>()->onColliding(clip(obj_rect.aabb, bnd_aabb), obj_rect.type);
+                    obj->cmpnt<Physics2D>()->onColliding(clip(obj_rect.aabb, bnd_aabb), obj_rect.type);
                 }
             }
         }

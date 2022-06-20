@@ -1,7 +1,7 @@
 #include "player.hpp"
 
 Player::Player(const GameObjectAsset ast):
-GameObject(CollisionGroup::object), ast(ast)
+GameObject(CollisionGroup::object), ast(ast), cur_state(ObjectState::idle)
 {
     /*
     states[ObjectState::idle] = std::make_unique<IdleState>(this);
@@ -12,6 +12,7 @@ GameObject(CollisionGroup::object), ast(ast)
     */
 
     cmpts[typeid(Sprite)] = std::make_shared<Sprite>(this);
+    cmpts[typeid(Physics2D)] = std::make_shared<Physics2D>(this);
     cmpts[typeid(RigidBody)] = std::make_shared<RigidBody>(this);
     cmpts[typeid(Animator)] = std::make_shared<Animator>(this);
 }
@@ -21,9 +22,8 @@ void Player::setUp()
         cmpnt->build();
     }
 
-    cur_state = ObjectState::idle;
     this->cmpnt<Animator>()->setState(cur_state);
-    this->cmpnt<RigidBody>()->setState(cur_state);
+    this->cmpnt<Physics2D>()->setState(cur_state);
 
     for (auto [cmpnt_t, cmpnt] : cmpts) {
         cmpnt->setUp();
@@ -31,15 +31,15 @@ void Player::setUp()
 }
 void Player::update(const float dt)
 {
-    ObjectState next = this->cmpnt<RigidBody>()->getState();
+    ObjectState next = this->cmpnt<Physics2D>()->getState();
     if (next != cur_state) {
         // printf("%s -> %s\n", out::toStr(cur_state).c_str(), out::toStr(next).c_str());
         cur_state = next;
         this->cmpnt<Animator>()->setState(cur_state);
-        this->cmpnt<RigidBody>()->setState(cur_state);
+        this->cmpnt<Physics2D>()->setState(cur_state);
     }
     this->cmpnt<Animator>()->update(dt);
-    this->cmpnt<RigidBody>()->update(dt);
+    this->cmpnt<Physics2D>()->update(dt);
 }
 void Player::lateUpdate()
 {
@@ -55,13 +55,15 @@ void Player::move(const Dir4 dir)
 {
     switch(dir) {
         case Dir4::left: {
+            cmpnt<Physics2D>()->setMoving(dir);
             cmpnt<Sprite>()->setFacing(false);
-            cmpnt<RigidBody>()->setDirection(dir);
+            cmpnt<RigidBody>()->updateFacing(dir);
             break;
         }
         case Dir4::right: {
+            cmpnt<Physics2D>()->setMoving(dir);
             cmpnt<Sprite>()->setFacing(true);
-            cmpnt<RigidBody>()->setDirection(dir);
+            cmpnt<RigidBody>()->updateFacing(dir);
             break;
         }
         default: break;
@@ -69,46 +71,34 @@ void Player::move(const Dir4 dir)
 }
 void Player::stop(const Dir4 dir)
 {
-    cmpnt<RigidBody>()->stopDirection(dir);
+    cmpnt<Physics2D>()->stopMoving(dir);
 }
 void Player::jump()
 {
-    cmpnt<RigidBody>()->jump();
+    cmpnt<Physics2D>()->jump();
 }
 void Player::terminateJump()
 {
-    cmpnt<RigidBody>()->terminateJump();
+    cmpnt<Physics2D>()->terminateJump();
     /*
     if(cmpnt<RigidBody>()->terminateJump()) {
         cmpnt<Animator>()->endEarly();
     }
     */
 }
-void Player::increase(const BodyPhysics cf)
+void Player::increase(const PhysicsCoeffs::AsEnum cf)
 {
-    cmpnt<RigidBody>()->increase(cf);
+    cmpnt<Physics2D>()->increase(cf);
 }
-void Player::decrease(const BodyPhysics cf)
+void Player::decrease(const PhysicsCoeffs::AsEnum cf)
 {
-    cmpnt<RigidBody>()->decrease(cf);
+    cmpnt<Physics2D>()->decrease(cf);
 }
 void Player::toggleRects()
 {
-    cmpnt<RigidBody>()->toggleDisplayBody();
+    cmpnt<RigidBody>()->toggleDisplay();
 }
 const GameObjectAsset& Player::getAsset() const
 {
     return this->ast;
-}
-const sf::Vector2f Player::getPosition() const
-{
-    return cmpnt<RigidBody>()->getPosition();
-}
-const sf::Vector2i Player::getSize() const
-{
-    return cmpnt<RigidBody>()->getSize();
-}
-const std::vector<CollisionRect>& Player::getRects() const
-{
-    return cmpnt<RigidBody>()->getRects();
 }

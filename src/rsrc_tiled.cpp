@@ -329,12 +329,12 @@ void TileObject::loadConfig(const char *filepath)
     }
     rx::xml_node<> *cfg = doc->first_node("config");
     rx::xml_node<> *phys = cfg->first_node("physics");
-    speed = attr<int>(phys, "speed");
-    mass = attr<int>(phys, "mass");
-    max_x_vel = attr<int>(phys, "maxvel");
-    jump_power = attr<int>(phys, "jump");
-    acl_gravity = attr<int>(phys, "grav");
-    damping = attr<int>(phys, "damping");
+    pCoeffs.speed = attr<int>(phys, "speed");
+    pCoeffs.mass = attr<int>(phys, "mass");
+    pCoeffs.maxvel = attr<int>(phys, "maxvel");
+    pCoeffs.jump = attr<int>(phys, "jump");
+    pCoeffs.gravity = attr<int>(phys, "grav");
+    pCoeffs.damping = attr<int>(phys, "damping");
 }
 void TileObject::addTile(rx::xml_node<> *node)
 {

@@ -142,5 +142,5 @@ const sf::IntRect Animator::getFrameRect() const
 void Animator::updateObject()
 {
     spr->setTextureRect(animations[cur]->getFrameRect());
-    body->setCollisionRects(animations[cur]->getCollisionRects());
+    body->setColliders(animations[cur]->getCollisionRects());
 }

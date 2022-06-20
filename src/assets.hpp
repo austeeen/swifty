@@ -14,12 +14,7 @@ struct GameObjectAsset
     const sf::Texture img_texture;
     const sf::Vector2i size;
     const sf::FloatRect rect;
-    const int speed; // * 100
-    const int mass;
-    const int max_x_vel;
-    const int jump_power; // * 100
-    const float acl_gravity;  // P/sec^2 where 1 P ~= 16 pixels
-    const float damping;
+    const PhysicsCoeffs coeffs;
     std::map<ObjectState, std::shared_ptr<AnimRoll>> animation_rolls;
 };
 

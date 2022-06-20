@@ -100,12 +100,7 @@ public:
     std::map<const int, std::shared_ptr<TileFrame>> tile_tbl;
     std::map<ObjectState, std::shared_ptr<AnimRoll>> animation_rolls;
     std::string cfg_fp;
-    int speed;
-    int mass;
-    int max_x_vel;
-    int jump_power;
-    float acl_gravity;
-    float damping;
+    PhysicsCoeffs pCoeffs;
 };
 
 

@@ -1,6 +1,8 @@
 #ifndef STATES_GAME_OBJECT_HPP
 #define STATES_GAME_OBJECT_HPP
 
+/*
+
 #include "../common.hpp"
 
 class Player;
@@ -63,4 +65,6 @@ public:
     void update(const float dt) override;
     void lateUpdate() override;
 };
+*/
+
 #endif // STATES_GAME_OBJECT_HPP

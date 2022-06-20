@@ -3,10 +3,7 @@
 
 #include "game_object.hpp"
 #include "../assets.hpp"
-#include "../components/component_base.hpp"
-#include "../components/sprite.hpp"
-#include "../components/rigid_body.hpp"
-#include "../components/animator.hpp"
+#include "../components/all.hpp"
 
 
 class Player: public GameObject
@@ -23,15 +20,11 @@ public:
     void jump();
     void terminateJump();
 
-    void increase(const BodyPhysics cf);
-    void decrease(const BodyPhysics cf);
+    void increase(const PhysicsCoeffs::AsEnum cf);
+    void decrease(const PhysicsCoeffs::AsEnum cf);
     void toggleRects();
 
     const GameObjectAsset& getAsset() const;
-    const sf::Vector2f getPosition() const override;
-    const sf::Vector2i getSize() const override;
-    const std::vector<CollisionRect>& getRects() const;
-
     template <typename T> std::shared_ptr<T> cmpnt() const {
         if (cmpts.count(typeid(T)) == 0)
             return nullptr;

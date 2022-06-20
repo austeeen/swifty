@@ -34,7 +34,7 @@ void Game::setUp()
     for (auto& bnd : boundaries) {
         collision_system.add(bnd);
     }
-    camera.setCenter(player->getPosition());
+    camera.setCenter(player->cmpnt<RigidBody>()->getPosition());
     camera.update(window.getSize());
     dt = frame_clock.restart().asSeconds();
 }
@@ -85,23 +85,23 @@ void Game::eventUpdate()
                 switch (event.key.code) {
                     case sf::Keyboard::Escape: { window.close(); break; }
 
-                    case sf::Keyboard::A: { player->increase(BodyPhysics::mass); break; }
-                    case sf::Keyboard::Z: { player->decrease(BodyPhysics::mass); break; }
+                    case sf::Keyboard::A: { player->increase(PhysicsCoeffs::AsEnum::mass); break; }
+                    case sf::Keyboard::Z: { player->decrease(PhysicsCoeffs::AsEnum::mass); break; }
 
-                    case sf::Keyboard::S: { player->increase(BodyPhysics::speed); break; }
-                    case sf::Keyboard::X: { player->decrease(BodyPhysics::speed); break; }
+                    case sf::Keyboard::S: { player->increase(PhysicsCoeffs::AsEnum::speed); break; }
+                    case sf::Keyboard::X: { player->decrease(PhysicsCoeffs::AsEnum::speed); break; }
 
-                    case sf::Keyboard::D: { player->increase(BodyPhysics::max_x_vel); break; }
-                    case sf::Keyboard::C: { player->decrease(BodyPhysics::max_x_vel); break; }
+                    case sf::Keyboard::D: { player->increase(PhysicsCoeffs::AsEnum::maxvel); break; }
+                    case sf::Keyboard::C: { player->decrease(PhysicsCoeffs::AsEnum::maxvel); break; }
 
-                    case sf::Keyboard::F: { player->increase(BodyPhysics::jump_power); break; }
-                    case sf::Keyboard::V: { player->decrease(BodyPhysics::jump_power); break; }
+                    case sf::Keyboard::F: { player->increase(PhysicsCoeffs::AsEnum::jump); break; }
+                    case sf::Keyboard::V: { player->decrease(PhysicsCoeffs::AsEnum::jump); break; }
 
-                    case sf::Keyboard::H: { player->increase(BodyPhysics::damping); break; }
-                    case sf::Keyboard::N: { player->decrease(BodyPhysics::damping); break; }
+                    case sf::Keyboard::H: { player->increase(PhysicsCoeffs::AsEnum::damping); break; }
+                    case sf::Keyboard::N: { player->decrease(PhysicsCoeffs::AsEnum::damping); break; }
 
-                    case sf::Keyboard::J: { player->increase(BodyPhysics::gravity); break; }
-                    case sf::Keyboard::M: { player->decrease(BodyPhysics::gravity); break; }
+                    case sf::Keyboard::J: { player->increase(PhysicsCoeffs::AsEnum::gravity); break; }
+                    case sf::Keyboard::M: { player->decrease(PhysicsCoeffs::AsEnum::gravity); break; }
                     case sf::Keyboard::R: { player->toggleRects(); break; }
                     default: { break; }
                 }
@@ -119,7 +119,7 @@ void Game::gameUpdate()
 void Game::lateUpdate()
 {
     player->lateUpdate();
-    camera.setCenter(player->getPosition());
+    camera.setCenter(player->cmpnt<RigidBody>()->getPosition());
     camera.applyView(window);
 }
 void Game::render()

@@ -9,8 +9,8 @@ public:
     Boundary(const sf::IntRect rect);
     Boundary(const sf::IntRect rect, const sf::Color c);
     void render(sf::RenderWindow &window) override;
-    const sf::Vector2f getPosition() const override;
-    const sf::Vector2i getSize() const override;
+    const sf::Vector2f getPosition() const;
+    const sf::Vector2i getSize() const;
     const sf::FloatRect getRect() const;
 
 private:

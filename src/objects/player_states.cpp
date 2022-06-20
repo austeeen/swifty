@@ -1,6 +1,7 @@
 #include "player_states.hpp"
 #include "player.hpp"
 
+/*
 IdleState::IdleState(Player* obj):
     StateBase(obj)
 {}
@@ -23,7 +24,6 @@ void IdleState::update(const float dt)
 void IdleState::lateUpdate()
 {}
 
-/**************************************************************************************************/
 
 RunningState::RunningState(Player* obj):
     StateBase(obj)
@@ -47,7 +47,6 @@ void RunningState::update(const float dt)
 void RunningState::lateUpdate()
 {}
 
-/**************************************************************************************************/
 
 JumpingState::JumpingState(Player* obj):
     StateBase(obj)
@@ -71,7 +70,6 @@ void JumpingState::update(const float dt)
 void JumpingState::lateUpdate()
 {}
 
-/**************************************************************************************************/
 
 FallingState::FallingState(Player* obj):
     StateBase(obj)
@@ -94,3 +92,5 @@ void FallingState::update(const float dt)
 }
 void FallingState::lateUpdate()
 {}
+
+*/
