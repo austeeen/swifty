@@ -2,7 +2,6 @@
 #define CMP_RIGID_BODY_HPP
 
 #include "component_base.hpp"
-#include <cmath>
 
 class RigidBody: public Component
 {

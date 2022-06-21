@@ -16,27 +16,30 @@ public:
     void build() override;
     void update(const float dt);
 
-    void setState(ObjectState state);
-    const ObjectState getState() const;
-
     void setMoving(const Dir4);
     void stopMoving(const Dir4);
     void jump();
     void terminateJump();
-    void onColliding(const sf::Vector2f offset, ColliderType type);
+
+    void setState(ObjectState state);
+    const ObjectState nextState();
+    void onColliding(const sf::Vector2f& offset, ColliderType type);
+
     const sf::Vector2f getVelocity() const;
 
     void increase(const PhysicsCoeffs::AsEnum cf);
     void decrease(const PhysicsCoeffs::AsEnum cf);
 
+    void print() const;
 
 private:
-    ObjectState cur_state;
+    ObjectState cur_state, next_state;
     std::shared_ptr<RigidBody> body;
     PhysicsCoeffs u;
     Force2D frc;
-    int moving_left, moving_right;
-    sf::Vector2f vel, acl;
+    int moving_left, moving_right, moving_dir;
+    sf::Vector2f vel, acl, body_offset, other_offset;
+    float falling_dt, block_falling;
 };
 
 #endif // CMP_PHYSICS_2D_HPP

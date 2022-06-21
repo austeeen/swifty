@@ -6,6 +6,7 @@
 #include <sstream>
 #include <map>
 #include <cstdint>
+#include <cmath>
 #include <memory>
 #include <string.h> // memset
 #include <typeindex>

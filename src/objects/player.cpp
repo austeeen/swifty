@@ -1,7 +1,7 @@
 #include "player.hpp"
 
 Player::Player(const GameObjectAsset ast):
-GameObject(CollisionGroup::object), ast(ast), cur_state(ObjectState::idle)
+GameObject(CollisionGroup::object), cur_state(ObjectState::idle), ast(ast)
 {
     /*
     states[ObjectState::idle] = std::make_unique<IdleState>(this);
@@ -31,19 +31,17 @@ void Player::setUp()
 }
 void Player::update(const float dt)
 {
-    ObjectState next = this->cmpnt<Physics2D>()->getState();
-    if (next != cur_state) {
-        // printf("%s -> %s\n", out::toStr(cur_state).c_str(), out::toStr(next).c_str());
-        cur_state = next;
-        this->cmpnt<Animator>()->setState(cur_state);
-        this->cmpnt<Physics2D>()->setState(cur_state);
-    }
     this->cmpnt<Animator>()->update(dt);
     this->cmpnt<Physics2D>()->update(dt);
 }
 void Player::lateUpdate()
 {
-
+    ObjectState next = this->cmpnt<Physics2D>()->nextState();
+    if (next != cur_state) {
+        cur_state = next;
+        this->cmpnt<Animator>()->setState(cur_state);
+        this->cmpnt<Physics2D>()->setState(cur_state);
+    }
 }
 void Player::render(sf::RenderWindow &window)
 {

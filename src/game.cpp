@@ -44,7 +44,6 @@ void Game::update()
     inputUpdate();
     eventUpdate();
     gameUpdate();
-    lateUpdate();
 }
 void Game::inputUpdate()
 {
@@ -115,9 +114,6 @@ void Game::gameUpdate()
 {
     player->update(dt);
     collision_system.checkCollisions();
-}
-void Game::lateUpdate()
-{
     player->lateUpdate();
     camera.setCenter(player->cmpnt<RigidBody>()->getPosition());
     camera.applyView(window);

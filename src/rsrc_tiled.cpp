@@ -312,6 +312,7 @@ void TileObject::getProperties(rx::xml_node<> *all_properties)
         if (prp_name == "config") {
             if (prp_type == "file") {
                 std::string cfg_fp = attr<std::string>(prp, "value");
+                cfg_fp = "res/" + cfg_fp;
                 loadConfig(cfg_fp.c_str());
             }
         }
@@ -351,13 +352,12 @@ void TileObject::addTile(rx::xml_node<> *node)
         if (type == "body") {
             ct = ColliderType::body;
         }
-        float col_x = attr<int>(c_rects, "x");
-        float col_y = attr<int>(c_rects, "y");
-        float col_w = attr<int>(c_rects, "width");
-        float col_h = attr<int>(c_rects, "height");
+        float col_x = std::round(attr<float>(c_rects, "x"));
+        float col_y = std::round(attr<float>(c_rects, "y"));
         tile->collision_rects.push_back({
             sf::Vector2f(col_x, col_y),
-            sf::FloatRect(col_x, col_y, col_w, col_h),
+            sf::FloatRect(col_x, col_y,
+                std::round(attr<float>(c_rects, "width")), std::round(attr<float>(c_rects, "height"))),
             ct
         });
         c_rects = c_rects->next_sibling();

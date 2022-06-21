@@ -21,7 +21,7 @@ public:
     void checkCollisions();
 
 private:
-    sf::Vector2f clip(const sf::FloatRect& a, const sf::FloatRect& b);
+    const sf::Vector2f findIntersection(const sf::FloatRect& ra, const sf::FloatRect& rb) const;
 
     std::vector<CollisionEvent> collision_events;
     std::vector<std::shared_ptr<Boundary>> boundaries;

@@ -16,26 +16,30 @@ void CollisionSystem::checkCollisions()
         for (auto& bnd : boundaries) {
             sf::FloatRect bnd_aabb = bnd->getRect();
             for (auto& obj_rect : obj->cmpnt<RigidBody>()->getRects()) {
-                if (obj_rect.aabb.intersects(bnd_aabb)) {
-                    obj->cmpnt<Physics2D>()->onColliding(clip(obj_rect.aabb, bnd_aabb), obj_rect.type);
+                const sf::Vector2f offset = findIntersection(obj_rect.aabb, bnd_aabb);
+                if (fabs(offset.x) > 0.f && fabs(offset.y) > 0.f) {
+                    obj->cmpnt<Physics2D>()->onColliding(offset, obj_rect.type);
                 }
             }
         }
     }
 }
-sf::Vector2f CollisionSystem::clip(const sf::FloatRect &a, const sf::FloatRect &b)
+const sf::Vector2f CollisionSystem::findIntersection(const sf::FloatRect& ra, const sf::FloatRect& rb) const
 {
-    float dx = 0.0, dy = 0.0;
-    if (b.left > a.left) {
-        dx = b.left - (a.left + a.width); // dy < 0
-    } else {
-        dx = (b.left + b.width) - a.left; // dx > 0
-    }
-    if (b.top > a.top) {
-        dy = b.top - (a.top + a.height); // dy < 0
-    } else {
-        dy = (b.top + b.height) - a.top; // dy > 0
-    }
+    const auto min = [](float a, float b) { return (a < b) ? a : b; };
+    const auto max = [](float a, float b) { return (a < b) ? b : a; };
 
+    const float left   = max(ra.left, rb.left);
+    const float top    = max(ra.top,  rb.top);
+    const float right  = min(ra.left + ra.width,  rb.left + rb.width);
+    const float bottom = min(ra.top  + ra.height, rb.top  + rb.height);
+
+    float dx = 0.0, dy = 0.0;
+    if ((left < right) && (top < bottom)) {
+        if (left == rb.left) { dx = left - right; }
+        else { dx = right - left; }
+        if (top == rb.top) { dy = top - bottom; }
+        else { dy = bottom - top; }
+    }
     return sf::Vector2f(dx, dy);
 }
