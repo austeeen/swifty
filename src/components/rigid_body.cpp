@@ -8,8 +8,8 @@ RigidBody::RigidBody(Player* obj):
 {}
 void RigidBody::setUp()
 {
-    GameObjectAsset ast = obj->getAsset();
-    position_rect = ast.rect;
+    PlayerObjectAsset ast = obj->getAsset();
+    position_rect = sf::FloatRect(0, 0, ast.size.x, ast.size.y);
     pos_shape = createShape(sf::Color::Green);
     move(ast.start_pos.x, ast.start_pos.y);
 }

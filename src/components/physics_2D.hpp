@@ -37,7 +37,7 @@ private:
     std::shared_ptr<RigidBody> body;
     PhysicsCoeffs u;
     Force2D frc;
-    int moving_left, moving_right, moving_dir;
+    int moving_left, moving_right, moving_dir, is_jumping;
     sf::Vector2f vel, acl, body_offset, other_offset;
     float falling_dt, block_falling;
 };

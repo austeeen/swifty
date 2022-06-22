@@ -1,0 +1,124 @@
+#!/bin/bash
+
+# set -x
+
+new_file() {
+    HPP_OPT_TEXT=""
+    CPP_OPT_TEXT=""
+
+    create_class() {
+        HPP_OPT_TEXT="class $1
+    {
+    public:
+        $1();
+
+    private:
+        // members
+    };"
+
+        CPP_OPT_TEXT="$1::$1(){}"
+
+    }
+
+
+    if [[ $# -lt 2 ]]; then
+        echo "ERROR: not enough arguments!"
+        usage
+        exit 1
+    fi
+
+    while [[ $# -gt 2 ]]
+    do
+        case "$1" in
+            -c|--class)
+                create_class $2
+                shift
+                shift;;
+            *)
+                usage
+                exit 1;;
+        esac
+    done
+
+    FULL_FP=$1
+    FILE_NAME="$(basename $FULL_FP)"
+    HPP_GUARD=$2
+
+    HPP_FP="$FULL_FP.hpp"
+    CPP_FP="$FULL_FP.cpp"
+
+    HPP_TXT="#ifndef $HPP_GUARD
+    #define $HPP_GUARD
+
+    #include \"../common.hpp\"
+
+    $HPP_OPT_TEXT
+
+    #endif // $HPP_GUARD"
+
+    CPP_TXT="#include \"$FILE_NAME.hpp\"
+
+    $CPP_OPT_TEXT
+    "
+
+    touch $HPP_FP
+    touch $CPP_FP
+
+    echo "$HPP_TXT" > $HPP_FP
+    echo "$CPP_TXT" > $CPP_FP
+}
+
+mod_file() {
+
+}
+
+mv_file() {
+
+}
+
+rm_file() {
+
+}
+
+usage () {
+    echo "cpp-file [cmd] <OPTIONS> [FILE_PATH] [HEADER_GUARD]"
+    echo "  generate/modify/update hpp/cpp src files"
+    echo "[cmd]"
+    echo "  new ) create new hpp/cpp src files"
+    echo "  mod ) modify existing hpp/cpp src files"
+    echo "   mv ) move existing hpp/cpp src files to new location/name"
+    echo "   rm ) remove existing hpp/cpp src files"
+    echo "use [cmd] help for info about command"
+    echo "[OPTIONS]"
+    echo "  -c|--class [CLS_NAME] ) create a class named CLS_NAME and generate a basic class empty class"
+    echo "  -h|--help ) display help"
+}
+
+usage_new () {
+    echo "cpp-file new <OPTIONS> [FILE_PATH] [HEADER_GUARD]"
+    echo "  create new hpp/cpp src files named FILE_PATH.hpp/.cpp using HEADER_GUARDS"
+    echo "[OPTIONS]"
+    echo "  -c|--class [CLS_NAME] ) generate a basic class empty class named CLS_NAME"
+}
+
+usage_mod () {
+    echo "cpp-file mod [CHOICE] [FILE_PATH]"
+    echo "  modify the CHOICE in hpp/cpp src files named FILE_PATH.hpp/.cpp"
+    echo "[CHOICE]"
+    echo "  -f|--file-name [NAME]) change hpp/cpp file names to NAME"
+}
+
+
+# get command or display help
+while [[ $# -gt 2 ]]
+do
+    case "$1" in
+        -c|--class)
+            create_class $2
+            shift
+            shift;;
+        *)
+            usage
+            exit 1;;
+    esac
+done

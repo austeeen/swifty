@@ -2,7 +2,6 @@
 #define CMP_BASE_HPP
 
 #include "../common.hpp"
-#include "../rsrc_tiled.hpp"
 
 class Player;
 class GameObjectAsset;

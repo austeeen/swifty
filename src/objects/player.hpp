@@ -2,14 +2,11 @@
 #define OBJ_PLAYER_HPP
 
 #include "game_object.hpp"
-#include "../assets.hpp"
-#include "../components/all.hpp"
 
-
-class Player: public GameObject
+class Player: public KinematicObject
 {
 public:
-    Player(const GameObjectAsset ast);
+    Player(const PlayerObjectAsset ast);
     void setUp() override;
     void update(const float dt) override;
     void lateUpdate() override;
@@ -24,20 +21,12 @@ public:
     void decrease(const PhysicsCoeffs::AsEnum cf);
     void toggleRects();
 
-    const GameObjectAsset& getAsset() const;
-    template <typename T> std::shared_ptr<T> cmpnt() const {
-        if (cmpts.count(typeid(T)) == 0)
-            return nullptr;
-        return std::dynamic_pointer_cast<T>(cmpts.at(typeid(T)));
-    }
+    const PlayerObjectAsset& getAsset() const;
 
 protected:
     // std::map<const ObjectState, std::unique_ptr<StateBase>> states;
     ObjectState cur_state;
-
-    CollisionGroup col_group;
-    std::map<std::type_index, std::shared_ptr<Component>> cmpts;
-    GameObjectAsset ast;
+    PlayerObjectAsset ast;
 };
 
 

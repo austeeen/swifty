@@ -10,8 +10,7 @@ static const float FLT_ZERO = 0.1;
 
 enum class Dir4 {up, down, left, right };
 
-enum class CollisionGroup { none, floor, object };
-enum class ColliderType { generic, body };
+enum class ColliderType { generic, body, platform };
 
 enum class ObjectState { idle, running, jumping, falling, wallsliding };
 

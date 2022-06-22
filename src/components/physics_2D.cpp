@@ -6,7 +6,7 @@ Physics2D::Physics2D(Player* obj):
     Component(obj),
     cur_state(ObjectState::idle),
     next_state(ObjectState::idle),
-    moving_left(0), moving_right(0), moving_dir(0),
+    moving_left(0), moving_right(0), moving_dir(0), is_jumping(0),
     vel(0, 0), acl(0, 0), body_offset(0, 0), other_offset(0, 0),
     falling_dt(0), block_falling(0.1)
 {
@@ -18,7 +18,7 @@ Physics2D::Physics2D(Player* obj):
 void Physics2D::build()
 {
     body = obj->cmpnt<RigidBody>();
-    GameObjectAsset ast = obj->getAsset();
+    PlayerObjectAsset ast = obj->getAsset();
     this->u = ast.coeffs;
     frc.update(u);
 }
@@ -32,6 +32,10 @@ void Physics2D::update(const float dt)
     // VELOCITY
     vel.x += acl.x * dt;
     vel.y += acl.y * dt;
+
+    if (is_jumping) {
+        vel.y -= frc.jump * dt;
+    }
 
     if (fabs(vel.x) < FLT_ZERO) {
         vel.x = 0.f;
@@ -69,12 +73,17 @@ void Physics2D::stopMoving(const Dir4 dir)
 void Physics2D::jump()
 {
     if (cur_state == ObjectState::idle || cur_state == ObjectState::running) {
-        vel.y -= frc.jump;
+        is_jumping = 1;
+        vel.y = -frc.jump;
+        std::cout << "is jumping" << std::endl;
+        print();
     }
 }
 void Physics2D::terminateJump()
 {
-
+    is_jumping = 0;
+    std::cout << "not jumping" << std::endl;
+    print();
 }
 void Physics2D::setState(ObjectState state)
 {

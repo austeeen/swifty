@@ -4,10 +4,9 @@
 #include "common.hpp"
 #include "data.hpp"
 #include "camera.hpp"
-#include "objects/player.hpp"
-#include "objects/boundary.hpp"
+#include "objects/all.hpp"
+#include "tiled/all.hpp"
 #include "sys_collision.hpp"
-#include "rsrc_tiled.hpp"
 #include "io/devices.hpp"
 
 class Game
@@ -36,6 +35,7 @@ private:
     InputDevice *io_device;
     std::shared_ptr<TileMap> tile_map;
     std::shared_ptr<Player> player;
+    std::vector<std::shared_ptr<MovingPlatform>> platforms;
     std::vector<std::shared_ptr<Boundary>> boundaries;
     CollisionSystem collision_system;
 };

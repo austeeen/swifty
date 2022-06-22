@@ -2,19 +2,25 @@
 
 Game::Game():
 window(sf::VideoMode(WINDOW::width, WINDOW::height), WINDOW::title, WINDOW::style),
-camera(CAMERA::view_rect),
-tile_map(std::make_shared<TileMap>("res/new_basic_level.tmx"))
+camera(CAMERA::view_rect)
 {
     window.setKeyRepeatEnabled(false);
 
-    TileObject cat_res("res/cat.tsx");
+
+    TileObject cat_res("res/cat_new.tsx");
     GameObjectAsset cat_ast(cat_res);
     player = std::make_shared<Player>(cat_ast);
 
+    tile_map = std::make_shared<TileMap>("res/new_basic_level.tmx");
     tile_map->build();
     for (auto& object_group : tile_map->object_groups) {
-        for (auto& [id, rect] : object_group->objects) {
+        for (auto& rect : object_group->objects) {
             boundaries.push_back(std::make_shared<Boundary>(rect));
+        }
+    }
+    for (auto& dyn_object_group : tile_map->dyn_object_groups) {
+        for (auto& [name, dyn_obj] : dyn_object_group->objects) {
+            platforms.push_back(std::make_shared<MovingPlatform>(dyn_obj));
         }
     }
 }
@@ -30,10 +36,19 @@ void Game::setUp()
     }
 
     player->setUp();
+    for (auto& plt : platforms) {
+        plt->setUp();
+    }
+
+
     collision_system.add(player);
     for (auto& bnd : boundaries) {
         collision_system.add(bnd);
     }
+    for (auto& plt : platforms) {
+        collision_system.add(plt);
+    }
+
     camera.setCenter(player->cmpnt<RigidBody>()->getPosition());
     camera.update(window.getSize());
     dt = frame_clock.restart().asSeconds();
@@ -113,6 +128,9 @@ void Game::eventUpdate()
 void Game::gameUpdate()
 {
     player->update(dt);
+    for (auto& plt : platforms) {
+        plt->update(dt);
+    }
     collision_system.checkCollisions();
     player->lateUpdate();
     camera.setCenter(player->cmpnt<RigidBody>()->getPosition());
@@ -125,6 +143,9 @@ void Game::render()
         window.draw(sf::Sprite(tile_layer->render_texture->getTexture()));
     }
     player->render(window);
+    for (auto& plt : platforms) {
+        plt->render(window);
+    }
     window.display();
 }
 void Game::sleep(const float sec)

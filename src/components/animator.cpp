@@ -75,7 +75,7 @@ void Animator::build()
 {
     spr = obj->cmpnt<Sprite>();
     body = obj->cmpnt<RigidBody>();
-    GameObjectAsset ast = obj->getAsset();
+    PlayerObjectAsset ast = obj->getAsset();
     for (auto& [id, roll] : ast.animation_rolls) {
         animations[id] = new Roll(roll);
     }

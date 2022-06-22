@@ -1,18 +1,20 @@
 #ifndef COMMON_HPP
 #define COMMON_HPP
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <map>
-#include <cstdint>
 #include <cmath>
+#include <cstdint>
+#include <fstream>
+#include <iostream>
+#include <map>
 #include <memory>
+#include <SFML/Graphics.hpp>
+#include <sstream>
+#include <stdexcept>
 #include <string.h> // memset
 #include <typeindex>
 #include <typeinfo>
-#include <stdexcept>
-#include <SFML/Graphics.hpp>
+#include <vector>
+
 #include "rapidxml/rapidxml.hpp"
 namespace rx = rapidxml;
 #include "typedefs.hpp"

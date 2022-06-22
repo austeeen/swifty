@@ -3,21 +3,16 @@
 
 #include "game_object.hpp"
 
-class Boundary: public GameObject
+class Boundary: public StaticObject
 {
 public:
     Boundary(const sf::IntRect rect);
-    Boundary(const sf::IntRect rect, const sf::Color c);
-    void render(sf::RenderWindow &window) override;
     const sf::Vector2f getPosition() const;
     const sf::Vector2i getSize() const;
-    const sf::FloatRect getRect() const;
+    const sf::FloatRect getCollider() const override;
 
 private:
-    CollisionGroup col_group;
     sf::IntRect rect;
-    sf::RectangleShape shape;
-    sf::Color color;
 };
 
 #endif // OBJ_BOUNDARY_HPP
