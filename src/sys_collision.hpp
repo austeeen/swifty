@@ -16,6 +16,10 @@ public:
     void checkCollisions();
 
 private:
+    void vsKinematicObjects(std::shared_ptr<KinematicObject> kin_obj);
+    void vsDynamicObjects(std::shared_ptr<KinematicObject> kin_obj);
+    void vsStaticObjects(std::shared_ptr<KinematicObject> kin_obj);
+
     const sf::Vector2f findIntersection(const sf::FloatRect& ra, const sf::FloatRect& rb) const;
 
     std::vector<std::shared_ptr<StaticObject>> static_objs;

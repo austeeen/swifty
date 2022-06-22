@@ -9,7 +9,7 @@
 
 struct GameObjectAsset
 {
-    GameObjectAsset(const TsxBaseObject& tsx_obj);
+    GameObjectAsset(std::shared_ptr<TsxBaseObject> tsx_obj);
     sf::Vector2f start_pos;
     const sf::Texture img_texture;
     const sf::Vector2i size;
@@ -17,7 +17,7 @@ struct GameObjectAsset
 
 struct PlayerObjectAsset: public GameObjectAsset
 {
-    PlayerObjectAsset(const TileObject& tsx_obj);
+    PlayerObjectAsset(std::shared_ptr<TileObject> tsx_obj);
 
     const PhysicsCoeffs coeffs;
     std::map<ObjectState, std::shared_ptr<AnimRoll>> animation_rolls;
@@ -25,7 +25,7 @@ struct PlayerObjectAsset: public GameObjectAsset
 
 struct PlatformObjectAsset: public GameObjectAsset
 {
-    PlatformObjectAsset(const DynamicTiledObject& tsx_obj);
+    PlatformObjectAsset(std::shared_ptr<DynamicTiledObject> tsx_obj);
 
     const CollisionRect collider;
     const int speed;

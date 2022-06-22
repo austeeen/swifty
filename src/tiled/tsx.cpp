@@ -14,7 +14,7 @@ DynamicTiledObject::DynamicTiledObject(rx::xml_node<>* node):
     type(""),
     speed(-1),
     dest(0,0), horizontal(false),
-    render_texture(nullptr)
+    render_texture(new sf::RenderTexture())
 {
     name = attr<std::string>(node, "name");
     type = attr<std::string>(node, "type");
@@ -79,17 +79,16 @@ void DynamicTiledObject::combinePieces(TileMap *map)
         }
 
         // normalized object's rect to position_rect's origin so we can position its texture
-        sf::FloatRect p(
-            obj.position_rect.left - position_rect.left,
-            obj.position_rect.top - position_rect.top,
-            obj.position_rect.width,
-            obj.position_rect.height);
+        const float pleft = obj.position_rect.left - position_rect.left;
+        const float ptop = obj.position_rect.top - position_rect.top;
+        const float pright = pleft + obj.position_rect.width;
+        const float pbottom = ptop + obj.position_rect.height;
 
         sf::Vertex *quads = &vertex_array[i * 4];
-        quads[0].position = sf::Vector2f(p.left, p.top);
-        quads[1].position = sf::Vector2f(p.left + p.width, p.top);
-        quads[2].position = sf::Vector2f(p.left + p.width, p.top  + p.height);
-        quads[3].position = sf::Vector2f(p.left, p.top  + p.height);
+        quads[0].position = sf::Vector2f(pleft,  ptop);
+        quads[1].position = sf::Vector2f(pright, ptop);
+        quads[2].position = sf::Vector2f(pright, pbottom);
+        quads[3].position = sf::Vector2f(pleft,  pbottom);
 
         cur_tileset = map->getTileset(gid);
         int real_gid = gid - cur_tileset->firstgid;
@@ -103,20 +102,24 @@ void DynamicTiledObject::combinePieces(TileMap *map)
 
         render_texture->draw(quads, 4, sf::Quads, cur_tileset->render_states);
 
-        if (collision_rect.width == 0 && collision_rect.height == 0) {
-            collision_rect = (sf::FloatRect) tile.collision_rect;
-            continue;
-        }
         if (tile.collision_rect.width == 0 && tile.collision_rect.width == 0) {
             continue;
         }
 
-        const float left   = min(collision_rect.left, tile.collision_rect.left);
-        const float top    = min(collision_rect.top,  tile.collision_rect.top);
-        const float right  = max(collision_rect.left + collision_rect.width,
-                                 tile.collision_rect.left + tile.collision_rect.width);
-        const float bottom = max(collision_rect.top  + collision_rect.height,
-                                 tile.collision_rect.top  + tile.collision_rect.height);
+        const float col_left = pleft + tile.collision_rect.left;
+        const float col_top = ptop + tile.collision_rect.top;
+        const float col_right = col_left + tile.collision_rect.width;
+        const float col_bottom = col_top + tile.collision_rect.height;
+
+        if (collision_rect.width == 0 && collision_rect.height == 0) {
+            collision_rect = (sf::FloatRect) tile.collision_rect;
+            continue;
+        }
+
+        const float left   = min(collision_rect.left, col_left);
+        const float top    = min(collision_rect.top,  col_top);
+        const float right  = max(collision_rect.left + collision_rect.width, col_right);
+        const float bottom = max(collision_rect.top  + collision_rect.height, col_bottom);
 
         collision_rect.left = left;
         collision_rect.top = top;
@@ -130,6 +133,8 @@ void DynamicTiledObject::combinePieces(TileMap *map)
     collider.type = ColliderType::platform;
 
     std::cout << "done building " << name << std::endl;
+    printf("  pos rect: (%f, %f, %f, %f)\n", position_rect.left, position_rect.top, position_rect.width, position_rect.height);
+    printf("  col rect: (%f, %f, %f, %f)\n", collision_rect.left, collision_rect.top, collision_rect.width, collision_rect.height);
 }
 
 /**************************************************************************************************/

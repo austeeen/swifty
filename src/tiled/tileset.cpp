@@ -33,13 +33,15 @@ TileSet::TileSet(rx::xml_node<> *node)
         if (type == "tile") {
             int indx = attr<int>(tile_node, "id");
 
-            rx::xml_node<> *obj_group = node->first_node("objectgroup");
+            rx::xml_node<> *obj_group = tile_node->first_node("objectgroup");
             if (obj_group != nullptr) {
-                rx::xml_node<> *obj = node->first_node("object");
+                rx::xml_node<> *obj = obj_group->first_node("object");
                 if (obj != nullptr) {
                     all_tiles[indx].collision_rect = sf::IntRect(
-                        attr<int>(node, "x"), attr<int>(node, "y"),
-                        attr<int>(node, "width"), attr<int>(node, "height"));
+                        attr<int>(obj, "x"), attr<int>(obj, "y"),
+                        attr<int>(obj, "width"), attr<int>(obj, "height"));
+                } else {
+                    printf("TileSet '%s' has tile entry without object in object group\n", name.c_str());
                 }
             }
         }

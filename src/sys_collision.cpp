@@ -17,20 +17,37 @@ void CollisionSystem::add(std::shared_ptr<KinematicObject> obj)
 void CollisionSystem::checkCollisions()
 {
     for (auto& kin : kin_objs) {
-        for (auto& stat : static_objs) {
-            for (auto& obj_rect : kin->cmpnt<RigidBody>()->getRects()) {
-                const sf::Vector2f offset = findIntersection(obj_rect.aabb, stat->getCollider());
-                if (fabs(offset.x) > 0.f && fabs(offset.y) > 0.f) {
-                    kin->cmpnt<Physics2D>()->onColliding(offset, obj_rect.type);
-                }
+        // vsKinematicObjects(kin);
+        // vsDynamicObjects(kin);
+        vsStaticObjects(kin);
+    }
+}
+void CollisionSystem::vsDynamicObjects(std::shared_ptr<KinematicObject> kin_obj)
+{
+    for (auto& dyn_obj : dyn_objs) {
+        for (auto& obj_rect : kin_obj->cmpnt<RigidBody>()->getRects()) {
+            const sf::Vector2f offset = findIntersection(obj_rect.aabb, dyn_obj->getCollider().aabb);
+            if (fabs(offset.x) > 0.f && fabs(offset.y) > 0.f) {
+                kin_obj->cmpnt<Physics2D>()->onColliding(offset, obj_rect.type);
+            }
+        }
+    }
+}
+void CollisionSystem::vsStaticObjects(std::shared_ptr<KinematicObject> kin_obj)
+{
+    for (auto& stat : static_objs) {
+        for (auto& obj_rect : kin_obj->cmpnt<RigidBody>()->getRects()) {
+            const sf::Vector2f offset = findIntersection(obj_rect.aabb, stat->getCollider());
+            if (fabs(offset.x) > 0.f && fabs(offset.y) > 0.f) {
+                kin_obj->cmpnt<Physics2D>()->onColliding(offset, obj_rect.type);
             }
         }
     }
 }
 const sf::Vector2f CollisionSystem::findIntersection(const sf::FloatRect& ra, const sf::FloatRect& rb) const
 {
-    const float min = [](const float a, const float b) { return (a < b) ? a : b; };
-    const float max = [](const float a, const float b) { return (a < b) ? b : a; };
+    const auto min = [](const float a, const float b) { return (a < b) ? a : b; };
+    const auto max = [](const float a, const float b) { return (a < b) ? b : a; };
 
     const float left   = max(ra.left, rb.left);
     const float top    = max(ra.top,  rb.top);

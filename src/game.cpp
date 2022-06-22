@@ -6,10 +6,7 @@ camera(CAMERA::view_rect)
 {
     window.setKeyRepeatEnabled(false);
 
-
-    TileObject cat_res("res/cat_new.tsx");
-    GameObjectAsset cat_ast(cat_res);
-    player = std::make_shared<Player>(cat_ast);
+    player = std::make_shared<Player>(PlayerObjectAsset(std::make_shared<TileObject>("res/cat_new.tsx")));
 
     tile_map = std::make_shared<TileMap>("res/new_basic_level.tmx");
     tile_map->build();
@@ -20,7 +17,7 @@ camera(CAMERA::view_rect)
     }
     for (auto& dyn_object_group : tile_map->dyn_object_groups) {
         for (auto& [name, dyn_obj] : dyn_object_group->objects) {
-            platforms.push_back(std::make_shared<MovingPlatform>(dyn_obj));
+            platforms.push_back(std::make_shared<MovingPlatform>(PlatformObjectAsset(dyn_obj)));
         }
     }
 }
@@ -37,6 +34,7 @@ void Game::setUp()
 
     player->setUp();
     for (auto& plt : platforms) {
+        std::cout << "setting up platform" << std::endl;
         plt->setUp();
     }
 
@@ -116,7 +114,13 @@ void Game::eventUpdate()
 
                     case sf::Keyboard::J: { player->increase(PhysicsCoeffs::AsEnum::gravity); break; }
                     case sf::Keyboard::M: { player->decrease(PhysicsCoeffs::AsEnum::gravity); break; }
-                    case sf::Keyboard::R: { player->toggleRects(); break; }
+                    case sf::Keyboard::R: {
+                        player->toggleRects();
+                        for (auto& plt : platforms) {
+                            plt->toggleDisplay();
+                        }
+                        break;
+                    }
                     default: { break; }
                 }
                 break;

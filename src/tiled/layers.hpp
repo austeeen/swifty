@@ -41,7 +41,7 @@ struct DynamicObjectGroup {
 
     std::string name;
     int id;
-    std::map<std::string, DynamicTiledObject> objects;
+    std::map<std::string, std::shared_ptr<DynamicTiledObject>> objects;
 };
 
 

@@ -13,8 +13,9 @@ public:
     void render(sf::RenderWindow&) override;
 
     void move(const float dx, const float dy);
+    void toggleDisplay();
 
-    const CollisionRect& getCollider() const;
+    const CollisionRect& getCollider() const override;
 
 private:
     const PlatformObjectAsset ast;
@@ -22,6 +23,8 @@ private:
     sf::FloatRect position_rect;
     sf::Vector2f vel, cur_dest;
     sf::Sprite sprite;
+    sf::RectangleShape pos_shape, col_shape;
+    bool display_body;
 };
 
 #endif // OBJ_MOVING_PLTFRM_HPP

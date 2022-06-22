@@ -24,18 +24,19 @@ public:
     virtual void update(const float dt) {};
     virtual void lateUpdate() {};
     virtual void render(sf::RenderWindow &window) {};
-    virtual const sf::FloatRect getCollider() const =0;
 };
 
 class StaticObject : public GameObjectBase
 {
 public:
+    virtual const sf::FloatRect getCollider() const =0;
 
 };
 
 class DynamicObject : public GameObjectBase
 {
 public:
+    virtual const CollisionRect& getCollider() const =0;
 
 };
 
