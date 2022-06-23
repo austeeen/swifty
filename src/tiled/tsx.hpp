@@ -11,7 +11,6 @@ class TsxBaseObject
 {
 public:
     std::string name;
-    sf::Texture img_texture;
     sf::Vector2i tilesize;
 };
 
@@ -36,8 +35,7 @@ public:
     int speed;
     sf::Vector2f dest;
     bool horizontal;
-    sf::FloatRect position_rect;
-    sf::FloatRect collision_rect;
+    sf::FloatRect position_rect, collision_rect;
     CollisionRect collider;
     sf::VertexArray vertex_array;
     sf::RenderTexture* render_texture;
@@ -55,6 +53,7 @@ public:
     void addTile(rx::xml_node<>* node);
     void addRoll(std::shared_ptr<AnimRoll> roll, rx::xml_node<>* node);
 
+    sf::Texture img_texture;
     std::string img_src;
     int tilecount, columns, totaltiles;
     sf::Vector2i imagesize;

@@ -38,11 +38,11 @@ void DynamicTiledObject::combinePieces(TileMap *map)
 
     // union all pieces' position_rects
     for (auto& obj : pieces) {
-        if (position_rect.width == 0 && position_rect.height == 0) {
-            position_rect = obj.position_rect;
+        if (obj.position_rect.width == 0 && obj.position_rect.width == 0) {
             continue;
         }
-        if (obj.position_rect.width == 0 && obj.position_rect.width == 0) {
+        if (position_rect.width == 0 && position_rect.height == 0) {
+            position_rect = obj.position_rect;
             continue;
         }
 
@@ -59,15 +59,17 @@ void DynamicTiledObject::combinePieces(TileMap *map)
         position_rect.height = bottom - position_rect.top;
     }
 
+    // convert the destination from tile coordinates to pixel coordinates
+    dest.x = map->tilesize.x * dest.x + position_rect.left;
+    dest.y = map->tilesize.y * dest.y + position_rect.top;
+    printf("  dest (%f, %f)\n", dest.x, dest.y);
+
     // create the object's render texture similar to a tile layer
     render_texture->create(position_rect.width, position_rect.height);
     render_texture->clear(sf::Color::Transparent);
 
-    // convert the destination from tile coordinates to pixel coordinates
-    dest.x = map->tilesize.x * dest.x;
-    dest.y = map->tilesize.y * dest.y;
-
-    vertex_array.resize(position_rect.width * position_rect.height * 4);
+    vertex_array.resize(pieces.size() * 4);
+    printf(" vertex_array size %d\n", pieces.size());
 
     TileSet* cur_tileset;
 
@@ -85,6 +87,8 @@ void DynamicTiledObject::combinePieces(TileMap *map)
         const float pbottom = ptop + obj.position_rect.height;
 
         sf::Vertex *quads = &vertex_array[i * 4];
+        printf(" quad #%d\n", i * 4);
+
         quads[0].position = sf::Vector2f(pleft,  ptop);
         quads[1].position = sf::Vector2f(pright, ptop);
         quads[2].position = sf::Vector2f(pright, pbottom);
@@ -126,6 +130,7 @@ void DynamicTiledObject::combinePieces(TileMap *map)
         collision_rect.width = right - collision_rect.left;
         collision_rect.height = bottom - collision_rect.top;
     }
+
     render_texture->display();
 
     collider.offset = sf::Vector2f(collision_rect.left, collision_rect.top);

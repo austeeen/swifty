@@ -8,6 +8,7 @@ class MovingPlatform : public DynamicObject
 {
 public:
     MovingPlatform(const PlatformObjectAsset& ast);
+    ~MovingPlatform();
     void setUp() override;
     void update(const float dt) override;
     void render(sf::RenderWindow&) override;
@@ -19,10 +20,10 @@ public:
 
 private:
     const PlatformObjectAsset ast;
+    sf::Sprite* sprite;
     CollisionRect collider;
     sf::FloatRect position_rect;
     sf::Vector2f vel, cur_dest;
-    sf::Sprite sprite;
     sf::RectangleShape pos_shape, col_shape;
     bool display_body;
 };

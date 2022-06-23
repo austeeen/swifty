@@ -47,14 +47,12 @@ void TileLayer::build(TileMap *map)
         quads[2].position = sf::Vector2f(px + tw, py  + th);
         quads[3].position = sf::Vector2f(px,      py  + th);
 
-
         const TileEntry& tile = cur_tileset->getTile(real_gid);
         quads[0].texCoords = sf::Vector2f(tile.texture_rect.left, tile.texture_rect.top);
         quads[1].texCoords = sf::Vector2f(tile.texture_rect.left + tile.texture_rect.width, tile.texture_rect.top);
         quads[2].texCoords = sf::Vector2f(tile.texture_rect.left + tile.texture_rect.width,
                                           tile.texture_rect.top  + tile.texture_rect.height);
         quads[3].texCoords = sf::Vector2f(tile.texture_rect.left, tile.texture_rect.top  + tile.texture_rect.height);
-
 
         render_texture->draw(quads, 4, sf::Quads, cur_tileset->render_states);
     }

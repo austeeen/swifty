@@ -10,8 +10,9 @@
 struct GameObjectAsset
 {
     GameObjectAsset(std::shared_ptr<TsxBaseObject> tsx_obj);
+
     sf::Vector2f start_pos;
-    const sf::Texture img_texture;
+    sf::Texture img_texture;
     const sf::Vector2i size;
 };
 
@@ -27,6 +28,7 @@ struct PlatformObjectAsset: public GameObjectAsset
 {
     PlatformObjectAsset(std::shared_ptr<DynamicTiledObject> tsx_obj);
 
+    const sf::FloatRect position_rect;
     const CollisionRect collider;
     const int speed;
     const sf::Vector2f dest;
