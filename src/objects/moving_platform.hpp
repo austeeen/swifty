@@ -17,6 +17,7 @@ public:
     void toggleDisplay();
 
     const CollisionRect& getCollider() const override;
+    const sf::Vector2f& getVelocity() const override;
 
 private:
     const PlatformObjectAsset ast;

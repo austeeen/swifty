@@ -37,7 +37,7 @@ class DynamicObject : public GameObjectBase
 {
 public:
     virtual const CollisionRect& getCollider() const =0;
-
+    virtual const sf::Vector2f& getVelocity() const =0;
 };
 
 class KinematicObject : public GameObjectBase, public ComponentType

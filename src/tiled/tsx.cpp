@@ -62,14 +62,11 @@ void DynamicTiledObject::combinePieces(TileMap *map)
     // convert the destination from tile coordinates to pixel coordinates
     dest.x = map->tilesize.x * dest.x + position_rect.left;
     dest.y = map->tilesize.y * dest.y + position_rect.top;
-    printf("  dest (%f, %f)\n", dest.x, dest.y);
 
     // create the object's render texture similar to a tile layer
     render_texture->create(position_rect.width, position_rect.height);
     render_texture->clear(sf::Color::Transparent);
-
     vertex_array.resize(pieces.size() * 4);
-    printf(" vertex_array size %d\n", pieces.size());
 
     TileSet* cur_tileset;
 
@@ -87,7 +84,6 @@ void DynamicTiledObject::combinePieces(TileMap *map)
         const float pbottom = ptop + obj.position_rect.height;
 
         sf::Vertex *quads = &vertex_array[i * 4];
-        printf(" quad #%d\n", i * 4);
 
         quads[0].position = sf::Vector2f(pleft,  ptop);
         quads[1].position = sf::Vector2f(pright, ptop);
@@ -138,8 +134,6 @@ void DynamicTiledObject::combinePieces(TileMap *map)
     collider.type = ColliderType::platform;
 
     std::cout << "done building " << name << std::endl;
-    printf("  pos rect: (%f, %f, %f, %f)\n", position_rect.left, position_rect.top, position_rect.width, position_rect.height);
-    printf("  col rect: (%f, %f, %f, %f)\n", collision_rect.left, collision_rect.top, collision_rect.width, collision_rect.height);
 }
 
 /**************************************************************************************************/

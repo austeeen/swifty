@@ -18,7 +18,7 @@ void CollisionSystem::checkCollisions()
 {
     for (auto& kin : kin_objs) {
         // vsKinematicObjects(kin);
-        // vsDynamicObjects(kin);
+        vsDynamicObjects(kin);
         vsStaticObjects(kin);
     }
 }
@@ -26,9 +26,11 @@ void CollisionSystem::vsDynamicObjects(std::shared_ptr<KinematicObject> kin_obj)
 {
     for (auto& dyn_obj : dyn_objs) {
         for (auto& obj_rect : kin_obj->cmpnt<RigidBody>()->getRects()) {
-            const sf::Vector2f offset = findIntersection(obj_rect.aabb, dyn_obj->getCollider().aabb);
+            const CollisionRect d_col = dyn_obj->getCollider();
+            const sf::Vector2f offset = findIntersection(obj_rect.aabb, d_col.aabb);
             if (fabs(offset.x) > 0.f && fabs(offset.y) > 0.f) {
-                kin_obj->cmpnt<Physics2D>()->onColliding(offset, obj_rect.type);
+                kin_obj->cmpnt<Physics2D>()->onColliding(offset, d_col.type, obj_rect.type);
+                kin_obj->cmpnt<Physics2D>()->updateInertia(dyn_obj->getVelocity());
             }
         }
     }
@@ -39,7 +41,7 @@ void CollisionSystem::vsStaticObjects(std::shared_ptr<KinematicObject> kin_obj)
         for (auto& obj_rect : kin_obj->cmpnt<RigidBody>()->getRects()) {
             const sf::Vector2f offset = findIntersection(obj_rect.aabb, stat->getCollider());
             if (fabs(offset.x) > 0.f && fabs(offset.y) > 0.f) {
-                kin_obj->cmpnt<Physics2D>()->onColliding(offset, obj_rect.type);
+                kin_obj->cmpnt<Physics2D>()->onColliding(offset, ColliderType::immovable, obj_rect.type);
             }
         }
     }

@@ -23,7 +23,8 @@ public:
 
     void setState(ObjectState state);
     const ObjectState nextState();
-    void onColliding(const sf::Vector2f& offset, ColliderType type);
+    void onColliding(const sf::Vector2f& offset, const ColliderType colliding_type, const ColliderType type);
+    void updateInertia(const sf::Vector2f& in);
 
     const sf::Vector2f getVelocity() const;
 
@@ -38,7 +39,7 @@ private:
     PhysicsCoeffs u;
     Force2D frc;
     int moving_left, moving_right, moving_dir, is_jumping;
-    sf::Vector2f vel, acl, body_offset, other_offset;
+    sf::Vector2f vel, inertia, acl, body_offset, other_offset;
     float falling_dt, block_falling;
 };
 

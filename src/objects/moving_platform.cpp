@@ -40,7 +40,6 @@ void MovingPlatform::update(const float dt)
     const float dx = mx - cur_dest.x;
     const float dy = my - cur_dest.y;
 
-    // printf("pos: (%f, %f), disp: (%f, %f)\n", mx, my, dx, dy);
 
     if (fabs(dx) < 0.01f) {
         mx = cur_dest.x;
@@ -67,6 +66,9 @@ void MovingPlatform::update(const float dt)
             cur_dest = ast.dest;
         }
     }
+
+    // printf("platform: v(%f, %f)\n", vel.x, vel.y);
+
     move(vel.x * dt, vel.y * dt);
 }
 void MovingPlatform::render(sf::RenderWindow &window)
@@ -100,4 +102,8 @@ void MovingPlatform::toggleDisplay()
 const CollisionRect& MovingPlatform::getCollider() const
 {
     return collider;
+}
+const sf::Vector2f& MovingPlatform::getVelocity() const
+{
+    return vel;
 }
