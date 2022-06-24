@@ -6,7 +6,7 @@ MovingPlatform::MovingPlatform(const PlatformObjectAsset& ast):
     collider(ast.collider),
     position_rect(ast.position_rect),
     vel(0, 0), cur_dest(0, 0),
-    display_body(false)
+    display_body(false), waypoint_indx(0), total_waypoints(ast.waypoints.size())
 {
     pos_shape.setOutlineThickness(1);
     pos_shape.setFillColor(sf::Color::Transparent);
@@ -25,13 +25,9 @@ MovingPlatform::~MovingPlatform()
 }
 void MovingPlatform::setUp()
 {
-    // move(ast.start_pos.x, ast.start_pos.y);
-    cur_dest = ast.dest;
-    printf("set up start pos: (%f, %f)\n", ast.start_pos.x, ast.start_pos.y);
-    sf::FloatRect sz = sprite->getGlobalBounds();
-    printf("  sprite rect: (%f, %f, %f, %f)\n", sz.left, sz.top, sz.width, sz.height);
-    printf("  pos    rect: (%f, %f, %f, %f)\n", position_rect.left, position_rect.top, position_rect.width, position_rect.height);
-    printf("  aabb   rect: (%f, %f, %f, %f)\n", collider.aabb.left, collider.aabb.top, collider.aabb.width, collider.aabb.height);
+    cur_dest = ast.waypoints[waypoint_indx];
+    printf("set up) start pos: (%f, %f)\n", ast.start_pos.x, ast.start_pos.y);
+    printf("set up) my pos: (%f, %f)\n", position_rect.left, position_rect.top);
 }
 void MovingPlatform::update(const float dt)
 {
@@ -60,11 +56,7 @@ void MovingPlatform::update(const float dt)
     }
 
     if (mx == cur_dest.x && my == cur_dest.y) {
-        if (cur_dest == ast.dest) {
-            cur_dest = ast.start_pos;
-        } else {
-            cur_dest = ast.dest;
-        }
+        nextDestination();
     }
 
     // printf("platform: v(%f, %f)\n", vel.x, vel.y);
@@ -98,6 +90,19 @@ void MovingPlatform::move(const float dx, const float dy)
 void MovingPlatform::toggleDisplay()
 {
     display_body = !display_body;
+}
+void MovingPlatform::nextDestination()
+{
+    if (cur_dest == ast.start_pos) {
+        waypoint_indx = (waypoint_indx + 1) % total_waypoints;
+        cur_dest = ast.waypoints[waypoint_indx];
+        std::cout << "waypoint #" << waypoint_indx << std::endl;
+    } else {
+        cur_dest = ast.start_pos;
+        std::cout << "start pos" << std::endl;
+    }
+    std::cout << cur_dest.x << ", " << cur_dest.y << std::endl;
+    printf("nextDest) my pos: (%f, %f)\n", position_rect.left, position_rect.top);
 }
 const CollisionRect& MovingPlatform::getCollider() const
 {

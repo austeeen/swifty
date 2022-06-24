@@ -2,6 +2,7 @@
 
 /**************************************************************************************************/
 /* VAL */
+/*
 rect::val::val(rect *r, const float v, void(rect::*_m)(const float)): r(r), mv(v), __move(_m)
 {};
 rect::val& rect::val::operator=(const val& v)
@@ -44,9 +45,9 @@ void rect::val::set(const float d)
 {
     mv = d;
 }
-
+*/
 /* POINT */
-
+/*
 rect::point::point(val *x, val *y):
 xy{x, y}, x(x), y(y)
 {}
@@ -68,7 +69,9 @@ rect::val& rect::point::operator[](const int i) const
 {
     return *xy[i];
 }
+*/
 /* RECT */
+/*
 rect::rect(): rect(0.f, 0.f, 0.f, 0.f)
 {}
 rect::rect(const float x, const float y, const float w, const float h) :
@@ -192,3 +195,4 @@ const bool rect::exists() const
 {
     return !(this->left == 0 && this->top == 0 && this->right == 0 && this->bottom == 0);
 }
+*/

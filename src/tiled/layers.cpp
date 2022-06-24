@@ -86,18 +86,23 @@ DynamicObjectGroup::DynamicObjectGroup(rx::xml_node<> *node)
     id = attr<int>(node, "id");
 
     rx::xml_node<> *obj_node = node->first_node();
-    while (obj_node) {
-        std::string obj_name = attr<std::string>(obj_node, "name");
-        if (objects.count(obj_name) == 0) {
-            objects[obj_name] = std::make_shared<DynamicTiledObject>(obj_node);
+    while (obj_node != nullptr) {
+        std::string obj_name = attr_if<std::string>(obj_node, "name");
+        if (obj_name != "") {
+            if (objects.count(obj_name) == 0) {
+                objects[obj_name] = std::make_shared<DynamicTiledObject>(obj_node);
+            }
+            objects[obj_name]->add(obj_node);
+        } else {
+            all_entries[attr<int>(obj_node, "id")] = sf::Vector2f(
+                attr<int>(obj_node, "x"), attr<int>(obj_node, "y"));
         }
-        objects[obj_name]->add(obj_node);
         obj_node = obj_node->next_sibling();
     }
 }
 void DynamicObjectGroup::build(TileMap *map)
 {
     for (auto& [name, dyn_obj] : objects) {
-        dyn_obj->combinePieces(map);
+        dyn_obj->combinePieces(map, all_entries);
     }
 }

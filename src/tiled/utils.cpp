@@ -92,3 +92,45 @@ void extractProperties(const rx::xml_node<> *prp, std::map<std::string, std::str
         n = n->next_sibling();
     }
 }
+
+/**************************************************************************************************/
+
+rect::rect():
+    left(0.f), top(0.f), right(0.f), bottom(0.f), width(0.f), height(0.f)
+{}
+rect::rect(const float l, const float t, const float w, const float h):
+    left(l), top(t), right(l + w), bottom(t + h), width(w), height(h)
+{}
+rect::rect(const sf::FloatRect& r):
+    left(r.left), top(r.top), right(r.left + r.width), bottom(r.top + r.height), width(r.width), height(r.height)
+{}
+rect::rect(const rect& r):
+    left(r.left), top(r.top), right(r.right), bottom(r.bottom), width(r.width), height(r.height)
+{}
+rect::operator sf::FloatRect() const
+{
+    return sf::FloatRect(left, top, width, height);
+}
+rect::operator bool() const
+{
+    return this->width != 0.f && this->height != 0.f;
+}
+const std::string rect::str() const
+{
+    std::stringstream ss;
+    ss << (int) left << ", " << (int) top << ", " << (int) width << ", " << (int) height;
+    return ss.str();
+}
+void rect::operator+=(const rect& r)
+{
+    this->left   = min(this->left,   r.left);
+    this->top    = min(this->top,    r.top);
+    this->right  = max(this->right,  r.right);
+    this->bottom = max(this->bottom, r.bottom);
+    this->width = this->right - this->left;
+    this->height = this->bottom - this->top;
+}
+void rect::operator+=(const sf::FloatRect& r)
+{
+    *this += rect(r);
+}

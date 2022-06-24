@@ -42,6 +42,7 @@ void CollisionSystem::vsStaticObjects(std::shared_ptr<KinematicObject> kin_obj)
             const sf::Vector2f offset = findIntersection(obj_rect.aabb, stat->getCollider());
             if (fabs(offset.x) > 0.f && fabs(offset.y) > 0.f) {
                 kin_obj->cmpnt<Physics2D>()->onColliding(offset, ColliderType::immovable, obj_rect.type);
+                kin_obj->cmpnt<Physics2D>()->updateInertia(sf::Vector2f(0.f, 0.f));
             }
         }
     }

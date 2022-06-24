@@ -5,16 +5,12 @@ ObjectEntry::ObjectEntry(rx::xml_node<>* node)
 {
     id = attr<int>(node, "id");
     gid = attr<int>(node, "gid");
-    position_rect = sf::FloatRect(
-        attr<int>(node, "x"), attr<int>(node, "y"),
-        attr<int>(node, "width"), attr<int>(node, "height"));
+    position_rect = rect(attr<int>(node, "x"), attr<int>(node, "y"),
+                         attr<int>(node, "width"), attr<int>(node, "height"));
 }
 
 DynamicTiledObject::DynamicTiledObject(rx::xml_node<>* node):
-    type(""),
-    speed(-1),
-    dest(0,0), horizontal(false),
-    render_texture(new sf::RenderTexture())
+    type(""), speed(-1), render_texture(new sf::RenderTexture())
 {
     name = attr<std::string>(node, "name");
     type = attr<std::string>(node, "type");
@@ -27,41 +23,31 @@ void DynamicTiledObject::add(rx::xml_node<>* node)
         std::map<std::string, std::string> prp_tbl;
         extractProperties(prps, prp_tbl);
         speed = std::stoi(prp_tbl.at("speed"));
-        dest = stovf(prp_tbl.at("dest"));
-        horizontal = stob(prp_tbl.at("horizontal"));
+        for (auto& [k, v] : prp_tbl) {
+            if (k.find("path") != std::string::npos) {
+                wp_ids.push_back(stoi(v));
+            }
+        }
     }
 }
-void DynamicTiledObject::combinePieces(TileMap *map)
+void DynamicTiledObject::combinePieces(TileMap *map, std::map<int, sf::Vector2f>& all_waypoints)
 {
-    const auto min = [](float a, float b) { return (a < b) ? a : b; };
-    const auto max = [](float a, float b) { return (a < b) ? b : a; };
-
     // union all pieces' position_rects
     for (auto& obj : pieces) {
-        if (obj.position_rect.width == 0 && obj.position_rect.width == 0) {
+        if (! (bool) obj.position_rect) {
             continue;
-        }
-        if (position_rect.width == 0 && position_rect.height == 0) {
+        } else if (! (bool) position_rect) {
             position_rect = obj.position_rect;
             continue;
+        } else {
+            position_rect += obj.position_rect;
         }
-
-        const float left   = min(position_rect.left, obj.position_rect.left);
-        const float top    = min(position_rect.top,  obj.position_rect.top);
-        const float right  = max(position_rect.left + position_rect.width,
-                                 obj.position_rect.left + obj.position_rect.width);
-        const float bottom = max(position_rect.top  + position_rect.height,
-                                 obj.position_rect.top  + obj.position_rect.height);
-
-        position_rect.left = left;
-        position_rect.top = top;
-        position_rect.width = right - position_rect.left;
-        position_rect.height = bottom - position_rect.top;
     }
 
-    // convert the destination from tile coordinates to pixel coordinates
-    dest.x = map->tilesize.x * dest.x + position_rect.left;
-    dest.y = map->tilesize.y * dest.y + position_rect.top;
+    // grab the waypoints, if any
+    for (const int id : wp_ids) {
+        waypoints.push_back(all_waypoints.at(id));
+    }
 
     // create the object's render texture similar to a tile layer
     render_texture->create(position_rect.width, position_rect.height);
@@ -70,70 +56,62 @@ void DynamicTiledObject::combinePieces(TileMap *map)
 
     TileSet* cur_tileset;
 
-    for (size_t i = 0; i < pieces.size(); ++i) {
+    for (size_t i = 0; i < pieces.size(); ++i)
+    {
         ObjectEntry& obj = pieces[i];
+
         int gid = obj.gid;
         if (gid == 0) {
             continue;
         }
 
         // normalized object's rect to position_rect's origin so we can position its texture
-        const float pleft = obj.position_rect.left - position_rect.left;
-        const float ptop = obj.position_rect.top - position_rect.top;
-        const float pright = pleft + obj.position_rect.width;
-        const float pbottom = ptop + obj.position_rect.height;
+        const rect pos(
+            obj.position_rect.left - position_rect.left,
+            obj.position_rect.top - position_rect.top,
+            obj.position_rect.width,
+            obj.position_rect.height
+        );
 
         sf::Vertex *quads = &vertex_array[i * 4];
 
-        quads[0].position = sf::Vector2f(pleft,  ptop);
-        quads[1].position = sf::Vector2f(pright, ptop);
-        quads[2].position = sf::Vector2f(pright, pbottom);
-        quads[3].position = sf::Vector2f(pleft,  pbottom);
+        quads[0].position = sf::Vector2f(pos.left,  pos.top);
+        quads[1].position = sf::Vector2f(pos.right, pos.top);
+        quads[2].position = sf::Vector2f(pos.right, pos.bottom);
+        quads[3].position = sf::Vector2f(pos.left,  pos.bottom);
 
         cur_tileset = map->getTileset(gid);
         int real_gid = gid - cur_tileset->firstgid;
         const TileEntry& tile = cur_tileset->getTile(real_gid);
 
         quads[0].texCoords = sf::Vector2f(tile.texture_rect.left, tile.texture_rect.top);
-        quads[1].texCoords = sf::Vector2f(tile.texture_rect.left + tile.texture_rect.width, tile.texture_rect.top);
-        quads[2].texCoords = sf::Vector2f(tile.texture_rect.left + tile.texture_rect.width,
-                                          tile.texture_rect.top  + tile.texture_rect.height);
-        quads[3].texCoords = sf::Vector2f(tile.texture_rect.left, tile.texture_rect.top  + tile.texture_rect.height);
+        quads[1].texCoords = sf::Vector2f(tile.texture_rect.right, tile.texture_rect.top);
+        quads[2].texCoords = sf::Vector2f(tile.texture_rect.right, tile.texture_rect.bottom);
+        quads[3].texCoords = sf::Vector2f(tile.texture_rect.left, tile.texture_rect.bottom);
 
         render_texture->draw(quads, 4, sf::Quads, cur_tileset->render_states);
 
-        if (tile.collision_rect.width == 0 && tile.collision_rect.width == 0) {
+        if ( !(bool)tile.collision_rect) {
             continue;
         }
-
-        const float col_left = pleft + tile.collision_rect.left;
-        const float col_top = ptop + tile.collision_rect.top;
-        const float col_right = col_left + tile.collision_rect.width;
-        const float col_bottom = col_top + tile.collision_rect.height;
-
-        if (collision_rect.width == 0 && collision_rect.height == 0) {
-            collision_rect = (sf::FloatRect) tile.collision_rect;
-            continue;
+        const rect col(
+            pos.left + tile.collision_rect.left,
+            pos.top + tile.collision_rect.top,
+            tile.collision_rect.width,
+            tile.collision_rect.height
+        );
+        if ( !(bool) collision_rect) {
+            collision_rect = col;
+        } else {
+            collision_rect += col;
         }
-
-        const float left   = min(collision_rect.left, col_left);
-        const float top    = min(collision_rect.top,  col_top);
-        const float right  = max(collision_rect.left + collision_rect.width, col_right);
-        const float bottom = max(collision_rect.top  + collision_rect.height, col_bottom);
-
-        collision_rect.left = left;
-        collision_rect.top = top;
-        collision_rect.width = right - collision_rect.left;
-        collision_rect.height = bottom - collision_rect.top;
     }
-
     render_texture->display();
-
     collider.offset = sf::Vector2f(collision_rect.left, collision_rect.top);
     collider.aabb = collision_rect;
     collider.type = ColliderType::platform;
 
-    std::cout << "done building " << name << std::endl;
+    std::cout << "done building " << name << std::endl << std::endl;
 }
 
 /**************************************************************************************************/

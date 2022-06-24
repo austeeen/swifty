@@ -4,7 +4,7 @@
 #include "utils.hpp"
 
 struct TileEntry {
-    sf::IntRect texture_rect, collision_rect;
+    rect texture_rect, collision_rect;
 };
 
 struct TileSet {

@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 
+/*
 class rect
 {
 public:
@@ -101,5 +102,5 @@ private:
     void __sw(const float dw) { right.move(dw);  centerx.move(dw / 2); }
     void __sh(const float dh) { bottom.move(dh); centery.move(dh / 2); }
 };
-
+*/
 #endif // UTIL_AABB_H

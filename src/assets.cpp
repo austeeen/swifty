@@ -18,7 +18,7 @@ PlatformObjectAsset::PlatformObjectAsset(std::shared_ptr<DynamicTiledObject> tsx
     position_rect(tsx_obj->position_rect),
     collider(tsx_obj->collider),
     speed(tsx_obj->speed),
-    dest(tsx_obj->dest)
+    waypoints(tsx_obj->waypoints)
 {
     img_texture = tsx_obj->render_texture->getTexture();
     start_pos = sf::Vector2f(tsx_obj->position_rect.left, tsx_obj->position_rect.top);

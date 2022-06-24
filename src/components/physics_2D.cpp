@@ -47,8 +47,7 @@ void Physics2D::update(const float dt)
 
     // printf("Physics2D: v(%f, %f)\n", vel.x, vel.y);
     // POSITION
-    body->move((vel.x + inertia.x) * dt, vel.y * dt);
-    inertia.x = 0;
+    body->move((vel.x + inertia.x) * dt, (vel.y + inertia.y) * dt);
 }
 void Physics2D::setMoving(const Dir4 dir)
 {
@@ -73,15 +72,11 @@ void Physics2D::jump()
     if (cur_state == ObjectState::idle || cur_state == ObjectState::running) {
         is_jumping = 1;
         vel.y = -frc.jump;
-        std::cout << "is jumping" << std::endl;
-        print();
     }
 }
 void Physics2D::terminateJump()
 {
     is_jumping = 0;
-    std::cout << "not jumping" << std::endl;
-    print();
 }
 void Physics2D::setState(ObjectState state)
 {
@@ -127,10 +122,6 @@ const ObjectState Physics2D::nextState()
             }
             break;
         }
-    }
-
-    if (next_state != cur_state) {
-        std::cout << out::toStr(cur_state) << " > " << out::toStr(next_state) << std::endl;
     }
     return next_state;
 }

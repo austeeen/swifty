@@ -12,9 +12,9 @@ TileSet::TileSet(rx::xml_node<> *node)
     for (int i = 0; i < totaltiles; i ++) {
         all_tiles.push_back(
             TileEntry {
-                sf::IntRect((i % columns) * tilesize.x, (i / columns) * tilesize.y,
+                rect((i % columns) * tilesize.x, (i / columns) * tilesize.y,
                 tilesize.x, tilesize.y),
-                sf::IntRect()
+                rect(0, 0, 0, 0)
             }
         );
     }
@@ -37,7 +37,7 @@ TileSet::TileSet(rx::xml_node<> *node)
             if (obj_group != nullptr) {
                 rx::xml_node<> *obj = obj_group->first_node("object");
                 if (obj != nullptr) {
-                    all_tiles[indx].collision_rect = sf::IntRect(
+                    all_tiles[indx].collision_rect = rect(
                         attr<int>(obj, "x"), attr<int>(obj, "y"),
                         attr<int>(obj, "width"), attr<int>(obj, "height"));
                 } else {
