@@ -2,9 +2,7 @@
 #define TLD_LAYERS_HPP
 
 #include "utils.hpp"
-#include "tsx.hpp"
-
-class TileMap;
+#include "dynamic_tiled_object.hpp"
 
 
 class TileLayer
@@ -42,7 +40,7 @@ struct DynamicObjectGroup {
     std::string name;
     int id;
     std::map<std::string, std::shared_ptr<DynamicTiledObject>> objects;
-    std::map<int, sf::Vector2f> all_entries;
+    std::map<int, Waypoint> waypoints;
 };
 
 

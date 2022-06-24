@@ -21,17 +21,17 @@ public:
     const sf::Vector2f& getVelocity() const override;
 
 private:
-    void nextDestination();
+    void nextWaypoint();
 
     const PlatformObjectAsset ast;
     sf::Sprite* sprite;
     CollisionRect collider;
     sf::FloatRect position_rect;
-    sf::Vector2i dir;
-    sf::Vector2f vel, cur_dest;
+    sf::Vector2f vel;
+    Waypoint* wp;
+    bool traversing;
     sf::RectangleShape pos_shape, col_shape;
     bool display_body;
-    int waypoint_indx, total_waypoints;
 };
 
 #endif // OBJ_MOVING_PLTFRM_HPP

@@ -16,33 +16,6 @@ public:
 
 /**************************************************************************************************/
 
-struct ObjectEntry
-{
-    ObjectEntry(rx::xml_node<>* node);
-    int id, gid;
-    rect position_rect;
-};
-
-class DynamicTiledObject: public TsxBaseObject
-{
-public:
-    DynamicTiledObject(rx::xml_node<>* node);
-    void add(rx::xml_node<>* node);
-    void combinePieces(TileMap *map, std::map<int, sf::Vector2f>& all_waypoints);
-
-    std::vector<ObjectEntry> pieces;
-    std::string type;
-    int speed;
-    std::vector<int> wp_ids;
-    std::vector<sf::Vector2f> waypoints;
-    rect position_rect, collision_rect;
-    CollisionRect collider;
-    sf::VertexArray vertex_array;
-    sf::RenderTexture* render_texture;
-};
-
-/**************************************************************************************************/
-
 class TileObject: public TsxBaseObject
 {
 public:

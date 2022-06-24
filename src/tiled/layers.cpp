@@ -87,15 +87,28 @@ DynamicObjectGroup::DynamicObjectGroup(rx::xml_node<> *node)
 
     rx::xml_node<> *obj_node = node->first_node();
     while (obj_node != nullptr) {
-        std::string obj_name = attr_if<std::string>(obj_node, "name");
-        if (obj_name != "") {
+
+        int next_id = -1;
+        rx::xml_node<> *prps = obj_node->first_node("properties");
+        if (prps != nullptr) {
+            std::map<std::string, std::string> prp_tbl;
+            extractProperties(prps, prp_tbl);
+            if (prp_tbl.count("next") != 0) {
+                next_id = std::stoi(prp_tbl.at("next"));
+            }
+        }
+
+        waypoints[attr<int>(obj_node, "id")] = Waypoint {
+            sf::Vector2f(attr<int>(obj_node, "x"), attr<int>(obj_node, "y")), next_id
+        };
+
+        std::string type = attr_if<std::string>(obj_node, "type");
+        if (type == "platform") {
+            std::string obj_name = attr<std::string>(obj_node, "name");
             if (objects.count(obj_name) == 0) {
                 objects[obj_name] = std::make_shared<DynamicTiledObject>(obj_node);
             }
             objects[obj_name]->add(obj_node);
-        } else {
-            all_entries[attr<int>(obj_node, "id")] = sf::Vector2f(
-                attr<int>(obj_node, "x"), attr<int>(obj_node, "y"));
         }
         obj_node = obj_node->next_sibling();
     }
@@ -103,6 +116,7 @@ DynamicObjectGroup::DynamicObjectGroup(rx::xml_node<> *node)
 void DynamicObjectGroup::build(TileMap *map)
 {
     for (auto& [name, dyn_obj] : objects) {
-        dyn_obj->combinePieces(map, all_entries);
+        dyn_obj->combinePieces(map);
+        dyn_obj->setWaypointTree(waypoints);
     }
 }

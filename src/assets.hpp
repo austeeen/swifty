@@ -32,7 +32,7 @@ struct PlatformObjectAsset: public GameObjectAsset
     const sf::FloatRect position_rect;
     const CollisionRect collider;
     const int speed;
-    const std::vector<sf::Vector2f> waypoints;
+    Waypoint* root_waypoint;
 };
 
 #endif // ASSETS_HPP

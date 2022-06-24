@@ -5,9 +5,9 @@ MovingPlatform::MovingPlatform(const PlatformObjectAsset& ast):
     sprite(nullptr),
     collider(ast.collider),
     position_rect(ast.position_rect),
-    dir(0, 0),
-    vel(0, 0), cur_dest(0, 0),
-    display_body(false), waypoint_indx(0), total_waypoints(ast.waypoints.size())
+    vel(0, 0),
+    traversing(true),
+    display_body(false)
 {
     pos_shape.setOutlineThickness(1);
     pos_shape.setFillColor(sf::Color::Transparent);
@@ -18,27 +18,27 @@ MovingPlatform::MovingPlatform(const PlatformObjectAsset& ast):
     col_shape.setOutlineColor(sf::Color::Blue);
 
     sprite = new sf::Sprite(ast.img_texture);
+    wp = ast.root_waypoint;
 }
 MovingPlatform::~MovingPlatform()
 {
     delete sprite;
     sprite = nullptr;
+    wp = nullptr;
 }
 void MovingPlatform::setUp()
 {
-    cur_dest = ast.waypoints[waypoint_indx];
-    dir.x = sgn(position_rect.left - cur_dest.x);
-    dir.y = sgn(position_rect.top - cur_dest.y);
+    wp = wp->next;
 }
 void MovingPlatform::update(const float dt)
 {
-    const float dx = position_rect.left - cur_dest.x;
-    const float dy = position_rect.top - cur_dest.y;
+    const float dx = position_rect.left - wp->loc.x;
+    const float dy = position_rect.top - wp->loc.y;
     // const int sx = sgn(dx);
     // const int sy = sgn(dy);
 
     if (fabs(dx) < FLT_ZERO) {
-        position_rect.left = cur_dest.x;
+        position_rect.left = wp->loc.x;
         vel.x = 0;
     }
     else if (dx > 0) {
@@ -48,7 +48,7 @@ void MovingPlatform::update(const float dt)
     }
 
     if (fabs(dy) < FLT_ZERO) {
-        position_rect.top = cur_dest.y;
+        position_rect.top = wp->loc.y;
         vel.y = 0;
     }
     else if (dy > 0) {
@@ -61,8 +61,8 @@ void MovingPlatform::update(const float dt)
 }
 void MovingPlatform::lateUpdate()
 {
-    if (position_rect.left == cur_dest.x && position_rect.top == cur_dest.y) {
-        nextDestination();
+    if (position_rect.left == wp->loc.x && position_rect.top == wp->loc.y) {
+        nextWaypoint();
     }
 }
 void MovingPlatform::render(sf::RenderWindow &window)
@@ -93,18 +93,20 @@ void MovingPlatform::toggleDisplay()
 {
     display_body = !display_body;
 }
-void MovingPlatform::nextDestination()
+void MovingPlatform::nextWaypoint()
 {
-    if (cur_dest == ast.start_pos) {
-        waypoint_indx = (waypoint_indx + 1) % total_waypoints;
-        cur_dest = ast.waypoints[waypoint_indx];
-    } else {
-        cur_dest = ast.start_pos;
+
+    if(wp->next == nullptr) {
+        traversing = false;
+    } else if (wp->prev == nullptr) {
+        traversing = true;
     }
 
-    dir.x = sgn(position_rect.left - cur_dest.x);
-    dir.y = sgn(position_rect.top - cur_dest.y);
-    std::cout << ast.name << ": next dest";
+    if (traversing) {
+        wp = wp->next;
+    } else {
+        wp = wp->prev;
+    }
 }
 const CollisionRect& MovingPlatform::getCollider() const
 {

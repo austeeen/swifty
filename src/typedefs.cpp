@@ -54,3 +54,10 @@ std::ostream& operator<<(std::ostream& o, const PhysicsCoeffs& u)
      << "}";
     return o;
 }
+
+Waypoint* Waypoint::setNext(Waypoint* n)
+{
+    this->next = n;
+    this->next->prev = this;
+    return n;
+}
