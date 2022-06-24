@@ -9,6 +9,7 @@ int main()
         game.update();
         game.render();
     }
+    game.exit();
 
     return 0;
 }

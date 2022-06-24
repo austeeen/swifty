@@ -5,6 +5,7 @@ MovingPlatform::MovingPlatform(const PlatformObjectAsset& ast):
     sprite(nullptr),
     collider(ast.collider),
     position_rect(ast.position_rect),
+    dir(0, 0),
     vel(0, 0), cur_dest(0, 0),
     display_body(false), waypoint_indx(0), total_waypoints(ast.waypoints.size())
 {
@@ -26,19 +27,19 @@ MovingPlatform::~MovingPlatform()
 void MovingPlatform::setUp()
 {
     cur_dest = ast.waypoints[waypoint_indx];
-    printf("set up) start pos: (%f, %f)\n", ast.start_pos.x, ast.start_pos.y);
-    printf("set up) my pos: (%f, %f)\n", position_rect.left, position_rect.top);
+    dir.x = sgn(position_rect.left - cur_dest.x);
+    dir.y = sgn(position_rect.top - cur_dest.y);
 }
 void MovingPlatform::update(const float dt)
 {
-    float mx = position_rect.left;
-    float my = position_rect.top;
-    const float dx = mx - cur_dest.x;
-    const float dy = my - cur_dest.y;
+    const float dx = position_rect.left - cur_dest.x;
+    const float dy = position_rect.top - cur_dest.y;
+    // const int sx = sgn(dx);
+    // const int sy = sgn(dy);
 
-
-    if (fabs(dx) < 0.01f) {
-        mx = cur_dest.x;
+    if (fabs(dx) < FLT_ZERO) {
+        position_rect.left = cur_dest.x;
+        vel.x = 0;
     }
     else if (dx > 0) {
         vel.x = -ast.speed;
@@ -46,8 +47,9 @@ void MovingPlatform::update(const float dt)
         vel.x = ast.speed;
     }
 
-    if (fabs(dy) < 0.01f) {
-        my = cur_dest.y;
+    if (fabs(dy) < FLT_ZERO) {
+        position_rect.top = cur_dest.y;
+        vel.y = 0;
     }
     else if (dy > 0) {
         vel.y = -ast.speed;
@@ -55,13 +57,13 @@ void MovingPlatform::update(const float dt)
         vel.y = ast.speed;
     }
 
-    if (mx == cur_dest.x && my == cur_dest.y) {
+    move(vel.x * dt, vel.y * dt);
+}
+void MovingPlatform::lateUpdate()
+{
+    if (position_rect.left == cur_dest.x && position_rect.top == cur_dest.y) {
         nextDestination();
     }
-
-    // printf("platform: v(%f, %f)\n", vel.x, vel.y);
-
-    move(vel.x * dt, vel.y * dt);
 }
 void MovingPlatform::render(sf::RenderWindow &window)
 {
@@ -96,13 +98,13 @@ void MovingPlatform::nextDestination()
     if (cur_dest == ast.start_pos) {
         waypoint_indx = (waypoint_indx + 1) % total_waypoints;
         cur_dest = ast.waypoints[waypoint_indx];
-        std::cout << "waypoint #" << waypoint_indx << std::endl;
     } else {
         cur_dest = ast.start_pos;
-        std::cout << "start pos" << std::endl;
     }
-    std::cout << cur_dest.x << ", " << cur_dest.y << std::endl;
-    printf("nextDest) my pos: (%f, %f)\n", position_rect.left, position_rect.top);
+
+    dir.x = sgn(position_rect.left - cur_dest.x);
+    dir.y = sgn(position_rect.top - cur_dest.y);
+    std::cout << ast.name << ": next dest";
 }
 const CollisionRect& MovingPlatform::getCollider() const
 {

@@ -15,6 +15,7 @@ PlayerObjectAsset::PlayerObjectAsset(std::shared_ptr<TileObject> tsx_obj):
 
 PlatformObjectAsset::PlatformObjectAsset(std::shared_ptr<DynamicTiledObject> tsx_obj):
     GameObjectAsset(tsx_obj),
+    name(tsx_obj->name),
     position_rect(tsx_obj->position_rect),
     collider(tsx_obj->collider),
     speed(tsx_obj->speed),

@@ -8,6 +8,7 @@
 #include "tiled/all.hpp"
 #include "sys_collision.hpp"
 #include "io/devices.hpp"
+#include "utils/benchmark.hpp"
 
 class Game
 {
@@ -18,6 +19,7 @@ public:
     void update();
     void lateupdate();
     void render();
+    void exit();
     bool isRunning() const;
 
 private:
@@ -29,7 +31,7 @@ private:
 
     sf::Clock frame_clock;
     float dt;
-
+    Clock fclock;
     sf::RenderWindow window;
     Camera camera;
     InputDevice *io_device;

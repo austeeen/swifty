@@ -11,6 +11,7 @@ public:
     ~MovingPlatform();
     void setUp() override;
     void update(const float dt) override;
+    void lateUpdate() override;
     void render(sf::RenderWindow&) override;
 
     void move(const float dx, const float dy);
@@ -21,11 +22,12 @@ public:
 
 private:
     void nextDestination();
-    
+
     const PlatformObjectAsset ast;
     sf::Sprite* sprite;
     CollisionRect collider;
     sf::FloatRect position_rect;
+    sf::Vector2i dir;
     sf::Vector2f vel, cur_dest;
     sf::RectangleShape pos_shape, col_shape;
     bool display_body;

@@ -111,7 +111,7 @@ void DynamicTiledObject::combinePieces(TileMap *map, std::map<int, sf::Vector2f>
     collider.aabb = collision_rect;
     collider.type = ColliderType::platform;
 
-    std::cout << "done building " << name << std::endl << std::endl;
+    std::cout << "done building " << name << std::endl;
 }
 
 /**************************************************************************************************/

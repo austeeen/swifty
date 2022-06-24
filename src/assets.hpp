@@ -28,6 +28,7 @@ struct PlatformObjectAsset: public GameObjectAsset
 {
     PlatformObjectAsset(std::shared_ptr<DynamicTiledObject> tsx_obj);
 
+    const std::string name;
     const sf::FloatRect position_rect;
     const CollisionRect collider;
     const int speed;

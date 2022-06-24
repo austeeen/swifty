@@ -5,6 +5,8 @@ window(sf::VideoMode(WINDOW::width, WINDOW::height), WINDOW::title, WINDOW::styl
 camera(CAMERA::view_rect)
 {
     window.setKeyRepeatEnabled(false);
+    // window.setFramerateLimit(60);
+    window.setVerticalSyncEnabled(true);
 
     player = std::make_shared<Player>(PlayerObjectAsset(std::make_shared<TileObject>("res/cat_new.tsx")));
 
@@ -49,6 +51,10 @@ void Game::setUp()
 
     camera.setCenter(player->cmpnt<RigidBody>()->getPosition());
     camera.update(window.getSize());
+
+    fclock.restart();
+    fclock.start();
+
     dt = frame_clock.restart().asSeconds();
 }
 void Game::update()
@@ -57,11 +63,11 @@ void Game::update()
     inputUpdate();
     eventUpdate();
     gameUpdate();
+    fclock.tick();
 }
 void Game::inputUpdate()
 {
     io_device->update();
-
     io::binding b = io_device->get(io::left);
     if (b == io::pressed_s) {
         player->move(Dir4::left);
@@ -135,8 +141,14 @@ void Game::gameUpdate()
     for (auto& plt : platforms) {
         plt->update(dt);
     }
+
     collision_system.checkCollisions();
+
     player->lateUpdate();
+    for (auto& plt : platforms) {
+        plt->lateUpdate();
+    }
+
     camera.setCenter(player->cmpnt<RigidBody>()->getPosition());
     camera.applyView(window);
 }
@@ -151,6 +163,13 @@ void Game::render()
         plt->render(window);
     }
     window.display();
+}
+void Game::exit()
+{
+    fclock.stop();
+    std::cout << "num frames: " << fclock.num_ticks << "\n";
+    std::cout << "run time: " << fclock.duration.count() << "\n";
+    std::cout << "fps: " << fclock.num_ticks / fclock.duration.count() << "\n";
 }
 void Game::sleep(const float sec)
 {
