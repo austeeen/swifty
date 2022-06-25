@@ -183,7 +183,7 @@
   <object id="30" x="393.552" y="154.938" width="4.75022" height="147.443"/>
   <object id="31" x="1.77812" y="1.77812" width="397.364" height="4.54545"/>
  </objectgroup>
- <objectgroup id="7" name="dynamic">
+ <objectgroup id="7" name="dynamic" locked="1">
   <object id="34" name="A" type="platform" gid="3" x="104" y="80" width="8" height="8">
    <properties>
     <property name="next" type="object" value="42"/>
