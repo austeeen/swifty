@@ -56,8 +56,6 @@ void TileLayer::build(TileMap *map)
 
         render_texture->draw(quads, 4, sf::Quads, cur_tileset->render_states);
     }
-
-    std::cout << "done building " << name << std::endl;
     render_texture->display();
 }
 

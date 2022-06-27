@@ -36,7 +36,7 @@ joy_indx(-1), button_count(0), has_x(false), has_y(false), has_z(false), connect
     has_x = sf::Joystick::hasAxis(joy_indx, sf::Joystick::X);
     has_y = sf::Joystick::hasAxis(joy_indx, sf::Joystick::Y);
     has_z = sf::Joystick::hasAxis(joy_indx, sf::Joystick::Z);
-    printf("Using Joystick [%d buttons, axis: (x:%d, y:%d, z:%d)]", button_count, has_x, has_y, has_z);
+    printf("Using Joystick [%d buttons, axis: (x:%d, y:%d, z:%d)]\n", button_count, has_x, has_y, has_z);
     this->bindings[io::jump] = joy::snes::A;
     this->bindings[io::back] = joy::snes::B;
     this->bindings[io::menu] = joy::snes::ST;

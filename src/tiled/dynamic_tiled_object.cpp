@@ -113,19 +113,12 @@ void DynamicTiledObject::combinePieces(TileMap *map)
     collider.offset = sf::Vector2f(collision_rect.left, collision_rect.top);
     collider.aabb = collision_rect;
     collider.type = ColliderType::platform;
-
-    std::cout << "done building " << name << std::endl;
 }
 void DynamicTiledObject::setWaypointTree(std::map<int, Waypoint>& all_waypoints)
 {
-    // grab the waypoints, if any
-    std::cout << name << std::endl;
     root_waypoint = new Waypoint(sf::Vector2f(position_rect.left, position_rect.top), root_next_wp);
-    std::cout << " " << root_next_wp << std::endl;
     Waypoint* wp = root_waypoint->setNext(new Waypoint(all_waypoints[root_next_wp]));
     while(wp->next_id != -1) {
-        std::cout << " " << wp->next_id << std::endl;
         wp = wp->setNext(new Waypoint(all_waypoints[wp->next_id]));
     }
-    // wp->setNext(root_waypoint);
 }

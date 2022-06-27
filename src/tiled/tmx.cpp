@@ -17,7 +17,6 @@ TileMap::TileMap(const char* filepath)
     rx::xml_node<> *node = map->first_node();
     while(node != nullptr) {
         std::string type = std::string(node->name());
-        printf("<%s ...> \n", type.c_str());
         if (type == "tileset") {
             int firstgid = attr<int>(node, "firstgid");
             tilesets[firstgid] = new TileSet(node);

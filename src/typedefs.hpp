@@ -46,9 +46,7 @@ std::ostream& operator<<(std::ostream& o, const PhysicsCoeffs& u);
 
 struct Waypoint {
     Waypoint(): loc(0, 0), next_id(-1), next(nullptr), prev(nullptr) {};
-    Waypoint(sf::Vector2f l, int n_id): loc(l), next_id(n_id), next(nullptr), prev(nullptr) {
-        std::cout << "waypoint next id : " << n_id << std::endl;
-    };
+    Waypoint(sf::Vector2f l, int n_id): loc(l), next_id(n_id), next(nullptr), prev(nullptr) {};
     Waypoint(const Waypoint& o): loc(o.loc), next_id(o.next_id), next(o.next), prev(o.prev) {};
     Waypoint* setNext(Waypoint* n);
     sf::Vector2f loc;

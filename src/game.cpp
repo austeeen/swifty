@@ -36,7 +36,6 @@ void Game::setUp()
 
     player->setUp();
     for (auto& plt : platforms) {
-        std::cout << "setting up platform" << std::endl;
         plt->setUp();
     }
 
