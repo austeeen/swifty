@@ -84,7 +84,7 @@
  </tile>
  <tile id="10" type="jumping">
   <properties>
-   <property name="end_early" type="int" value="2"/>
+   <property name="end_early" type="int" value="1"/>
    <property name="hold_last" type="bool" value="true"/>
    <property name="one_shot" type="bool" value="false"/>
   </properties>
@@ -93,9 +93,8 @@
    <object id="2" x="7.95652" y="4.02176" width="7" height="4.86957"/>
   </objectgroup>
   <animation>
-   <frame tileid="10" duration="70"/>
-   <frame tileid="11" duration="180"/>
-   <frame tileid="12" duration="100"/>
+   <frame tileid="10" duration="400"/>
+   <frame tileid="11" duration="200"/>
   </animation>
  </tile>
  <tile id="11">

@@ -1,11 +1,26 @@
 #include "assets.hpp"
 
-GameObjectAsset::GameObjectAsset(const TileObject& obj):
-    img_texture(obj.img_texture),
-    size(obj.tilesize),
-    rect(sf::Vector2f(0, 0), (sf::Vector2f) obj.tilesize),
-    coeffs(obj.pCoeffs),
-    animation_rolls(obj.animation_rolls)
+GameObjectAsset::GameObjectAsset(std::shared_ptr<TsxBaseObject> tsx_obj):
+    size(tsx_obj->tilesize)
+{}
+
+PlayerObjectAsset::PlayerObjectAsset(std::shared_ptr<TileObject> tsx_obj):
+    GameObjectAsset(tsx_obj),
+    coeffs(tsx_obj->pCoeffs),
+    animation_rolls(tsx_obj->animation_rolls)
 {
-     start_pos = sf::Vector2f(CAT_START_X * obj.tilesize.x, CAT_START_Y * obj.tilesize.y);
+    img_texture = tsx_obj->img_texture;
+    start_pos = sf::Vector2f(CAT_START_X * size.x, CAT_START_Y * size.y);
+}
+
+PlatformObjectAsset::PlatformObjectAsset(std::shared_ptr<DynamicTiledObject> tsx_obj):
+    GameObjectAsset(tsx_obj),
+    name(tsx_obj->name),
+    position_rect(tsx_obj->position_rect),
+    collider(tsx_obj->collider),
+    speed(tsx_obj->speed),
+    root_waypoint(tsx_obj->root_waypoint)
+{
+    img_texture = tsx_obj->render_texture->getTexture();
+    start_pos = sf::Vector2f(tsx_obj->position_rect.left, tsx_obj->position_rect.top);
 }

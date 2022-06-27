@@ -1,7 +1,7 @@
 #include "player.hpp"
 
-Player::Player(const GameObjectAsset ast):
-GameObject(CollisionGroup::object), cur_state(ObjectState::idle), ast(ast)
+Player::Player(const PlayerObjectAsset ast):
+cur_state(ObjectState::idle), ast(ast)
 {
     /*
     states[ObjectState::idle] = std::make_unique<IdleState>(this);
@@ -96,7 +96,7 @@ void Player::toggleRects()
 {
     cmpnt<RigidBody>()->toggleDisplay();
 }
-const GameObjectAsset& Player::getAsset() const
+const PlayerObjectAsset& Player::getAsset() const
 {
     return this->ast;
 }

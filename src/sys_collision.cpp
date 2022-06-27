@@ -2,32 +2,55 @@
 
 CollisionSystem::CollisionSystem()
 {}
-void CollisionSystem::add(std::shared_ptr<Player> obj)
+void CollisionSystem::add(std::shared_ptr<StaticObject> obj)
 {
-    objects.push_back(obj);
+    static_objs.push_back(obj);
 }
-void CollisionSystem::add(std::shared_ptr<Boundary> bnd)
+void CollisionSystem::add(std::shared_ptr<DynamicObject> obj)
 {
-    boundaries.push_back(bnd);
+    dyn_objs.push_back(obj);
+}
+void CollisionSystem::add(std::shared_ptr<KinematicObject> obj)
+{
+    kin_objs.push_back(obj);
 }
 void CollisionSystem::checkCollisions()
 {
-    for (auto& obj : objects) {
-        for (auto& bnd : boundaries) {
-            sf::FloatRect bnd_aabb = bnd->getRect();
-            for (auto& obj_rect : obj->cmpnt<RigidBody>()->getRects()) {
-                const sf::Vector2f offset = findIntersection(obj_rect.aabb, bnd_aabb);
-                if (fabs(offset.x) > 0.f && fabs(offset.y) > 0.f) {
-                    obj->cmpnt<Physics2D>()->onColliding(offset, obj_rect.type);
-                }
+    for (auto& kin : kin_objs) {
+        // vsKinematicObjects(kin);
+        vsDynamicObjects(kin);
+        vsStaticObjects(kin);
+    }
+}
+void CollisionSystem::vsDynamicObjects(std::shared_ptr<KinematicObject> kin_obj)
+{
+    for (auto& dyn_obj : dyn_objs) {
+        for (auto& obj_rect : kin_obj->cmpnt<RigidBody>()->getRects()) {
+            const CollisionRect d_col = dyn_obj->getCollider();
+            const sf::Vector2f offset = findIntersection(obj_rect.aabb, d_col.aabb);
+            if (fabs(offset.x) > 0.f && fabs(offset.y) > 0.f) {
+                kin_obj->cmpnt<Physics2D>()->onColliding(offset, d_col.type, obj_rect.type);
+                kin_obj->cmpnt<Physics2D>()->updateInertia(dyn_obj->getVelocity());
+            }
+        }
+    }
+}
+void CollisionSystem::vsStaticObjects(std::shared_ptr<KinematicObject> kin_obj)
+{
+    for (auto& stat : static_objs) {
+        for (auto& obj_rect : kin_obj->cmpnt<RigidBody>()->getRects()) {
+            const sf::Vector2f offset = findIntersection(obj_rect.aabb, stat->getCollider());
+            if (fabs(offset.x) > 0.f && fabs(offset.y) > 0.f) {
+                kin_obj->cmpnt<Physics2D>()->onColliding(offset, ColliderType::immovable, obj_rect.type);
+                kin_obj->cmpnt<Physics2D>()->updateInertia(sf::Vector2f(0.f, 0.f));
             }
         }
     }
 }
 const sf::Vector2f CollisionSystem::findIntersection(const sf::FloatRect& ra, const sf::FloatRect& rb) const
 {
-    const auto min = [](float a, float b) { return (a < b) ? a : b; };
-    const auto max = [](float a, float b) { return (a < b) ? b : a; };
+    const auto min = [](const float a, const float b) { return (a < b) ? a : b; };
+    const auto max = [](const float a, const float b) { return (a < b) ? b : a; };
 
     const float left   = max(ra.left, rb.left);
     const float top    = max(ra.top,  rb.top);

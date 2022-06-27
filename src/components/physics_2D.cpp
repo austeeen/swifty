@@ -6,19 +6,14 @@ Physics2D::Physics2D(Player* obj):
     Component(obj),
     cur_state(ObjectState::idle),
     next_state(ObjectState::idle),
-    moving_left(0), moving_right(0), moving_dir(0),
-    vel(0, 0), acl(0, 0), body_offset(0, 0), other_offset(0, 0),
+    moving_left(0), moving_right(0), moving_dir(0), is_jumping(0),
+    vel(0, 0), inertia(0, 0), acl(0, 0), body_offset(0, 0), other_offset(0, 0),
     falling_dt(0), block_falling(0.1)
-{
-    other_offset.x = 0.f;
-    other_offset.y = 0.f;
-    body_offset.x = 0.f;
-    body_offset.y = 0.f;
-}
+{}
 void Physics2D::build()
 {
     body = obj->cmpnt<RigidBody>();
-    GameObjectAsset ast = obj->getAsset();
+    PlayerObjectAsset ast = obj->getAsset();
     this->u = ast.coeffs;
     frc.update(u);
 }
@@ -33,6 +28,10 @@ void Physics2D::update(const float dt)
     vel.x += acl.x * dt;
     vel.y += acl.y * dt;
 
+    if (is_jumping) {
+        vel.y -= frc.jump * dt;
+    }
+
     if (fabs(vel.x) < FLT_ZERO) {
         vel.x = 0.f;
     } else if (vel.x > u.maxvel) {
@@ -45,8 +44,10 @@ void Physics2D::update(const float dt)
     if (fabs(vel.y) < 0.1) {
         vel.y = 0.f;
     }
+
+    // printf("Physics2D: v(%f, %f)\n", vel.x, vel.y);
     // POSITION
-    body->move(vel.x * dt, vel.y * dt);
+    body->move((vel.x + inertia.x) * dt, (vel.y + inertia.y) * dt);
 }
 void Physics2D::setMoving(const Dir4 dir)
 {
@@ -69,12 +70,13 @@ void Physics2D::stopMoving(const Dir4 dir)
 void Physics2D::jump()
 {
     if (cur_state == ObjectState::idle || cur_state == ObjectState::running) {
-        vel.y -= frc.jump;
+        is_jumping = 1;
+        vel.y = -frc.jump;
     }
 }
 void Physics2D::terminateJump()
 {
-
+    is_jumping = 0;
 }
 void Physics2D::setState(ObjectState state)
 {
@@ -121,17 +123,16 @@ const ObjectState Physics2D::nextState()
             break;
         }
     }
-
-    if (next_state != cur_state) {
-        std::cout << out::toStr(cur_state) << " > " << out::toStr(next_state) << std::endl;
-    }
     return next_state;
 }
-void Physics2D::onColliding(const sf::Vector2f& offset, ColliderType type)
+void Physics2D::onColliding(const sf::Vector2f& offset, const ColliderType colliding_type, const ColliderType type)
 {
     if (fabs(offset.x) < fabs(offset.y)) {
         body->xCollision(offset.x);
         vel.x = 0.f;
+        if (colliding_type == ColliderType::immovable) {
+            inertia.x = 0;
+        }
     } else {
         if (cur_state == ObjectState::jumping) {
             if (offset.y > 0.f) {
@@ -148,7 +149,14 @@ void Physics2D::onColliding(const sf::Vector2f& offset, ColliderType type)
                 vel.y = 0.f;
             }
         }
+        if (colliding_type == ColliderType::immovable) {
+            inertia.y = 0;
+        }
     }
+}
+void Physics2D::updateInertia(const sf::Vector2f& in)
+{
+    inertia = in;
 }
 const sf::Vector2f Physics2D::getVelocity() const
 {
