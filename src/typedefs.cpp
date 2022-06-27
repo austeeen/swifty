@@ -8,7 +8,9 @@ namespace out {
             case ObjectState::running: { return "running"; }
             case ObjectState::jumping: { return "jumping"; }
             case ObjectState::falling: { return "falling"; }
-            case ObjectState::wallsliding: { return "wall_sliding"; }
+            case ObjectState::healing: { return "healing"; }
+            case ObjectState::damaged: { return "damaged"; }
+            case ObjectState::dead: { return "dead"; }
             default: { break; }
         }
         return "undefined";

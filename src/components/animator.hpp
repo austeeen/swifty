@@ -27,7 +27,7 @@ private:
 class Animator: public Component
 {
 public:
-    Animator(Player* obj);
+    Animator(KinematicObject* obj);
     void build() override;
     void setUp() override;
     void update(const float dt) override;

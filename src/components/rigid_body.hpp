@@ -6,7 +6,7 @@
 class RigidBody: public Component
 {
 public:
-    RigidBody(Player* ast);
+    RigidBody(KinematicObject* ast);
     void setUp() override;
     void render(sf::RenderWindow &window) override;
 

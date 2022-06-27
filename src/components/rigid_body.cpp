@@ -1,14 +1,14 @@
 #include "rigid_body.hpp"
-#include "../objects/player.hpp"
+#include "../objects/game_object.hpp"
 
-RigidBody::RigidBody(Player* obj):
+RigidBody::RigidBody(KinematicObject* obj):
     Component(obj),
     cur_facing(Dir4::right),
     display_body(false)
 {}
 void RigidBody::setUp()
 {
-    PlayerObjectAsset ast = obj->getAsset();
+    GameObjectAsset ast = obj->getAsset();
     position_rect = sf::FloatRect(0, 0, ast.size.x, ast.size.y);
     pos_shape = createShape(sf::Color::Green);
 }
@@ -108,7 +108,7 @@ const sf::Vector2i RigidBody::getSize() const
 {
     return sf::Vector2i(position_rect.width, position_rect.height);
 }
-const std::vector<CollisionRect>& RigidBody::getRects() const
+const std::vector<CollisionRect>& RigidBody::getColliders() const
 {
     return collision_rects;
 }

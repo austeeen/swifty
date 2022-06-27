@@ -1,7 +1,7 @@
 #include "sprite.hpp"
-#include "../objects/player.hpp"
+#include "../objects/game_object.hpp"
 
-Sprite::Sprite(Player* obj):
+Sprite::Sprite(KinematicObject* obj):
 Component(obj), cur_rect(0, 0, 0, 0), facing_right(true)
 {}
 void Sprite::build()

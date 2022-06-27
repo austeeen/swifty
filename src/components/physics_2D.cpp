@@ -1,8 +1,8 @@
 #include "physics_2D.hpp"
 #include "rigid_body.hpp"
-#include "../objects/player.hpp"
+#include "../objects/game_object.hpp"
 
-Physics2D::Physics2D(Player* obj):
+Physics2D::Physics2D(KinematicObject* obj):
     Component(obj),
     cur_state(ObjectState::idle),
     next_state(ObjectState::idle),
@@ -13,7 +13,7 @@ Physics2D::Physics2D(Player* obj):
 void Physics2D::build()
 {
     body = obj->cmpnt<RigidBody>();
-    PlayerObjectAsset ast = obj->getAsset();
+    GameObjectAsset ast = obj->getAsset();
     this->u = ast.coeffs;
     frc.update(u);
 }
@@ -103,9 +103,6 @@ const ObjectState Physics2D::nextState()
                 next_state = ObjectState::falling;
             }
             // else if wall sliding
-            break;
-        }
-        case ObjectState::wallsliding: {
             break;
         }
         default: { // covers running or idle

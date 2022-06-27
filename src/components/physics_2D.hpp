@@ -12,7 +12,7 @@ class Physics2D: public Component
         void update(const PhysicsCoeffs& new_u);
     };
 public:
-    Physics2D(Player* obj);
+    Physics2D(KinematicObject* obj);
     void build() override;
     void update(const float dt);
 
