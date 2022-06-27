@@ -32,12 +32,18 @@ TileMap::TileMap(const char* filepath)
                 object_groups.push_back(new ObjectGroup(node));
             }
         }
+        else if (type == "layer") {
+            spawn_locations = new SpawnLocations(node);
+        }
         node = node->next_sibling();
     }
     delete doc;
 }
 TileMap::~TileMap()
 {
+    delete spawn_locations;
+    spawn_locations = nullptr;
+    
     for (auto& [gid, ts] : tilesets) {
         delete ts;
     }

@@ -7,24 +7,25 @@
 #define CAT_START_X 1
 #define CAT_START_Y 1
 
-struct GameObjectAsset
+struct ObjectAssetBase
 {
-    GameObjectAsset(std::shared_ptr<TsxBaseObject> tsx_obj);
+    ObjectAssetBase(std::shared_ptr<TsxBaseObject> tsx_obj);
 
     sf::Vector2f start_pos;
     sf::Texture img_texture;
     const sf::Vector2i size;
 };
 
-struct PlayerObjectAsset: public GameObjectAsset
+struct GameObjectAsset: public ObjectAssetBase
 {
-    PlayerObjectAsset(std::shared_ptr<TileObject> tsx_obj);
+    GameObjectAsset(std::shared_ptr<TileObject> tsx_obj);
 
+    const std::string name;
     const PhysicsCoeffs coeffs;
     std::map<ObjectState, std::shared_ptr<AnimRoll>> animation_rolls;
 };
 
-struct PlatformObjectAsset: public GameObjectAsset
+struct PlatformObjectAsset: public ObjectAssetBase
 {
     PlatformObjectAsset(std::shared_ptr<DynamicTiledObject> tsx_obj);
 

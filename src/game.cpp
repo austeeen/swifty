@@ -8,9 +8,14 @@ camera(CAMERA::view_rect)
     // window.setFramerateLimit(60);
     window.setVerticalSyncEnabled(true);
 
-    player = std::make_shared<Player>(PlayerObjectAsset(std::make_shared<TileObject>("res/cat_new.tsx")));
+    player = std::make_shared<Player>(GameObjectAsset(std::make_shared<TileObject>("res/cat_new.tsx")));
+
+    enemies.push_back(
+        std::make_shared<Enemy>(GameObjectAsset(std::make_shared<TileObject>("res/spider.tsx")))
+    );
 
     tile_map = std::make_shared<TileMap>("res/new_basic_level.tmx");
+
     tile_map->build();
     for (auto& object_group : tile_map->object_groups) {
         for (auto& rect : object_group->objects) {
@@ -38,7 +43,16 @@ void Game::setUp()
     for (auto& plt : platforms) {
         plt->setUp();
     }
+    for (auto& enm : enemies) {
+        enm->setUp();
+    }
 
+    // todo - will make this more robust eventually
+    const sf::IntRect player_start = tile_map->spawn_locations->to_spawn["player"];
+    player->setStartPosition(player_start.left, player_start.top);
+    // todo - will make this more robust eventually
+    const sf::IntRect spider_start = tile_map->spawn_locations->to_spawn["spider"];
+    enemies[0]->setStartPosition(spider_start.left, spider_start.top);
 
     collision_system.add(player);
     for (auto& bnd : boundaries) {
@@ -46,6 +60,9 @@ void Game::setUp()
     }
     for (auto& plt : platforms) {
         collision_system.add(plt);
+    }
+    for (auto& enm : enemies) {
+        collision_system.add(enm);
     }
 
     camera.setCenter(player->cmpnt<RigidBody>()->getPosition());
@@ -124,6 +141,9 @@ void Game::eventUpdate()
                         for (auto& plt : platforms) {
                             plt->toggleDisplay();
                         }
+                        for (auto& enm : enemies) {
+                            enm->toggleRects();
+                        }
                         break;
                     }
                     default: { break; }
@@ -137,6 +157,9 @@ void Game::eventUpdate()
 void Game::gameUpdate()
 {
     player->update(dt);
+    for (auto& enm : enemies) {
+        enm->update(dt);
+    }
     for (auto& plt : platforms) {
         plt->update(dt);
     }
@@ -144,6 +167,9 @@ void Game::gameUpdate()
     collision_system.checkCollisions();
 
     player->lateUpdate();
+    for (auto& enm : enemies) {
+        enm->lateUpdate();
+    }
     for (auto& plt : platforms) {
         plt->lateUpdate();
     }
@@ -158,6 +184,9 @@ void Game::render()
         window.draw(sf::Sprite(tile_layer->render_texture->getTexture()));
     }
     player->render(window);
+    for (auto& enm : enemies) {
+        enm->render(window);
+    }
     for (auto& plt : platforms) {
         plt->render(window);
     }

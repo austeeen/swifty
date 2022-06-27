@@ -43,6 +43,15 @@ public:
 class KinematicObject : public GameObjectBase, public ComponentType
 {
 public:
+    KinematicObject(const GameObjectAsset ast);
+    void setStartPosition(const int x, const int y);
+    const GameObjectAsset& getAsset() const;
+    void toggleRects();
+    const std::string& getName() const;
+
+protected:
+    ObjectState cur_state;
+    GameObjectAsset ast;
 
 };
 

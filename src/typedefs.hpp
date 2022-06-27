@@ -13,11 +13,11 @@ template <typename T> int sgn(T val) {
     return (T(0) < val) - (val < T(0));
 }
 
-enum class Dir4 {up, down, left, right };
+enum class Dir4 { up, down, left, right };
 
 enum class ColliderType { generic, body, platform, immovable };
 
-enum class ObjectState { idle, running, jumping, falling, wallsliding };
+enum class ObjectState { idle, running, jumping, falling, healing, damaged, dead };
 
 enum class RollState { none, next, done };
 

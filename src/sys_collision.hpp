@@ -25,6 +25,9 @@ private:
     std::vector<std::shared_ptr<StaticObject>> static_objs;
     std::vector<std::shared_ptr<DynamicObject>> dyn_objs;
     std::vector<std::shared_ptr<KinematicObject>> kin_objs;
+
+    std::set<std::pair<const std::string, const std::string>> checked_this_frame;
+    std::set<std::pair<const std::string, const std::string>> collided_already; // may not need
 };
 
 #endif // COLLISION_HPP

@@ -11,7 +11,6 @@ void RigidBody::setUp()
     PlayerObjectAsset ast = obj->getAsset();
     position_rect = sf::FloatRect(0, 0, ast.size.x, ast.size.y);
     pos_shape = createShape(sf::Color::Green);
-    move(ast.start_pos.x, ast.start_pos.y);
 }
 void RigidBody::render(sf::RenderWindow &window)
 {

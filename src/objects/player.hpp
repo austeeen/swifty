@@ -6,7 +6,7 @@
 class Player: public KinematicObject
 {
 public:
-    Player(const PlayerObjectAsset ast);
+    Player(const GameObjectAsset ast);
     void setUp() override;
     void update(const float dt) override;
     void lateUpdate() override;
@@ -19,14 +19,6 @@ public:
 
     void increase(const PhysicsCoeffs::AsEnum cf);
     void decrease(const PhysicsCoeffs::AsEnum cf);
-    void toggleRects();
-
-    const PlayerObjectAsset& getAsset() const;
-
-protected:
-    // std::map<const ObjectState, std::unique_ptr<StateBase>> states;
-    ObjectState cur_state;
-    PlayerObjectAsset ast;
 };
 
 

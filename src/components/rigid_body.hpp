@@ -21,7 +21,7 @@ public:
 
     const sf::Vector2f getPosition() const;
     const sf::Vector2i getSize() const;
-    const std::vector<CollisionRect>& getRects() const;
+    const std::vector<CollisionRect>& getColliders() const;
 
 private:
     void updateColliders();

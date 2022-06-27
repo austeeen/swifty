@@ -124,4 +124,26 @@
    <object id="2" x="3.91304" y="6.0435" width="11.0435" height="4.04348"/>
   </objectgroup>
  </tile>
+ <tile id="20" type="healing">
+  <properties>
+   <property name="end_early" type="int" value="0"/>
+   <property name="hold_last" type="bool" value="false"/>
+   <property name="one_shot" type="bool" value="false"/>
+  </properties>
+  <animation>
+   <frame tileid="20" duration="150"/>
+   <frame tileid="21" duration="150"/>
+   <frame tileid="22" duration="150"/>
+   <frame tileid="23" duration="150"/>
+   <frame tileid="21" duration="150"/>
+   <frame tileid="22" duration="150"/>
+   <frame tileid="23" duration="150"/>
+   <frame tileid="25" duration="150"/>
+   <frame tileid="26" duration="150"/>
+   <frame tileid="27" duration="150"/>
+   <frame tileid="25" duration="150"/>
+   <frame tileid="26" duration="150"/>
+   <frame tileid="27" duration="150"/>
+  </animation>
+ </tile>
 </tileset>

@@ -43,5 +43,14 @@ struct DynamicObjectGroup {
     std::map<int, Waypoint> waypoints;
 };
 
+/**************************************************************************************************/
+
+struct SpawnLocations {
+    SpawnLocations(rx::xml_node<>* node);
+
+    std::string name;
+    int id;
+    std::map<std::string, sf::IntRect> to_spawn;
+};
 
 #endif // TLD_LAYERS_HPP
