@@ -1,7 +1,7 @@
 #ifndef TLD_TMX_HPP
 #define TLD_TMX_HPP
 
-#include "utils.hpp"
+#include "../utils/utils.hpp"
 #include "tileset.hpp"
 #include "tsx.hpp"
 #include "layers.hpp"

@@ -1,7 +1,7 @@
 #ifndef TLD_TSX_HPP
 #define TLD_TSX_HPP
 
-#include "utils.hpp"
+#include "../utils/utils.hpp"
 
 class TileMap;
 

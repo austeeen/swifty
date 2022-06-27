@@ -2,6 +2,7 @@
 #define TLD_DYNOBJ_HPP
 
 #include "tsx.hpp"
+#include "../utils/rect.hpp"
 
 struct ObjectEntry
 {

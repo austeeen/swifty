@@ -35,24 +35,28 @@ void MovingPlatform::update(const float dt)
     const float dx = position_rect.left - wp->loc.x;
     const float dy = position_rect.top - wp->loc.y;
 
-    if (fabs(dx) < FLT_ZERO) {
-        position_rect.left = wp->loc.x;
-        vel.x = 0;
-    }
-    else if (dx > 0) {
-        vel.x = -ast.speed;
-    } else {
-        vel.x = ast.speed;
+    if (dx != 0.f) {
+        if (fabs(dx) < FLT_ZERO) {
+            position_rect.left = wp->loc.x;
+            vel.x = 0;
+        }
+        else if (dx > 0) {
+            vel.x = -ast.speed;
+        } else {
+            vel.x = ast.speed;
+        }
     }
 
-    if (fabs(dy) < FLT_ZERO) {
-        position_rect.top = wp->loc.y;
-        vel.y = 0;
-    }
-    else if (dy > 0) {
-        vel.y = -ast.speed;
-    } else {
-        vel.y = ast.speed;
+    if (dy != 0.f) {
+        if (fabs(dy) < FLT_ZERO) {
+            position_rect.top = wp->loc.y;
+            vel.y = 0;
+        }
+        else if (dy > 0) {
+            vel.y = -ast.speed;
+        } else {
+            vel.y = ast.speed;
+        }
     }
 
     move(vel.x * dt, vel.y * dt);

@@ -35,11 +35,12 @@ struct rect
     rect(const rect& r);
 
     rect& operator=(const rect &r);
-    rect& operator+=(const rect& r);
+    void operator+=(const rect& r);
     void operator+=(const sf::FloatRect& r);
+    operator bool() const;
+    operator std::string() const;
     operator sf::FloatRect() const;
     operator sf::IntRect() const;
-    operator bool() const;
 
     inline void move(float x, float y) {
         this->left += x;
@@ -58,7 +59,6 @@ struct rect
     void setCenter(const float x, const float y);
     sf::Vector2f getCenter() const;
 
-    std::string tostr() const;
     static rect clip(const rect &a, const rect &b);
     rect clip(const rect &rect) const;
 

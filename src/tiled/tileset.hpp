@@ -1,7 +1,8 @@
 #ifndef TLD_TILESET_HPP
 #define TLD_TILESET_HPP
 
-#include "utils.hpp"
+#include "../utils/utils.hpp"
+#include "../utils/rect.hpp"
 
 struct TileEntry {
     rect texture_rect, collision_rect;

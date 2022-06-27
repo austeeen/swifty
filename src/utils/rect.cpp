@@ -1,4 +1,5 @@
-#include "aabb.hpp"
+#include "rect.hpp"
+#include "utils.hpp"
 
 /**************************************************************************************************/
 /* VAL */
@@ -61,6 +62,29 @@ rect& rect::operator=(const rect &r)
     height.set(r.height);
     return *this;
 }
+void rect::operator+=(const rect& r)
+{
+    left.set(min(this->left,   r.left));
+    top.set(min(this->top,    r.top));
+    right.set(max(this->right,  r.right));
+    bottom.set(max(this->bottom, r.bottom));
+    width.set(this->right - this->left);
+    height.set(this->bottom - this->top);
+}
+void rect::operator+=(const sf::FloatRect& r)
+{
+    *this += rect(r);
+}
+rect::operator bool() const
+{
+    return this->width != 0.f && this->height != 0.f;
+}
+rect::operator std::string() const
+{
+    std::stringstream ss;
+    ss << (int) left << ", " << (int) top << ", " << (int) width << ", " << (int) height;
+    return ss.str();
+}
 rect::operator sf::FloatRect() const
 {
     return sf::FloatRect(left, top, width, height);
@@ -109,10 +133,6 @@ void rect::setCenter(const float x, const float y)
 sf::Vector2f rect::getCenter() const
 {
     return sf::Vector2f(left + width / 2, top + height / 2);
-}
-std::string rect::tostr() const
-{
-    return "[" + left.tostr() + ", " + top.tostr() + ", " + right.tostr() + ", " + bottom.tostr() + "], (" + width.tostr() + ", " + height.tostr() + ")";
 }
 rect rect::clip(const rect &a, const rect &b)
 {
