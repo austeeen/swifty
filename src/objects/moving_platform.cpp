@@ -34,8 +34,6 @@ void MovingPlatform::update(const float dt)
 {
     const float dx = position_rect.left - wp->loc.x;
     const float dy = position_rect.top - wp->loc.y;
-    // const int sx = sgn(dx);
-    // const int sy = sgn(dy);
 
     if (fabs(dx) < FLT_ZERO) {
         position_rect.left = wp->loc.x;
