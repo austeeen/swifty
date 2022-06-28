@@ -1,9 +1,10 @@
 #include "rigid_body.hpp"
 #include "../objects/game_object.hpp"
 
-RigidBody::RigidBody(KinematicObject* obj):
+RigidBody::RigidBody(GameObject* obj):
     Component(obj),
     cur_facing(Dir4::right),
+    m_body_collider(nullptr),
     display_body(false)
 {}
 void RigidBody::setUp()
@@ -42,6 +43,13 @@ void RigidBody::toggleDisplay()
 void RigidBody::setColliders(const std::vector<CollisionRect>& rects)
 {
     collision_rects.clear();
+    m_body_collider = nullptr;
+    for (auto& col_rect : rects) {
+        collision_rects.push_back(col_rect);
+        if (col_rect.type == ColliderType::body) {
+            m_body_collider = &collision_rects.back();
+        }
+    }
     copy(rects.begin(), rects.end(), back_inserter(collision_rects));
     if (cur_facing == Dir4::left) {
         faceLeft();
@@ -99,6 +107,10 @@ void RigidBody::yCollision(const float offset)
     for (auto& col_rect : collision_rects) {
         col_rect.aabb.top += offset;
     }
+}
+bool RigidBody::overlapping(const sf::FloatRect& rect) const
+{
+    return m_body_collider->aabb.intersects(rect);
 }
 const sf::Vector2f RigidBody::getPosition() const
 {

@@ -2,7 +2,7 @@
 #include "rigid_body.hpp"
 #include "../objects/game_object.hpp"
 
-Physics2D::Physics2D(KinematicObject* obj):
+Physics2D::Physics2D(GameObject* obj):
     Component(obj),
     cur_state(ObjectState::idle),
     next_state(ObjectState::idle),

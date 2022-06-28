@@ -65,7 +65,7 @@ const std::vector<CollisionRect>& Roll::getCollisionRects() const
 
 /**************************************************************************************************/
 
-Animator::Animator(KinematicObject* obj):
+Animator::Animator(GameObject* obj):
     Component(obj),
     spr(nullptr),
     cur(ObjectState::idle),

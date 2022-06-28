@@ -1,7 +1,7 @@
 #include "player.hpp"
 
 Player::Player(const GameObjectAsset ast):
-    KinematicObject(ast)
+    GameObject(ast)
 {}
 void Player::setUp()
 {

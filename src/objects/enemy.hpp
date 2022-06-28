@@ -3,7 +3,7 @@
 
 #include "game_object.hpp"
 
-class Enemy: public KinematicObject
+class Enemy: public GameObject
 {
 public:
     Enemy(const GameObjectAsset ast);

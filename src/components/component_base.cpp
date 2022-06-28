@@ -1,7 +1,7 @@
 #include "component_base.hpp"
 #include "../objects/game_object.hpp"
 
-Component::Component(KinematicObject* obj): obj(obj)
+Component::Component(GameObject* obj): obj(obj)
 {}
 void Component::build()
 {}

@@ -75,10 +75,4 @@ struct AnimRoll {
     int end_early_frame = 0;
 };
 
-
-struct AiPath {
-    AiPath();
-    Waypoint* root;
-};
-
 #endif // TYPE_DEF_HPP

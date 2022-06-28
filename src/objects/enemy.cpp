@@ -1,7 +1,7 @@
 #include "enemy.hpp"
 
 Enemy::Enemy(const GameObjectAsset ast):
-    KinematicObject(ast)
+    GameObject(ast)
 {}
 void Enemy::setUp()
 {

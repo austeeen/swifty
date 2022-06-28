@@ -8,7 +8,7 @@ class RigidBody;
 class Sprite: public Component
 {
 public:
-    Sprite(KinematicObject* obj);
+    Sprite(GameObject* obj);
     void build() override;
     void render(sf::RenderWindow &window) override;
     void setTextureRect(const sf::IntRect& texture_rect);

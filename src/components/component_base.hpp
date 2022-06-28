@@ -3,13 +3,13 @@
 
 #include "../common.hpp"
 
-class KinematicObject;
+class GameObject;
 class GameObjectAsset;
 
 class Component
 {
 public:
-    Component(KinematicObject* obj);
+    Component(GameObject* obj);
     ~Component() { obj = nullptr; }
     virtual void build();
     virtual void setUp();
@@ -17,7 +17,7 @@ public:
     virtual void render(sf::RenderWindow &window);
 
 public:
-    KinematicObject* obj;
+    GameObject* obj;
 };
 
 #endif // CMP_BASE_HPP
