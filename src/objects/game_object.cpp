@@ -10,7 +10,8 @@ KinematicObject::KinematicObject(const GameObjectAsset ast):
 }
 void KinematicObject::setStartPosition(const int x, const int y)
 {
-    cmpnt<RigidBody>()->move(ast.start_pos.x, ast.start_pos.y);
+    printf("%s (%d, %d)\n", this->getName().c_str(), x, y);
+    cmpnt<RigidBody>()->move(x, y);
 }
 const GameObjectAsset& KinematicObject::getAsset() const
 {

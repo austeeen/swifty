@@ -44,12 +44,14 @@ void Game::setUp()
         plt->setUp();
     }
     for (auto& enm : enemies) {
+        printf("setting up: %s\n", enm->getName().c_str());
         enm->setUp();
     }
 
     // todo - will make this more robust eventually
     const sf::IntRect player_start = tile_map->spawn_locations->to_spawn["player"];
     player->setStartPosition(player_start.left, player_start.top);
+
     // todo - will make this more robust eventually
     const sf::IntRect spider_start = tile_map->spawn_locations->to_spawn["spider"];
     enemies[0]->setStartPosition(spider_start.left, spider_start.top);

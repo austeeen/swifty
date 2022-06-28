@@ -171,7 +171,7 @@ void Physics2D::decrease(const PhysicsCoeffs::AsEnum cf)
 }
 void Physics2D::print() const
 {
-    printf("[Physics2D] %s acl(%f, %f) vel(%f, %f)\n", out::toStr(cur_state).c_str(), acl.x, acl.y, vel.x, vel.y);
+    printf("[Physics2D] %s %s acl(%f, %f) vel(%f, %f)\n", obj->getName().c_str(), out::toStr(cur_state).c_str(), acl.x, acl.y, vel.x, vel.y);
 }
 void Physics2D::Force2D::update(const PhysicsCoeffs& new_u)
 {
