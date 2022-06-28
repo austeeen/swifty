@@ -2,13 +2,6 @@
 *.log
 build/
 
-# liscensed sprites that i can't upload to other websites :/
-res/elthen
-
-# Distribution / packaging
-
-build/
-
 # Prerequisites
 *.d
 
