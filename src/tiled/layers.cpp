@@ -1,11 +1,17 @@
 #include "layers.hpp"
 #include "tmx.hpp"
 
-TileLayer::TileLayer(rx::xml_node<> *node):
-render_texture(new sf::RenderTexture())
+LayerBase::LayerBase(rx::xml_node<> *node)
 {
     name = attr<std::string>(node, "name");
     id = attr<int>(node, "id");
+}
+
+/**************************************************************************************************/
+
+TileLayer::TileLayer(rx::xml_node<> *node):
+    LayerBase(node), render_texture(new sf::RenderTexture())
+{
     size.x = attr<int>(node, "width");
     size.y = attr<int>(node, "height");
     rx::xml_node<> *data = node->first_node("data");
@@ -61,10 +67,9 @@ void TileLayer::build(TileMap *map)
 
 /**************************************************************************************************/
 
-ObjectGroup::ObjectGroup(rx::xml_node<> *node)
+ObjectGroup::ObjectGroup(rx::xml_node<> *node):
+    LayerBase(node)
 {
-    name = attr<std::string>(node, "name");
-    id = attr<int>(node, "id");
     rx::xml_node<> *obj_node = node->first_node();
     while (obj_node) {
         objects.push_back(sf::IntRect(
@@ -78,11 +83,9 @@ ObjectGroup::ObjectGroup(rx::xml_node<> *node)
 
 /**************************************************************************************************/
 
-DynamicObjectGroup::DynamicObjectGroup(rx::xml_node<> *node)
+DynamicObjectGroup::DynamicObjectGroup(rx::xml_node<> *node):
+    LayerBase(node)
 {
-    name = attr<std::string>(node, "name");
-    id = attr<int>(node, "id");
-
     rx::xml_node<> *obj_node = node->first_node();
     while (obj_node != nullptr) {
 
@@ -121,16 +124,34 @@ void DynamicObjectGroup::build(TileMap *map)
 
 /**************************************************************************************************/
 
-SpawnLocations::SpawnLocations(rx::xml_node<>* node)
+SpawnLocations::SpawnLocations(rx::xml_node<>* node):
+    LayerBase(node)
 {
-    name = attr<std::string>(node, "name");
-    id = attr<int>(node, "id");
     rx::xml_node<> *obj_node = node->first_node();
     while (obj_node) {
         std::string type = attr<std::string>(obj_node, "type");
         if (type == "spawn") {
             std::string name = attr<std::string>(obj_node, "name");
             to_spawn[name] = sf::IntRect(
+                attr<int>(obj_node, "x"), attr<int>(obj_node, "y"),
+                attr<int>(obj_node, "width"), attr<int>(obj_node, "height")
+            );
+        }
+        obj_node = obj_node->next_sibling();
+    }
+}
+
+/**************************************************************************************************/
+
+AiPaths::AiPaths(rx::xml_node<>* node):
+    LayerBase(node)
+{
+    rx::xml_node<> *obj_node = node->first_node();
+    while (obj_node) {
+        std::string type = attr<std::string>(obj_node, "type");
+        if (type == "waypoint") {
+            std::string name = attr<std::string>(obj_node, "name");
+            all_paths[name] = sf::IntRect(
                 attr<int>(obj_node, "x"), attr<int>(obj_node, "y"),
                 attr<int>(obj_node, "width"), attr<int>(obj_node, "height")
             );

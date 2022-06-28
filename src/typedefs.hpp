@@ -53,7 +53,6 @@ struct Waypoint {
     int next_id;
     Waypoint* next;
     Waypoint* prev;
-
 };
 
 struct CollisionRect {
@@ -74,6 +73,12 @@ struct AnimRoll {
     bool one_shot = false;
     bool hold_last_frame = false;
     int end_early_frame = 0;
+};
+
+
+struct AiPath {
+    AiPath();
+    Waypoint* root;
 };
 
 #endif // TYPE_DEF_HPP

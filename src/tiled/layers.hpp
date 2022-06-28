@@ -5,15 +5,20 @@
 #include "dynamic_tiled_object.hpp"
 
 
-class TileLayer
+struct LayerBase {
+    LayerBase(rx::xml_node<>* node);
+    std::string name;
+    int id;
+};
+
+/**************************************************************************************************/
+
+struct TileLayer: public LayerBase
 {
-public:
     TileLayer(rx::xml_node<>* node);
     ~TileLayer();
     void build(TileMap* map);
 
-    std::string name;
-    int id;
     std::string gidstr;
     sf::Vector2i size;
     sf::VertexArray vertex_array;
@@ -22,35 +27,41 @@ public:
 
 /**************************************************************************************************/
 
-struct ObjectGroup {
+struct ObjectGroup: public LayerBase
+{
     ObjectGroup(rx::xml_node<>* node);
     void build(TileMap* map);
 
-    std::string name;
-    int id;
     std::vector<sf::IntRect> objects;
 };
 
 /**************************************************************************************************/
 
-struct DynamicObjectGroup {
+struct DynamicObjectGroup: public LayerBase
+{
     DynamicObjectGroup(rx::xml_node<>* node);
     void build(TileMap* map);
 
-    std::string name;
-    int id;
     std::map<std::string, std::shared_ptr<DynamicTiledObject>> objects;
     std::map<int, Waypoint> waypoints;
 };
 
 /**************************************************************************************************/
 
-struct SpawnLocations {
+struct SpawnLocations: public LayerBase
+{
     SpawnLocations(rx::xml_node<>* node);
 
-    std::string name;
-    int id;
     std::map<std::string, sf::IntRect> to_spawn;
+};
+
+/**************************************************************************************************/
+
+struct AiPaths: public LayerBase
+{
+    AiPaths(rx::xml_node<>* node);
+    void build(TileMap* map);
+    std::map<std::string, std::vector<Waypoint>> all_paths;
 };
 
 #endif // TLD_LAYERS_HPP

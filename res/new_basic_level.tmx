@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.8" tiledversion="1.8.5" orientation="orthogonal" renderorder="right-down" width="50" height="38" tilewidth="8" tileheight="8" infinite="0" nextlayerid="9" nextobjectid="55">
+<map version="1.8" tiledversion="1.8.5" orientation="orthogonal" renderorder="right-down" width="50" height="38" tilewidth="8" tileheight="8" infinite="0" nextlayerid="10" nextobjectid="57">
  <tileset firstgid="1" name="small_basic_tiles" tilewidth="8" tileheight="8" tilecount="32" columns="8" objectalignment="topleft">
   <image source="small_basic_tiles.png" width="64" height="32"/>
   <tile id="1">
@@ -227,6 +227,22 @@
  </objectgroup>
  <objectgroup id="8" name="spawn_locations" locked="1">
   <object id="53" name="player" type="spawn" x="16" y="32" width="8" height="8"/>
-  <object id="54" name="spider" type="spawn" x="224" y="104" width="8" height="8"/>
+  <object id="54" name="spider" type="spawn" x="224" y="104" width="8" height="8">
+   <properties>
+    <property name="path" type="object" value="55"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup id="9" name="ai_paths" locked="1">
+  <object id="55" name="spider" type="waypoint" x="64" y="104" width="8" height="8">
+   <properties>
+    <property name="next" type="object" value="56"/>
+   </properties>
+  </object>
+  <object id="56" name="spider" type="waypoint" x="136" y="57" width="8" height="8">
+   <properties>
+    <property name="next" type="object" value="54"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>
