@@ -7,6 +7,7 @@ class GameObject : public ObjectBase
 {
 public:
     GameObject(const GameObjectAsset ast);
+    void build();
     void setUp() override;
     void update(const float dt) override;
     void lateUpdate() override;
@@ -21,6 +22,7 @@ public:
 
     const std::string& getName() const;
     const GameObjectAsset& getAsset() const;
+    const sf::FloatRect& getPositionRect() const;
     const std::vector<CollisionRect>& getColliders() const;
     const sf::Vector2f& getVelocity() const;
 
@@ -34,7 +36,6 @@ protected:
     std::map<std::type_index, std::shared_ptr<Component>> cmpts;
     ObjectState cur_state;
     GameObjectAsset ast;
-
 };
 
 #endif // GAMEOBJECT_HPP

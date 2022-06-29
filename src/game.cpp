@@ -11,7 +11,7 @@ camera(CAMERA::view_rect)
     player = std::make_shared<Player>(GameObjectAsset(std::make_shared<TileObject>("res/cat_new.tsx")));
 
     enemies.push_back(
-        std::make_shared<Enemy>(GameObjectAsset(std::make_shared<TileObject>("res/spider.tsx")))
+        std::make_shared<AiObject>(GameObjectAsset(std::make_shared<TileObject>("res/spider.tsx")))
     );
 
     tile_map = std::make_shared<TileMap>("res/new_basic_level.tmx");

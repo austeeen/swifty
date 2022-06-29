@@ -8,11 +8,14 @@ GameObject::GameObject(const GameObjectAsset ast):
     cmpts[typeid(RigidBody)] = std::make_shared<RigidBody>(this);
     cmpts[typeid(Animator)] = std::make_shared<Animator>(this);
 }
-void GameObject::setUp()
+void GameObject::build()
 {
     for (auto [cmpnt_t, cmpnt] : cmpts) {
         cmpnt->build();
     }
+}
+void GameObject::setUp()
+{
     setState(cur_state);
     for (auto [cmpnt_t, cmpnt] : cmpts) {
         cmpnt->setUp();
@@ -20,8 +23,9 @@ void GameObject::setUp()
 }
 void GameObject::update(const float dt)
 {
-    this->cmpnt<Animator>()->update(dt);
-    this->cmpnt<Physics2D>()->update(dt);
+    for (auto [cmpnt_t, cmpnt] : cmpts) {
+        cmpnt->update(dt);
+    }
 }
 void GameObject::lateUpdate()
 {
@@ -61,6 +65,10 @@ void GameObject::updateInertia(const sf::Vector2f& inertia) const
 const GameObjectAsset& GameObject::getAsset() const
 {
     return ast;
+}
+const sf::FloatRect& GameObject::getPositionRect() const
+{
+    return this->cmpnt<RigidBody>()->getPositionRect();
 }
 const std::string& GameObject::getName() const
 {

@@ -35,6 +35,7 @@ public:
     std::map<ObjectState, std::shared_ptr<AnimRoll>> animation_rolls;
     std::string cfg_fp;
     PhysicsCoeffs pCoeffs;
+    sf::FloatRect pathing_zone; // todo
 };
 
 #endif // TLD_TSX_HPP

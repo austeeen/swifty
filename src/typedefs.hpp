@@ -8,6 +8,7 @@
 #include <iostream>
 
 static const float FLT_ZERO = 0.1;
+static const float STUCK_TIMEOUT = 5.f;
 
 template <typename T> int sgn(T val) {
     return (T(0) < val) - (val < T(0));

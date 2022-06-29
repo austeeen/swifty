@@ -37,7 +37,7 @@ private:
     InputDevice *io_device;
     std::shared_ptr<TileMap> tile_map;
     std::shared_ptr<Player> player;
-    std::vector<std::shared_ptr<Enemy>> enemies;
+    std::vector<std::shared_ptr<AiObject>> enemies;
     std::vector<std::shared_ptr<MovingPlatform>> platforms;
     std::vector<std::shared_ptr<Boundary>> boundaries;
     CollisionSystem collision_system;

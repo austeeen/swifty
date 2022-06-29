@@ -112,9 +112,31 @@ bool RigidBody::overlapping(const sf::FloatRect& rect) const
 {
     return m_body_collider->aabb.intersects(rect);
 }
+bool RigidBody::intersects(const sf::Vector2f& loc) const
+{
+    return position_rect.contains(loc);
+}
+bool RigidBody::intersects(const sf::FloatRect& rect) const
+{
+    return position_rect.intersects(rect);
+}
+bool RigidBody::closeTo(const sf::Vector2f& loc) const
+{
+    // todo -- grow size of body collider by some amount (1.5x, 2x, etc)
+    return position_rect.contains(loc);
+}
+bool RigidBody::closeTo(const sf::FloatRect& rect) const
+{
+    // todo -- grow size of body collider by some amount (1.5x, 2x, etc)
+    return position_rect.intersects(rect);
+}
 const sf::Vector2f RigidBody::getPosition() const
 {
     return sf::Vector2f(position_rect.left, position_rect.top);
+}
+const sf::FloatRect& RigidBody::getPositionRect() const
+{
+    return position_rect;
 }
 const sf::Vector2i RigidBody::getSize() const
 {

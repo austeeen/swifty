@@ -6,6 +6,6 @@
 #include "moving_platform.hpp"
 #include "boundary.hpp"
 #include "player.hpp"
-#include "enemy.hpp"
+#include "ai_object.hpp"
 
 #endif // OBJ_ALL_HPP

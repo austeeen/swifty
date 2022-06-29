@@ -9,9 +9,8 @@ public:
     RigidBody(GameObject* ast);
     void setUp() override;
     void render(sf::RenderWindow &window) override;
-
+    
     void toggleDisplay();
-
     void move(const float x, const float y);
 
     void setColliders(const std::vector<CollisionRect>& rects);
@@ -20,7 +19,13 @@ public:
     void yCollision(const float offset);
 
     bool overlapping(const sf::FloatRect& rect) const;
+    bool intersects(const sf::Vector2f& loc) const;
+    bool intersects(const sf::FloatRect& rect) const;
+    bool closeTo(const sf::Vector2f& rect) const;
+    bool closeTo(const sf::FloatRect& rect) const;
+
     const sf::Vector2f getPosition() const;
+    const sf::FloatRect& getPositionRect() const;
     const sf::Vector2i getSize() const;
     const std::vector<CollisionRect>& getColliders() const;
 

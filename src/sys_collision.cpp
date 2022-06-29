@@ -41,6 +41,7 @@ void CollisionSystem::vsGameObjects(std::shared_ptr<GameObject> g_obj)
         checked_this_frame.insert(collision_pair);
 
 
+        // todo -- collision stuff
         /*
         for (auto& objA_col : g_obj->cmpnt<RigidBody>()->getColliders())
         {

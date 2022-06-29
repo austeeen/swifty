@@ -5,11 +5,13 @@
 
 class GameObject;
 class GameObjectAsset;
+class AiObject;
 
 class Component
 {
 public:
     Component(GameObject* obj);
+    Component(AiObject* obj);
     ~Component() { obj = nullptr; }
     virtual void build();
     virtual void setUp();
