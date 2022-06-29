@@ -10,26 +10,26 @@ void CollisionSystem::add(std::shared_ptr<DynamicObject> obj)
 {
     dyn_objs.push_back(obj);
 }
-void CollisionSystem::add(std::shared_ptr<KinematicObject> obj)
+void CollisionSystem::add(std::shared_ptr<GameObject> obj)
 {
-    kin_objs.push_back(obj);
+    game_objs.push_back(obj);
 }
 void CollisionSystem::checkCollisions()
 {
     checked_this_frame.clear();
     collided_already.clear();
-    for (auto& kin : kin_objs) {
-        vsKinematicObjects(kin);
+    for (auto& kin : game_objs) {
+        vsGameObjects(kin);
         vsDynamicObjects(kin);
         vsStaticObjects(kin);
     }
 }
-void CollisionSystem::vsKinematicObjects(std::shared_ptr<KinematicObject> kin_objA)
+void CollisionSystem::vsGameObjects(std::shared_ptr<GameObject> g_obj)
 {
-    const std::string objA_name = kin_objA->getName();
-    for (auto& kin_objB : kin_objs)
+    const std::string objA_name = g_obj->getName();
+    for (auto& g_objsB : game_objs)
     {
-        const std::string objB_name = kin_objB->getName();
+        const std::string objB_name = g_objsB->getName();
         if (objA_name == objB_name) {
             continue;
         }
@@ -42,16 +42,16 @@ void CollisionSystem::vsKinematicObjects(std::shared_ptr<KinematicObject> kin_ob
 
 
         /*
-        for (auto& objA_col : kin_objA->cmpnt<RigidBody>()->getColliders())
+        for (auto& objA_col : g_obj->cmpnt<RigidBody>()->getColliders())
         {
-            for (auto& objB_col : kin_objB->cmpnt<RigidBody>()->getColliders())
+            for (auto& objB_col : g_objsB->cmpnt<RigidBody>()->getColliders())
             {
                 // handle kinematic collisions
 
                 const sf::Vector2f offset = findIntersection(objA_col.aabb, objB_col.aabb);
                 if (fabs(offset.x) > 0.f && fabs(offset.y) > 0.f) {
-                    kin_objA->cmpnt<Physics2D>()->onColliding(offset, objB_col.type, objA_col.type);
-                    kin_objA->cmpnt<Physics2D>()->updateInertia(kin_objB->cmpnt<Physics2D>()->getVelocity());
+                    g_obj->cmpnt<Physics2D>()->onColliding(offset, objB_col.type, objA_col.type);
+                    g_obj->cmpnt<Physics2D>()->updateInertia(g_objsB->cmpnt<Physics2D>()->getVelocity());
                     checked_this_frame.insert(collision_pair);
                     break;
                 }
@@ -60,27 +60,27 @@ void CollisionSystem::vsKinematicObjects(std::shared_ptr<KinematicObject> kin_ob
         */
     }
 }
-void CollisionSystem::vsDynamicObjects(std::shared_ptr<KinematicObject> kin_obj)
+void CollisionSystem::vsDynamicObjects(std::shared_ptr<GameObject> g_obj)
 {
     for (auto& dyn_obj : dyn_objs) {
-        for (auto& obj_rect : kin_obj->cmpnt<RigidBody>()->getColliders()) {
+        for (auto& obj_rect : g_obj->cmpnt<RigidBody>()->getColliders()) {
             const CollisionRect d_col = dyn_obj->getCollider();
             const sf::Vector2f offset = findIntersection(obj_rect.aabb, d_col.aabb);
             if (fabs(offset.x) > 0.f && fabs(offset.y) > 0.f) {
-                kin_obj->cmpnt<Physics2D>()->onColliding(offset, d_col.type, obj_rect.type);
-                kin_obj->cmpnt<Physics2D>()->updateInertia(dyn_obj->getVelocity());
+                g_obj->cmpnt<Physics2D>()->onColliding(offset, d_col.type, obj_rect.type);
+                g_obj->cmpnt<Physics2D>()->updateInertia(dyn_obj->getVelocity());
             }
         }
     }
 }
-void CollisionSystem::vsStaticObjects(std::shared_ptr<KinematicObject> kin_obj)
+void CollisionSystem::vsStaticObjects(std::shared_ptr<GameObject> g_obj)
 {
     for (auto& stat : static_objs) {
-        for (auto& obj_rect : kin_obj->cmpnt<RigidBody>()->getColliders()) {
+        for (auto& obj_rect : g_obj->cmpnt<RigidBody>()->getColliders()) {
             const sf::Vector2f offset = findIntersection(obj_rect.aabb, stat->getCollider());
             if (fabs(offset.x) > 0.f && fabs(offset.y) > 0.f) {
-                kin_obj->cmpnt<Physics2D>()->onColliding(offset, ColliderType::immovable, obj_rect.type);
-                kin_obj->cmpnt<Physics2D>()->updateInertia(sf::Vector2f(0.f, 0.f));
+                g_obj->cmpnt<Physics2D>()->onColliding(offset, ColliderType::immovable, obj_rect.type);
+                g_obj->cmpnt<Physics2D>()->updateInertia(sf::Vector2f(0.f, 0.f));
             }
         }
     }

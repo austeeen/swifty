@@ -3,21 +3,35 @@
 
 #include "object_bases.hpp"
 
-class GameObject : public KinematicObject, public ComponentType
+class GameObject : public ObjectBase
 {
 public:
     GameObject(const GameObjectAsset ast);
+    void setUp() override;
+    void update(const float dt) override;
+    void lateUpdate() override;
+    void render(sf::RenderWindow &window) override;
+
+    void setState(const ObjectState s);
     void setStartPosition(const int x, const int y);
-    const GameObjectAsset& getAsset() const;
     void toggleRects();
-    const std::string& getName() const override;
-    const CollisionRect& getCollider() const override;
-    const std::vector<sf::Vector2f>& getColliders() const override;
-    void onColliding(const sf::Vector2f& offset, const ColliderType m_type, const ColliderType b_type) const override;
-    void updateInertia(const sf::Vector2f& intertia) const override;
-    const sf::Vector2f& getVelocity() const override;
-    
+
+    void onColliding(const sf::Vector2f& offset, const ColliderType m_type, const ColliderType b_type) const;
+    void updateInertia(const sf::Vector2f& inertia) const;
+
+    const std::string& getName() const;
+    const GameObjectAsset& getAsset() const;
+    const std::vector<CollisionRect>& getColliders() const;
+    const sf::Vector2f& getVelocity() const;
+
+    template <typename T> std::shared_ptr<T> cmpnt() const {
+        if (cmpts.count(typeid(T)) == 0)
+            return nullptr;
+        return std::dynamic_pointer_cast<T>(cmpts.at(typeid(T)));
+    }
+
 protected:
+    std::map<std::type_index, std::shared_ptr<Component>> cmpts;
     ObjectState cur_state;
     GameObjectAsset ast;
 

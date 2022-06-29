@@ -7,10 +7,7 @@ class Enemy: public GameObject
 {
 public:
     Enemy(const GameObjectAsset ast);
-    void setUp() override;
-    void update(const float dt) override;
-    void lateUpdate() override;
-    void render(sf::RenderWindow &window) override;
+    
 };
 
 

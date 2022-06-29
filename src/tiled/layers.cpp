@@ -151,10 +151,9 @@ AiPaths::AiPaths(rx::xml_node<>* node):
         std::string type = attr<std::string>(obj_node, "type");
         if (type == "waypoint") {
             std::string name = attr<std::string>(obj_node, "name");
-            all_paths[name] = sf::IntRect(
+            all_paths[name].push_back(sf::IntRect(
                 attr<int>(obj_node, "x"), attr<int>(obj_node, "y"),
-                attr<int>(obj_node, "width"), attr<int>(obj_node, "height")
-            );
+                attr<int>(obj_node, "width"), attr<int>(obj_node, "height")));
         }
         obj_node = obj_node->next_sibling();
     }

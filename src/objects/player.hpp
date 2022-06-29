@@ -7,10 +7,6 @@ class Player: public GameObject
 {
 public:
     Player(const GameObjectAsset ast);
-    void setUp() override;
-    void update(const float dt) override;
-    void lateUpdate() override;
-    void render(sf::RenderWindow &window) override;
 
     void move(const Dir4);
     void stop(const Dir4);

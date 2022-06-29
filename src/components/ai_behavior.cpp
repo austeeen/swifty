@@ -5,10 +5,10 @@ void testTree()
 {
     /*
     [start]--pass-->[loc1]--pass-->[loc2]--pass-->[done]
-      \             \            \
-      fail          fail         fail
-        \             \            \
-       start          start       start
+       \               \              \
+       fail            fail           fail
+         \               \              \
+       [start]         [start]        [start]
     */
 
     MoveToRect* start = new MoveToRect(sf::FloatRect(0, 0, 10, 10));
@@ -25,13 +25,15 @@ MoveToRect::MoveToRect(const sf::FloatRect& dest):
 {}
 void MoveToRect::enter(GameObject* obj)
 {
-    obj->
+    obj->setState(ObjectState::running);
+    // obj->cmpnt<PathControl>()->setDestination(m_dest);
 }
 void MoveToRect::exit(GameObject* obj)
 {
-
+    // obj->cmpnt<PathControl>()->clearDestination();
 }
-bool MoveToRect::execute(GameObject* obj) {
+bool MoveToRect::execute(GameObject* obj)
+{
     return !obj->cmpnt<RigidBody>()->overlapping(m_dest);
 }
 

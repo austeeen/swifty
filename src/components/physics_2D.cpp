@@ -155,7 +155,7 @@ void Physics2D::updateInertia(const sf::Vector2f& in)
 {
     inertia = in;
 }
-const sf::Vector2f Physics2D::getVelocity() const
+const sf::Vector2f& Physics2D::getVelocity() const
 {
     return vel;
 }

@@ -3,7 +3,6 @@
 
 #include "component_base.hpp"
 
-
 struct ActionNode {
     ActionNode();
     virtual void enter(GameObject* obj) = 0;

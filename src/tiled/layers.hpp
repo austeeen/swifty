@@ -61,7 +61,7 @@ struct AiPaths: public LayerBase
 {
     AiPaths(rx::xml_node<>* node);
     void build(TileMap* map);
-    std::map<std::string, std::vector<Waypoint>> all_paths;
+    std::map<std::string, std::vector<sf::IntRect>> all_paths;
 };
 
 #endif // TLD_LAYERS_HPP
