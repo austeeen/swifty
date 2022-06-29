@@ -4,7 +4,7 @@
 AiState::AiState(AiObject* obj):
     m_obj(obj)
 {}
-void AiState::setDecisionRoot(Node* root)
+void AiState::setRoot(Node* root)
 {
     decision_root = root;
 }

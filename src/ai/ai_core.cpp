@@ -1,7 +1,7 @@
 #include "ai_core.hpp"
 
-ConditionalNode::ConditionalNode(Condition cond, Node* pass, Node* fail):
-    condition(cond), pass(pass), fail(fail)
+ConditionalNode::ConditionalNode(Condition cond):
+    condition(cond)
 {}
 Node* ConditionalNode::exec(AiObject* obj)
 {

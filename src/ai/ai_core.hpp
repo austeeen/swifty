@@ -5,8 +5,8 @@
 
 class AiObject;
 
-typedef bool (AiObject::*Condition)();
-typedef void (AiObject::*Action)();
+typedef bool(AiObject::*Condition)() const;
+typedef void(AiObject::*Action)();
 
 struct Node {
     virtual Node* exec(AiObject* obj) =0;
@@ -14,7 +14,7 @@ struct Node {
 
 struct ConditionalNode: public Node
 {
-    ConditionalNode(Condition cond, Node* pass, Node* fail);
+    ConditionalNode(Condition cond);
     Node* exec(AiObject* obj) override;
 
     Condition condition;

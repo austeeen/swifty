@@ -16,6 +16,7 @@ public:
     const bool stuckTimedout() const;
 
 private:
+    AiObject* m_obj;
     std::map<const AiState::Type, AiState*> m_state_tbl;
     AiState::Type m_state;
     float stuck_dt;
