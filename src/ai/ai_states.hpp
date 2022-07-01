@@ -9,6 +9,7 @@ public:
     enum class Type { wandering, stalking, returning };
 
     AiState(AiObject* obj);
+    ~AiState();
     void setRoot(Node* root);
     virtual const Type observe() const =0;
     void processDecision() const;

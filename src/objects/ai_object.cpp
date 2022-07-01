@@ -12,26 +12,42 @@ void AiObject::setTarget(GameObject* target)
 {
     m_target = target;
 }
+
+
 void AiObject::noAction()
 {
     return;
 }
-void AiObject::newDestination()
+void AiObject::attackTarget()
 {
-    cmpnt<Pathing2D>()->createDestination();
+    // todo
+    return;
 }
 void AiObject::clearDestination()
 {
     cmpnt<Pathing2D>()->clearPath();
 }
+void AiObject::setPathFromZone()
+{
+    cmpnt<Pathing2D>()->createDestination();
+    cmpnt<Pathing2D>()->drawPath();
+}
 void AiObject::setPathToTarget()
 {
     cmpnt<Pathing2D>()->setDestination(m_target->getPositionRect());
+    cmpnt<Pathing2D>()->drawPath();
 }
 void AiObject::setPathToHome()
 {
     cmpnt<Pathing2D>()->setDestination(m_home);
+    cmpnt<Pathing2D>()->drawPath();
 }
+void AiObject::redrawPath()
+{
+    cmpnt<Pathing2D>()->redrawPath();
+}
+
+
 bool AiObject::hasDestination() const
 {
     return cmpnt<Pathing2D>()->hasDestination();

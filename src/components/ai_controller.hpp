@@ -10,6 +10,7 @@ class AiController: public Component
 {
 public:
     AiController(AiObject* obj);
+    ~AiController();
     void build() override;
     void setUp() override;
     void update(const float dt) override;

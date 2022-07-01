@@ -12,7 +12,7 @@ void Pathing2D::update(const float dt)
 {
     if (m_node == nullptr) {
         return;
-    } else if (obj->cmpnt<RigidBody>()->contains(m_node->loc)) {
+    } else if (obj->cmpnt<RigidBody>()->intersects(m_node->loc)) {
         m_node = m_node->next;
     }
 }
@@ -32,10 +32,23 @@ void Pathing2D::drawPath()
     // root == final waypoint and the waypoint nodes are linked backwards
     m_node = m_root;
 }
+void Pathing2D::redrawPath()
+{
+    // to do
+    if (m_root != nullptr) {
+        clearPath();
+    }
+    // root == final waypoint and the waypoint nodes are linked backwards
+    m_node = m_root;
+}
 void Pathing2D::createDestination()
 {
     // todo create destination from pathing zone
-    drawPath();
+}
+void Pathing2D::setDestination(const sf::FloatRect& dest)
+{
+    // todo create destination from given dest rect
+    // m_root->loc = dest.center ?
 }
 const sf::Vector2f Pathing2D::getDestination() const
 {

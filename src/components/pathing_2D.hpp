@@ -12,7 +12,7 @@ public:
 
     void clearPath();
     void drawPath();
-
+    void redrawPath();
     void clearDestination();
     void createDestination();
     void setDestination(const sf::FloatRect& dest);

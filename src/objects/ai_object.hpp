@@ -8,23 +8,23 @@ class AiObject: public GameObject
 public:
     AiObject(const GameObjectAsset ast);
 
-    void noAction();
-
     void setTarget(GameObject* target);
-    void newDestination();
-    void clearDestination();
 
+    // action hooks
+    void noAction();
+    void attackTarget();
+    void clearDestination();
+    void setPathFromZone();
     void setPathToTarget();
     void setPathToHome();
+    void redrawPath();
 
+    // condition hooks
     bool hasDestination() const;
-
     bool targetDetected() const;
-
     bool closeToDestination() const;
     bool closeToTarget() const;
     bool closeToHome() const;
-
     bool isStuck() const;
 
 protected:
