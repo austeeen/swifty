@@ -1,5 +1,5 @@
-#include "assets.hpp"
-
+#include "ast_objects.hpp"
+/*
 ObjectAssetBase::ObjectAssetBase(std::shared_ptr<TsxBaseObject> tsx_obj):
     size(tsx_obj->tilesize)
 {}
@@ -26,3 +26,4 @@ PlatformObjectAsset::PlatformObjectAsset(std::shared_ptr<DynamicTiledObject> tsx
     img_texture = tsx_obj->render_texture->getTexture();
     start_pos = sf::Vector2f(tsx_obj->position_rect.left, tsx_obj->position_rect.top);
 }
+*/

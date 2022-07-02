@@ -1,28 +1,77 @@
 #include "layers.hpp"
-#include "tmx.hpp"
+#include "map.hpp"
 
-LayerBase::LayerBase(rx::xml_node<> *node)
+Layer::Layer(rx::xml_node<> *node)
 {
     name = attr<std::string>(node, "name");
+    type = asLayerType.at(name);
     id = attr<int>(node, "id");
 }
 
 /**************************************************************************************************/
 
 TileLayer::TileLayer(rx::xml_node<> *node):
-    LayerBase(node), render_texture(new sf::RenderTexture())
+    Layer(node)
 {
     size.x = attr<int>(node, "width");
     size.y = attr<int>(node, "height");
     rx::xml_node<> *data = node->first_node("data");
-    gidstr = data->value();
+    utl::split(data->value(), ',', gid_list);
 }
-TileLayer::~TileLayer()
+void TileLayer::process(TileMap *map)
 {
-    delete render_texture;
-    render_texture = nullptr;
+    for (const int gid : gid_list)
+    {
+        if (gid == 0) {
+            continue;
+        }
+        Tile* t;
+        TileSet* tileset = map->getTileset(gid);
+        const sf::Vector2i tilesize = map->getTileSize();
+        const int tw = tilesize.x;
+        const int th = tilesize.y;
+        const int px = (gid % size.x) * tw;
+        const int py = (gid / size.x) * th;
+
+        t->gid = gid - tileset->getFirstGid();
+        t->render_states = tileset->getRenderStates();
+
+        t->quads[0].position = sf::Vector2f(px,      py);
+        t->quads[1].position = sf::Vector2f(px + tw, py);
+        t->quads[2].position = sf::Vector2f(px + tw, py  + th);
+        t->quads[3].position = sf::Vector2f(px,      py  + th);
+
+        const Tile& ts_tile = tileset->getTile(t->gid);
+        t->quads[0].texCoords = ts_tile.quads[0].texCoords;
+        t->quads[1].texCoords = ts_tile.quads[1].texCoords;
+        t->quads[2].texCoords = ts_tile.quads[2].texCoords;
+        t->quads[3].texCoords = ts_tile.quads[3].texCoords;
+    }
 }
-void TileLayer::build(TileMap *map)
+
+/**************************************************************************************************/
+
+ObjectLayer::ObjectLayer(rx::xml_node<> *node):
+    Layer(node)
+{
+    rx::xml_node<> *obj_node = node->first_node();
+    while (obj_node) {
+        TiledObject* obj = new TiledObject();
+        obj->id = attr<int>(node, "id");
+        obj->rect = sf::IntRect(attr<int>(obj_node, "x"), attr<int>(obj_node, "y"),
+                                attr<int>(obj_node, "width"), attr<int>(obj_node, "height"));
+        obj->name = attr_if<std::string>(node, "name");
+        obj->type = attr_if<std::string>(node, "type");
+
+        if (obj_node->first_node("properties")) {
+            extractProperties(obj_node, obj->prps);
+        }
+        obj_node = obj_node->next_sibling();
+    }
+}
+
+/*
+void TileLayer::process(TileMap *map)
 {
     render_texture->create(map->tilesize.x * size.x, map->tilesize.y * size.y);
     render_texture->clear(sf::Color::Transparent);
@@ -65,8 +114,6 @@ void TileLayer::build(TileMap *map)
     render_texture->display();
 }
 
-/**************************************************************************************************/
-
 ObjectGroup::ObjectGroup(rx::xml_node<> *node):
     LayerBase(node)
 {
@@ -80,8 +127,6 @@ ObjectGroup::ObjectGroup(rx::xml_node<> *node):
     }
 }
 
-
-/**************************************************************************************************/
 
 DynamicObjectGroup::DynamicObjectGroup(rx::xml_node<> *node):
     LayerBase(node)
@@ -122,8 +167,6 @@ void DynamicObjectGroup::build(TileMap *map)
     }
 }
 
-/**************************************************************************************************/
-
 SpawnLocations::SpawnLocations(rx::xml_node<>* node):
     LayerBase(node)
 {
@@ -141,8 +184,6 @@ SpawnLocations::SpawnLocations(rx::xml_node<>* node):
     }
 }
 
-/**************************************************************************************************/
-
 AiZones::AiZones(rx::xml_node<>* node):
     LayerBase(node)
 {
@@ -158,3 +199,4 @@ AiZones::AiZones(rx::xml_node<>* node):
         obj_node = obj_node->next_sibling();
     }
 }
+*/

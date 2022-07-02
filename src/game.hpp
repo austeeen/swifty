@@ -5,10 +5,11 @@
 #include "data.hpp"
 #include "camera.hpp"
 #include "objects/all.hpp"
-#include "tiled/all.hpp"
+#include "foundry/foundry.hpp"
 #include "sys_collision.hpp"
 #include "io/devices.hpp"
 #include "utils/benchmark.hpp"
+
 
 class Game
 {
@@ -35,6 +36,9 @@ private:
     sf::RenderWindow window;
     Camera camera;
     InputDevice *io_device;
+
+    Foundry *foundry;
+
     std::shared_ptr<TileMap> tile_map;
     std::shared_ptr<Player> player;
     std::vector<std::shared_ptr<AiObject>> enemies;

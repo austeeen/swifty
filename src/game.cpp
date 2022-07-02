@@ -8,6 +8,10 @@ camera(CAMERA::view_rect)
     // window.setFramerateLimit(60);
     window.setVerticalSyncEnabled(true);
 
+    foundry = new Foundry();
+    foundry->loadScene("new_basic_level");
+
+    /* TODO: move this stuff into tiled loader / asset / foundry stuff */
     player = std::make_shared<Player>(GameObjectAsset(std::make_shared<TileObject>("res/cat_new.tsx")));
 
     enemies.push_back(
