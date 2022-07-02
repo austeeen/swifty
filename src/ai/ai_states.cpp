@@ -5,9 +5,7 @@ AiState::AiState(AiObject* obj):
     m_obj(obj), decision_root(nullptr)
 {}
 AiState::~AiState()
-{
-    // todo -- tree traversal to delete
-}
+{}
 void AiState::setRoot(Node* root)
 {
     decision_root = root;

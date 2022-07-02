@@ -57,11 +57,11 @@ struct SpawnLocations: public LayerBase
 
 /**************************************************************************************************/
 
-struct AiPaths: public LayerBase
+struct AiZones: public LayerBase
 {
-    AiPaths(rx::xml_node<>* node);
+    AiZones(rx::xml_node<>* node);
     void build(TileMap* map);
-    std::map<std::string, std::vector<sf::IntRect>> all_paths;
+    std::map<std::string, sf::IntRect> all_zones;
 };
 
 #endif // TLD_LAYERS_HPP

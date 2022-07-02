@@ -39,6 +39,12 @@ void Game::setUp()
         io_device = new Keyboard();
     }
 
+    player->build();
+    for (auto& enm : enemies) {
+        printf("building: %s\n", enm->getName().c_str());
+        enm->build();
+    }
+
     player->setUp();
     for (auto& plt : platforms) {
         plt->setUp();
@@ -55,6 +61,7 @@ void Game::setUp()
     // todo - will make this more robust eventually
     const sf::IntRect spider_start = tile_map->spawn_locations->to_spawn["spider"];
     enemies[0]->setStartPosition(spider_start.left, spider_start.top);
+    enemies[0]->setAiZone(tile_map->ai_zones->all_zones["spider"]);
 
     collision_system.add(player);
     for (auto& bnd : boundaries) {

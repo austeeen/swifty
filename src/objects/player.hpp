@@ -8,8 +8,6 @@ class Player: public GameObject
 public:
     Player(const GameObjectAsset ast);
 
-    void move(const Dir4);
-    void stop(const Dir4);
     void jump();
     void terminateJump();
 

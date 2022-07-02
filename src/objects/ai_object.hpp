@@ -8,7 +8,9 @@ class AiObject: public GameObject
 public:
     AiObject(const GameObjectAsset ast);
 
+    void setState(const ObjectState s) override;
     void setTarget(GameObject* target);
+    void setAiZone(const sf::IntRect& zone);
 
     // action hooks
     void noAction();
@@ -28,8 +30,9 @@ public:
     bool isStuck() const;
 
 protected:
+
     GameObject* m_target;
-    sf::FloatRect m_home;
+    sf::Vector2f m_home;
 };
 
 #endif // OBJ_AI_OBJECT_HPP

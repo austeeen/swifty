@@ -2,6 +2,7 @@
 <tileset version="1.8" tiledversion="1.8.5" name="spider" tilewidth="16" tileheight="16" tilecount="54" columns="9">
  <properties>
   <property name="config" type="file" value="spider.cfg"/>
+  <property name="facing_right" type="bool" value="false"/>
  </properties>
  <image source="elthen/spider.png" width="144" height="96"/>
  <tile id="0" type="idle">

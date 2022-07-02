@@ -7,9 +7,10 @@ class RigidBody: public Component
 {
 public:
     RigidBody(GameObject* ast);
+    void build() override;
     void setUp() override;
     void render(sf::RenderWindow &window) override;
-    
+
     void toggleDisplay();
     void move(const float x, const float y);
 

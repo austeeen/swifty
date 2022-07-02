@@ -14,11 +14,14 @@ public:
     void build() override;
     void setUp() override;
     void update(const float dt) override;
+    void setState(ObjectState s);
     const bool stuckTimedout() const;
 
 private:
     AiObject* m_obj;
+    std::vector<Node*> m_allnodes;
     std::map<const AiState::Type, AiState*> m_state_tbl;
+    ObjectState m_obj_state;
     AiState::Type m_state;
     float stuck_dt;
     const float stuck_timeout = STUCK_TIMEOUT;

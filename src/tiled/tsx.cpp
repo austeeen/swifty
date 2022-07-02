@@ -56,6 +56,12 @@ TileObject::TileObject(const char* filepath)
         node = node->next_sibling();
     }
 
+    if (facing_right) {
+        printf("%s is facing right\n", name.c_str());
+    } else {
+        printf("%s is facing left\n", name.c_str());
+    }
+
     delete doc;
 }
 TileObject::~TileObject()
@@ -71,6 +77,8 @@ void TileObject::getProperties(rx::xml_node<> *all_properties)
     std::string cfg_fp = prop_tbl["config"];
     cfg_fp = "res/" + cfg_fp;
     loadConfig(cfg_fp.c_str());
+
+    facing_right = stob(prop_tbl["facing_right"]);
 }
 void TileObject::loadConfig(const char *filepath)
 {

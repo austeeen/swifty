@@ -2,6 +2,7 @@
 <tileset version="1.8" tiledversion="1.8.5" name="cat_new" tilewidth="18" tileheight="18" tilecount="30" columns="5">
  <properties>
   <property name="config" type="file" value="cat.cfg"/>
+  <property name="facing_right" type="bool" value="true"/>
  </properties>
  <image source="elthen/cat-18x18.png" width="90" height="108"/>
  <tile id="0" type="idle">

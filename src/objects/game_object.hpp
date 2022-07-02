@@ -13,7 +13,11 @@ public:
     void lateUpdate() override;
     void render(sf::RenderWindow &window) override;
 
-    void setState(const ObjectState s);
+    void move(const Dir4 d);
+    void stop(const Dir4 d);
+    void stopAll();
+
+    virtual void setState(const ObjectState s);
     void setStartPosition(const int x, const int y);
     void toggleRects();
 
@@ -22,6 +26,7 @@ public:
 
     const std::string& getName() const;
     const GameObjectAsset& getAsset() const;
+    const Dir4 getOrientation() const;
     const sf::FloatRect& getPositionRect() const;
     const std::vector<CollisionRect>& getColliders() const;
     const sf::Vector2f& getVelocity() const;
@@ -36,6 +41,7 @@ protected:
     std::map<std::type_index, std::shared_ptr<Component>> cmpts;
     ObjectState cur_state;
     GameObjectAsset ast;
+    const Dir4 orientation;
 };
 
 #endif // GAMEOBJECT_HPP

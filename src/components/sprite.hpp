@@ -10,16 +10,17 @@ class Sprite: public Component
 public:
     Sprite(GameObject* obj);
     void build() override;
+    void setUp() override;
     void render(sf::RenderWindow &window) override;
     void setTextureRect(const sf::IntRect& texture_rect);
-    void setFacing(bool facing_right);
+    void flipTexture(bool facing_right);
 
 private:
     void updateTextureRect();
 
     sf::Texture img_texture;
     sf::IntRect cur_rect;
-    bool facing_right;
+    bool flip_texture;
     sf::Sprite sprite;
 };
 

@@ -7,11 +7,15 @@ RigidBody::RigidBody(GameObject* obj):
     m_body_collider(nullptr),
     display_body(false)
 {}
-void RigidBody::setUp()
+void RigidBody::build()
 {
     GameObjectAsset ast = obj->getAsset();
     position_rect = sf::FloatRect(0, 0, ast.size.x, ast.size.y);
     pos_shape = createShape(sf::Color::Green);
+}
+void RigidBody::setUp()
+{
+    updateFacing(obj->getOrientation());
 }
 void RigidBody::render(sf::RenderWindow &window)
 {

@@ -1,12 +1,71 @@
 #include "pathing_2D.hpp"
 #include "../objects/game_object.hpp"
 
+PathingVSI::PathingVSI(GameObject* obj): Component(obj)
+{}
+void PathingVSI::update(const float dt)
+{
+    last_dt = dt * 100000;
+    if (!hasDestination()) {
+        printf("Spider has no destination\n");
+        return;
+    } else if (obj->cmpnt<RigidBody>()->intersects(m_destination)) {
+        printf("Spider reached destination\n");
+        clearDestination();
+        obj->stopAll();
+    } else {
+        const sf::FloatRect posrect = obj->getPositionRect();
+        if (posrect.left < m_destination.x && posrect.left + posrect.width < m_destination.x) {
+            obj->stop(Dir4::left);
+            obj->move(Dir4::right);
+            printf("Spider moving right\n");
+        } else {
+            obj->stop(Dir4::right);
+            obj->move(Dir4::left);
+            printf("Spider moving left\n");
+        }
+    }
+}
+void PathingVSI::setZone(const sf::IntRect& zone)
+{
+    printf("set zone (%d, %d, %d, %d)\n", zone.left, zone.top, zone.width, zone.height);
+    m_zone = zone;
+}
+void PathingVSI::newDestination()
+{
+    srand(last_dt);
+    m_destination.y = m_zone.top - (m_zone.height / 2);
+    m_destination.x = (rand() % m_zone.width) + m_zone.left;
+    printf("new destination (%f, %f)\n", m_destination.x, m_destination.y);
+}
+void PathingVSI::setDestination(const sf::Vector2f& dest)
+{
+    m_destination = dest;
+    printf("set destination (%f, %f)\n", m_destination.x, m_destination.y);
+}
+void PathingVSI::clearDestination()
+{
+    m_destination.x = 0.f;
+    m_destination.y = 0.f;
+    printf("cleared destination (%f, %f)\n", m_destination.x, m_destination.y);
+}
+const sf::Vector2f PathingVSI::getDestination() const
+{
+    return m_destination;
+}
+const bool PathingVSI::hasDestination() const
+{
+    return m_destination.x != 0.f && m_destination.y != 0.f;
+}
+
+/**************************************************************************************************/
+
 Pathing2D::Pathing2D(GameObject* obj):
     Component(obj)
 {}
 void Pathing2D::setUp()
 {
-    m_bounds = obj->getAsset().pathing_zone;
+    // m_bounds = obj->getAsset().pathing_zone;
 }
 void Pathing2D::update(const float dt)
 {
@@ -15,6 +74,10 @@ void Pathing2D::update(const float dt)
     } else if (obj->cmpnt<RigidBody>()->intersects(m_node->loc)) {
         m_node = m_node->next;
     }
+}
+void Pathing2D::setZone(const sf::IntRect& zone)
+{
+    m_zone = zone;
 }
 void Pathing2D::clearPath()
 {

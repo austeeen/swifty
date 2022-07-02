@@ -10,6 +10,11 @@ AiController::AiController(AiObject* obj):
 }
 AiController::~AiController()
 {
+    for (auto& n : m_allnodes) {
+        delete n;
+    }
+    m_allnodes.clear();
+
     for (auto& [state_type, state] : m_state_tbl) {
         delete state;
     }
@@ -26,7 +31,7 @@ void AiController::build()
     ActionNode* a5 = new ActionNode(&AiObject::setPathToHome);
 
     // wandering tree
-    ConditionalNode* w_c0 = new ConditionalNode(&AiObject::targetDetected);
+    ConditionalNode* w_c0 = new ConditionalNode(&AiObject::hasDestination);
     ConditionalNode* w_c1 = new ConditionalNode(&AiObject::closeToDestination);
     ConditionalNode* w_c2 = new ConditionalNode(&AiObject::isStuck);
     w_c0->pass = w_c1;
@@ -59,6 +64,22 @@ void AiController::build()
     s_c1->fail = a2;
     m_state_tbl[AiState::Type::returning]->setRoot(r_c0);
 
+    m_allnodes.push_back(a0);
+    m_allnodes.push_back(a1);
+    m_allnodes.push_back(a2);
+    m_allnodes.push_back(a3);
+    m_allnodes.push_back(a4);
+    m_allnodes.push_back(a5);
+
+    m_allnodes.push_back(w_c0);
+    m_allnodes.push_back(w_c1);
+    m_allnodes.push_back(w_c2);
+    m_allnodes.push_back(s_c0);
+    m_allnodes.push_back(s_c1);
+    m_allnodes.push_back(r_c0);
+    m_allnodes.push_back(r_c1);
+
+
 }
 void AiController::setUp()
 {
@@ -66,15 +87,18 @@ void AiController::setUp()
 }
 void AiController::update(const float dt)
 {
-    // todo :
-    // ObjectState cur_state = [some state calculated based on body/physics/pathing?]
-    // do ai state stuff [observe, processDecision]
-    // check for being 'stuck'?
-        // may just check if cur_state == idle?
-        // may involve pathing2d, rigid body, physics 2d, etc not sure yet.
-        // update stuck_dt
-    // else
-        // clear stuck_dt
+    m_state_tbl[m_state]->observe();
+    m_state_tbl[m_state]->processDecision();
+
+    if (m_obj_state == ObjectState::idle) {
+        stuck_dt += dt;
+    } else {
+        stuck_dt = 0.f;
+    }
+}
+void AiController::setState(ObjectState s)
+{
+    m_obj_state = s;
 }
 const bool AiController::stuckTimedout() const
 {

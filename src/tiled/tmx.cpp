@@ -28,8 +28,9 @@ TileMap::TileMap(const char* filepath)
                 dyn_object_groups.push_back(new DynamicObjectGroup(node));
             } else if (sub_type == "spawn_locations") {
                 spawn_locations = new SpawnLocations(node);
-            }
-            else {
+            } else if (sub_type == "ai_zones") {
+                ai_zones = new AiZones(node);
+            } else {
                 object_groups.push_back(new ObjectGroup(node));
             }
         }
@@ -41,6 +42,8 @@ TileMap::~TileMap()
 {
     delete spawn_locations;
     spawn_locations = nullptr;
+    delete ai_zones;
+    ai_zones = nullptr;
 
     for (auto& [gid, ts] : tilesets) {
         delete ts;

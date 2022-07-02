@@ -7,9 +7,9 @@ ObjectAssetBase::ObjectAssetBase(std::shared_ptr<TsxBaseObject> tsx_obj):
 GameObjectAsset::GameObjectAsset(std::shared_ptr<TileObject> tsx_obj):
     ObjectAssetBase(tsx_obj),
     name(tsx_obj->name),
+    facing_right(tsx_obj->facing_right),
     coeffs(tsx_obj->pCoeffs),
-    animation_rolls(tsx_obj->animation_rolls),
-    pathing_zone(tsx_obj->pathing_zone)
+    animation_rolls(tsx_obj->animation_rolls)
 {
     img_texture = tsx_obj->img_texture;
     start_pos = sf::Vector2f(CAT_START_X * size.x, CAT_START_Y * size.y);

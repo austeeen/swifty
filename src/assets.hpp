@@ -21,9 +21,9 @@ struct GameObjectAsset: public ObjectAssetBase
     GameObjectAsset(std::shared_ptr<TileObject> tsx_obj);
 
     const std::string name;
+    const bool facing_right;
     const PhysicsCoeffs coeffs;
     std::map<ObjectState, std::shared_ptr<AnimRoll>> animation_rolls;
-    const sf::FloatRect pathing_zone;
 };
 
 struct PlatformObjectAsset: public ObjectAssetBase

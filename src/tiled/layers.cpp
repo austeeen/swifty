@@ -143,17 +143,17 @@ SpawnLocations::SpawnLocations(rx::xml_node<>* node):
 
 /**************************************************************************************************/
 
-AiPaths::AiPaths(rx::xml_node<>* node):
+AiZones::AiZones(rx::xml_node<>* node):
     LayerBase(node)
 {
     rx::xml_node<> *obj_node = node->first_node();
     while (obj_node) {
         std::string type = attr<std::string>(obj_node, "type");
-        if (type == "waypoint") {
+        if (type == "zone") {
             std::string name = attr<std::string>(obj_node, "name");
-            all_paths[name].push_back(sf::IntRect(
+            all_zones[name] = sf::IntRect(
                 attr<int>(obj_node, "x"), attr<int>(obj_node, "y"),
-                attr<int>(obj_node, "width"), attr<int>(obj_node, "height")));
+                attr<int>(obj_node, "width"), attr<int>(obj_node, "height"));
         }
         obj_node = obj_node->next_sibling();
     }
