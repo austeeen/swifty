@@ -7,7 +7,7 @@ namespace WINDOW
 {
     const int width = 1024;
     const int height = 768;
-    const std::string title = "Cat";
+    const std::string title = "Swifty";
     const int style = sf::Style::Resize + sf::Style::Close;
 }
 

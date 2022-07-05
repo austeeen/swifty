@@ -1,11 +1,13 @@
 #include "assets.hpp"
 
-GameObjectAsset::GameObjectAsset(std::shared_ptr<TsxBaseObject> tsx_obj):
+ObjectAssetBase::ObjectAssetBase(std::shared_ptr<TsxBaseObject> tsx_obj):
     size(tsx_obj->tilesize)
 {}
 
-PlayerObjectAsset::PlayerObjectAsset(std::shared_ptr<TileObject> tsx_obj):
-    GameObjectAsset(tsx_obj),
+GameObjectAsset::GameObjectAsset(std::shared_ptr<TileObject> tsx_obj):
+    ObjectAssetBase(tsx_obj),
+    name(tsx_obj->name),
+    facing_right(tsx_obj->facing_right),
     coeffs(tsx_obj->pCoeffs),
     animation_rolls(tsx_obj->animation_rolls)
 {
@@ -14,7 +16,7 @@ PlayerObjectAsset::PlayerObjectAsset(std::shared_ptr<TileObject> tsx_obj):
 }
 
 PlatformObjectAsset::PlatformObjectAsset(std::shared_ptr<DynamicTiledObject> tsx_obj):
-    GameObjectAsset(tsx_obj),
+    ObjectAssetBase(tsx_obj),
     name(tsx_obj->name),
     position_rect(tsx_obj->position_rect),
     collider(tsx_obj->collider),

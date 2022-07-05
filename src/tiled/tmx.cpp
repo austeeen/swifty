@@ -20,14 +20,16 @@ TileMap::TileMap(const char* filepath)
         if (type == "tileset") {
             int firstgid = attr<int>(node, "firstgid");
             tilesets[firstgid] = new TileSet(node);
-        }
-        else if (type == "layer") {
+        } else if (type == "layer") {
             tile_layers.push_back(new TileLayer(node));
-        }
-        else if (type == "objectgroup") {
+        } else if (type == "objectgroup") {
             std::string sub_type = attr<std::string>(node, "name");
             if (sub_type == "dynamic") {
                 dyn_object_groups.push_back(new DynamicObjectGroup(node));
+            } else if (sub_type == "spawn_locations") {
+                spawn_locations = new SpawnLocations(node);
+            } else if (sub_type == "ai_zones") {
+                ai_zones = new AiZones(node);
             } else {
                 object_groups.push_back(new ObjectGroup(node));
             }
@@ -38,6 +40,11 @@ TileMap::TileMap(const char* filepath)
 }
 TileMap::~TileMap()
 {
+    delete spawn_locations;
+    spawn_locations = nullptr;
+    delete ai_zones;
+    ai_zones = nullptr;
+
     for (auto& [gid, ts] : tilesets) {
         delete ts;
     }

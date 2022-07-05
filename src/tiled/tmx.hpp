@@ -18,6 +18,9 @@ public:
     std::vector<TileLayer*> tile_layers;
     std::vector<ObjectGroup*> object_groups;
     std::vector<DynamicObjectGroup*> dyn_object_groups;
+    SpawnLocations* spawn_locations;
+    AiZones* ai_zones;
+
     sf::Vector2i mapsize, tilesize;
 };
 

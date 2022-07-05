@@ -26,6 +26,7 @@ public:
     void addTile(rx::xml_node<>* node);
     void addRoll(std::shared_ptr<AnimRoll> roll, rx::xml_node<>* node);
 
+    bool facing_right;
     sf::Texture img_texture;
     std::string img_src;
     int tilecount, columns, totaltiles;

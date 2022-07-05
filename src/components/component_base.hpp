@@ -3,13 +3,15 @@
 
 #include "../common.hpp"
 
-class Player;
+class GameObject;
 class GameObjectAsset;
+class AiObject;
 
 class Component
 {
 public:
-    Component(Player* obj);
+    Component(GameObject* obj);
+    Component(AiObject* obj);
     ~Component() { obj = nullptr; }
     virtual void build();
     virtual void setUp();
@@ -17,7 +19,7 @@ public:
     virtual void render(sf::RenderWindow &window);
 
 public:
-    Player* obj;
+    GameObject* obj;
 };
 
 #endif // CMP_BASE_HPP

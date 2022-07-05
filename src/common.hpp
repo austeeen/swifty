@@ -7,6 +7,7 @@
 #include <iostream>
 #include <map>
 #include <memory>
+#include <set>
 #include <SFML/Graphics.hpp>
 #include <sstream>
 #include <stdexcept>
@@ -14,6 +15,7 @@
 #include <typeindex>
 #include <typeinfo>
 #include <vector>
+#include <utility>
 
 #include "rapidxml/rapidxml.hpp"
 namespace rx = rapidxml;

@@ -8,16 +8,17 @@
 #include <iostream>
 
 static const float FLT_ZERO = 0.1;
+static const float STUCK_TIMEOUT = 5.f;
 
 template <typename T> int sgn(T val) {
     return (T(0) < val) - (val < T(0));
 }
 
-enum class Dir4 {up, down, left, right };
+enum class Dir4 { up, down, left, right };
 
 enum class ColliderType { generic, body, platform, immovable };
 
-enum class ObjectState { idle, running, jumping, falling, wallsliding };
+enum class ObjectState { idle, running, jumping, falling, healing, damaged, dead };
 
 enum class RollState { none, next, done };
 
@@ -53,7 +54,6 @@ struct Waypoint {
     int next_id;
     Waypoint* next;
     Waypoint* prev;
-
 };
 
 struct CollisionRect {

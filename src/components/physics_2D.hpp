@@ -12,7 +12,7 @@ class Physics2D: public Component
         void update(const PhysicsCoeffs& new_u);
     };
 public:
-    Physics2D(Player* obj);
+    Physics2D(GameObject* obj);
     void build() override;
     void update(const float dt);
 
@@ -26,7 +26,7 @@ public:
     void onColliding(const sf::Vector2f& offset, const ColliderType colliding_type, const ColliderType type);
     void updateInertia(const sf::Vector2f& in);
 
-    const sf::Vector2f getVelocity() const;
+    const sf::Vector2f& getVelocity() const;
 
     void increase(const PhysicsCoeffs::AsEnum cf);
     void decrease(const PhysicsCoeffs::AsEnum cf);

@@ -1,7 +1,7 @@
 #include "animator.hpp"
 #include "sprite.hpp"
 #include "rigid_body.hpp"
-#include "../objects/player.hpp"
+#include "../objects/game_object.hpp"
 
 Roll::Roll(std::shared_ptr<AnimRoll> roll):
     frame_indx(0),
@@ -65,7 +65,7 @@ const std::vector<CollisionRect>& Roll::getCollisionRects() const
 
 /**************************************************************************************************/
 
-Animator::Animator(Player* obj):
+Animator::Animator(GameObject* obj):
     Component(obj),
     spr(nullptr),
     cur(ObjectState::idle),
@@ -75,7 +75,7 @@ void Animator::build()
 {
     spr = obj->cmpnt<Sprite>();
     body = obj->cmpnt<RigidBody>();
-    PlayerObjectAsset ast = obj->getAsset();
+    GameObjectAsset ast = obj->getAsset();
     for (auto& [id, roll] : ast.animation_rolls) {
         animations[id] = new Roll(roll);
     }

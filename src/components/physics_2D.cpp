@@ -1,8 +1,8 @@
 #include "physics_2D.hpp"
 #include "rigid_body.hpp"
-#include "../objects/player.hpp"
+#include "../objects/game_object.hpp"
 
-Physics2D::Physics2D(Player* obj):
+Physics2D::Physics2D(GameObject* obj):
     Component(obj),
     cur_state(ObjectState::idle),
     next_state(ObjectState::idle),
@@ -13,7 +13,7 @@ Physics2D::Physics2D(Player* obj):
 void Physics2D::build()
 {
     body = obj->cmpnt<RigidBody>();
-    PlayerObjectAsset ast = obj->getAsset();
+    GameObjectAsset ast = obj->getAsset();
     this->u = ast.coeffs;
     frc.update(u);
 }
@@ -105,9 +105,6 @@ const ObjectState Physics2D::nextState()
             // else if wall sliding
             break;
         }
-        case ObjectState::wallsliding: {
-            break;
-        }
         default: { // covers running or idle
             if (moving_dir) {
                 next_state = ObjectState::running;
@@ -158,7 +155,7 @@ void Physics2D::updateInertia(const sf::Vector2f& in)
 {
     inertia = in;
 }
-const sf::Vector2f Physics2D::getVelocity() const
+const sf::Vector2f& Physics2D::getVelocity() const
 {
     return vel;
 }
@@ -174,7 +171,7 @@ void Physics2D::decrease(const PhysicsCoeffs::AsEnum cf)
 }
 void Physics2D::print() const
 {
-    printf("[Physics2D] %s acl(%f, %f) vel(%f, %f)\n", out::toStr(cur_state).c_str(), acl.x, acl.y, vel.x, vel.y);
+    printf("[Physics2D] %s %s acl(%f, %f) vel(%f, %f)\n", obj->getName().c_str(), out::toStr(cur_state).c_str(), acl.x, acl.y, vel.x, vel.y);
 }
 void Physics2D::Force2D::update(const PhysicsCoeffs& new_u)
 {

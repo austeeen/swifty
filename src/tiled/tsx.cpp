@@ -46,8 +46,20 @@ TileObject::TileObject(const char* filepath)
             addRoll(animation_rolls[ObjectState::jumping], node);
         } else if (anim_roll == "falling") {
             addRoll(animation_rolls[ObjectState::falling], node);
+        } else if (anim_roll == "healing") {
+            addRoll(animation_rolls[ObjectState::healing], node);
+        } else if (anim_roll == "damaged") {
+            addRoll(animation_rolls[ObjectState::damaged], node);
+        } else if (anim_roll == "dead") {
+            addRoll(animation_rolls[ObjectState::dead], node);
         }
         node = node->next_sibling();
+    }
+
+    if (facing_right) {
+        printf("%s is facing right\n", name.c_str());
+    } else {
+        printf("%s is facing left\n", name.c_str());
     }
 
     delete doc;
@@ -65,6 +77,8 @@ void TileObject::getProperties(rx::xml_node<> *all_properties)
     std::string cfg_fp = prop_tbl["config"];
     cfg_fp = "res/" + cfg_fp;
     loadConfig(cfg_fp.c_str());
+
+    facing_right = stob(prop_tbl["facing_right"]);
 }
 void TileObject::loadConfig(const char *filepath)
 {
@@ -120,6 +134,12 @@ void TileObject::addTile(rx::xml_node<> *node)
         animation_rolls[ObjectState::jumping] = std::make_shared<AnimRoll>();
     } else if (anim_roll == "falling") {
         animation_rolls[ObjectState::falling] = std::make_shared<AnimRoll>();
+    } else if (anim_roll == "healing") {
+        animation_rolls[ObjectState::healing] = std::make_shared<AnimRoll>();
+    } else if (anim_roll == "damaged") {
+        animation_rolls[ObjectState::damaged] = std::make_shared<AnimRoll>();
+    } else if (anim_roll == "dead") {
+        animation_rolls[ObjectState::dead] = std::make_shared<AnimRoll>();
     }
 }
 void TileObject::addRoll(std::shared_ptr<AnimRoll> roll, rx::xml_node<> *node)

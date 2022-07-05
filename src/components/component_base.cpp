@@ -1,7 +1,10 @@
 #include "component_base.hpp"
-#include "../objects/player.hpp"
+#include "../objects/game_object.hpp"
+#include "../objects/ai_object.hpp"
 
-Component::Component(Player* obj): obj(obj)
+Component::Component(GameObject* obj): obj(obj)
+{}
+Component::Component(AiObject* obj): obj(obj)
 {}
 void Component::build()
 {}

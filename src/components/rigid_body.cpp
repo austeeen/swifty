@@ -1,17 +1,21 @@
 #include "rigid_body.hpp"
-#include "../objects/player.hpp"
+#include "../objects/game_object.hpp"
 
-RigidBody::RigidBody(Player* obj):
+RigidBody::RigidBody(GameObject* obj):
     Component(obj),
     cur_facing(Dir4::right),
+    m_body_collider(nullptr),
     display_body(false)
 {}
-void RigidBody::setUp()
+void RigidBody::build()
 {
-    PlayerObjectAsset ast = obj->getAsset();
+    GameObjectAsset ast = obj->getAsset();
     position_rect = sf::FloatRect(0, 0, ast.size.x, ast.size.y);
     pos_shape = createShape(sf::Color::Green);
-    move(ast.start_pos.x, ast.start_pos.y);
+}
+void RigidBody::setUp()
+{
+    updateFacing(obj->getOrientation());
 }
 void RigidBody::render(sf::RenderWindow &window)
 {
@@ -43,6 +47,13 @@ void RigidBody::toggleDisplay()
 void RigidBody::setColliders(const std::vector<CollisionRect>& rects)
 {
     collision_rects.clear();
+    m_body_collider = nullptr;
+    for (auto& col_rect : rects) {
+        collision_rects.push_back(col_rect);
+        if (col_rect.type == ColliderType::body) {
+            m_body_collider = &collision_rects.back();
+        }
+    }
     copy(rects.begin(), rects.end(), back_inserter(collision_rects));
     if (cur_facing == Dir4::left) {
         faceLeft();
@@ -101,15 +112,41 @@ void RigidBody::yCollision(const float offset)
         col_rect.aabb.top += offset;
     }
 }
+bool RigidBody::overlapping(const sf::FloatRect& rect) const
+{
+    return m_body_collider->aabb.intersects(rect);
+}
+bool RigidBody::intersects(const sf::Vector2f& loc) const
+{
+    return position_rect.contains(loc);
+}
+bool RigidBody::intersects(const sf::FloatRect& rect) const
+{
+    return position_rect.intersects(rect);
+}
+bool RigidBody::closeTo(const sf::Vector2f& loc) const
+{
+    // todo -- grow size of body collider by some amount (1.5x, 2x, etc)
+    return position_rect.contains(loc);
+}
+bool RigidBody::closeTo(const sf::FloatRect& rect) const
+{
+    // todo -- grow size of body collider by some amount (1.5x, 2x, etc)
+    return position_rect.intersects(rect);
+}
 const sf::Vector2f RigidBody::getPosition() const
 {
     return sf::Vector2f(position_rect.left, position_rect.top);
+}
+const sf::FloatRect& RigidBody::getPositionRect() const
+{
+    return position_rect;
 }
 const sf::Vector2i RigidBody::getSize() const
 {
     return sf::Vector2i(position_rect.width, position_rect.height);
 }
-const std::vector<CollisionRect>& RigidBody::getRects() const
+const std::vector<CollisionRect>& RigidBody::getColliders() const
 {
     return collision_rects;
 }
