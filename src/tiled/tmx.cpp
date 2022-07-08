@@ -26,9 +26,9 @@ TileMap::TileMap(const char* filepath)
             std::string sub_type = attr<std::string>(node, "name");
             if (sub_type == "dynamic") {
                 dyn_object_groups.push_back(new DynamicObjectGroup(node));
-            } else if (sub_type == "spawn_locations") {
+            } else if (sub_type == "location") {
                 spawn_locations = new SpawnLocations(node);
-            } else if (sub_type == "ai_zones") {
+            } else if (sub_type == "zone") {
                 ai_zones = new AiZones(node);
             } else {
                 object_groups.push_back(new ObjectGroup(node));
