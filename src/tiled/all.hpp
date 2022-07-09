@@ -1,9 +1,11 @@
 #ifndef TLD_ALL_HPP
 #define TLD_ALL_HPP
 
-#include "tmx.hpp"
+#include "tile_map.hpp"
 #include "tsx.hpp"
 #include "tileset.hpp"
-#include "layers.hpp"
+#include "locations_layer.hpp"
+#include "structure_layers.hpp"
+#include "tile_layer.hpp"
 
-#endif // RSRC_TILED_HPP
+#endif // TLD_ALL_HPP

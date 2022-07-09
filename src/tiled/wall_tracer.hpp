@@ -27,8 +27,6 @@
 
 */
 
-enum class DIR4 { UP, DOWN, LEFT, RIGHT };
-
 const char HASEDGE = '2';
 
 
@@ -55,10 +53,10 @@ struct Tile
     TerrainType trn;
     Wangset::type type;
 
-    void setNeighbor(DIR4 d, Tile* t);
-    bool hasNeighbor(DIR4 d);
-    Tile* getNeighbor(DIR4 d);
-    void clearNeighbor(DIR4 dir);
+    void setNeighbor(Dir4 d, Tile* t);
+    bool hasNeighbor(Dir4 d);
+    Tile* getNeighbor(Dir4 d);
+    void clearNeighbor(Dir4 dir);
 
 private:
     Tile* adj[4];
@@ -75,10 +73,13 @@ class Tracer
 {
 public:
     Tracer(rx::xml_node<>* node);
+    void setUpWangset(rx::xml_node<>* node);
     void traceGidStr(const std::string& gid_str, const sf::Vector2i& size);
+    void traceAll();
 
+    std::vector<Tile*> alltiles;
 
-    std::map<int, int> wangset;
+    std::map<int, int> tile_to_wangset;
     std::vector<RectStructure> combined_rects;
 };
 

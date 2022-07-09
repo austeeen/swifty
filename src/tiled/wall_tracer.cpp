@@ -1,6 +1,8 @@
 #include "wall_tracer.hpp"
 
 Tracer::Tracer(rx::xml_node<> *node)
+{}
+void Tracer::setUpWangset(rx::xml_node<> *node)
 {
     rx::xml_node<> *wang_node = node->first_node("wangset");
     while(wang_node) {
@@ -13,7 +15,7 @@ Tracer::Tracer(rx::xml_node<> *node)
                 }
             }
             if (wang_indx) {
-                wangset[attr<int>(wang_node, "tileid")] = wang_indx;
+                tile_to_wangset[attr<int>(wang_node, "tileid")] = wang_indx;
             }
         }
     }
@@ -27,16 +29,26 @@ void Tracer::traceGidStr(const std::string& gid_str, const sf::Vector2i& size)
     split(gid_str, ',', allgids);
 
     for (size_t i = 0; i < allgids.size(); i ++) {
-        const int tx = i % bw;
-        const int ty = i / bw;
-        
-        Tile *t = allgids[i];
-        if (t->crd.y > 0)
-            t->setNeighbor(bt::dir4::up,    alltiles[i - bw]);
-        if (t->crd.y < (bh - 1))
-            t->setNeighbor(bt::dir4::down,  alltiles[i + bw]);
-        if (t->crd.x > 0)
-            t->setNeighbor(bt::dir4::left,  alltiles[i - 1]);
-        if (t->crd.x < (bw - 1))
-            t->setNeighbor(bt::dir4::right, alltiles[i + 1]);
-    }}
+        if (allgids[i] == 0) {
+            alltiles.push_back(nullptr);
+        } else {
+            alltiles.push_back(new Tile(allgids[i], i % bw, i / bw));
+        }
+    }
+
+    for (size_t i = 0; i < alltiles.size(); i ++) {
+        Tile *t = alltiles[i];
+        if (t->y > 0)
+            t->setNeighbor(Dir4::up,    alltiles[i - bw]);
+        if (t->y < (bh - 1))
+            t->setNeighbor(Dir4::down,  alltiles[i + bw]);
+        if (t->x > 0)
+            t->setNeighbor(Dir4::left,  alltiles[i - 1]);
+        if (t->x < (bw - 1))
+            t->setNeighbor(Dir4::right, alltiles[i + 1]);
+    }
+}
+void Tracer::traceAll()
+{
+
+}

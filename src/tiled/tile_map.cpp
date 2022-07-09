@@ -1,4 +1,4 @@
-#include "tmx.hpp"
+#include "tile_map.hpp"
 
 TileMap::TileMap(const char* filepath)
 {
@@ -18,20 +18,15 @@ TileMap::TileMap(const char* filepath)
     while(node != nullptr) {
         std::string type = std::string(node->name());
         if (type == "tileset") {
-            int firstgid = attr<int>(node, "firstgid");
-            tilesets[firstgid] = new TileSet(node);
-        } else if (type == "layer") {
-            tile_layers.push_back(new TileLayer(node));
-        } else if (type == "objectgroup") {
+            tilesets[attr<int>(node, "firstgid")] = new TileSet(node);
+        } else {
             std::string sub_type = attr<std::string>(node, "name");
-            if (sub_type == "dynamic") {
-                dyn_object_groups.push_back(new DynamicObjectGroup(node));
-            } else if (sub_type == "location") {
-                spawn_locations = new SpawnLocations(node);
-            } else if (sub_type == "zone") {
-                ai_zones = new AiZones(node);
-            } else {
-                object_groups.push_back(new ObjectGroup(node));
+            if (sub_type == "location") {
+                locations = new Locations(node);
+            } else if (sub_type == "background") {
+                background = new TileLayer(node);
+            } else if (sub_type == "structures") {
+                addStructures(node);
             }
         }
         node = node->next_sibling();
@@ -40,38 +35,26 @@ TileMap::TileMap(const char* filepath)
 }
 TileMap::~TileMap()
 {
-    delete spawn_locations;
-    spawn_locations = nullptr;
-    delete ai_zones;
-    ai_zones = nullptr;
+    delete background;
+    background = nullptr;
+    delete locations;
+    locations = nullptr;
 
     for (auto& [gid, ts] : tilesets) {
         delete ts;
     }
     tilesets.clear();
 
-    for (auto& tl : tile_layers) {
-        delete tl;
+    for (auto& [name, st] : structure_group) {
+        delete st;
     }
-    tile_layers.clear();
-
-    for (auto& og : object_groups) {
-        delete og;
-    }
-    object_groups.clear();
-
-    for (auto& dog : dyn_object_groups) {
-        delete dog;
-    }
-    dyn_object_groups.clear();
+    structure_group.clear();
 }
 void TileMap::build()
 {
-    for (auto& lyr : tile_layers) {
-        lyr->build(this);
-    }
-    for (auto& lyr : dyn_object_groups) {
-        lyr->build(this);
+    background->build(this);
+    for (auto& [name, st] : structure_group) {
+        st->build(this);
     }
 }
 TileSet* TileMap::getTileset(const int cur_gid)
@@ -85,4 +68,21 @@ TileSet* TileMap::getTileset(const int cur_gid)
         }
     }
     return tilesets[indx];
+}
+void TileMap::addStructures(rx::xml_node<>* node)
+{
+    rx::xml_node<> *lyr_node = node->first_node();
+    while(lyr_node) {
+        std::string type = std::string(lyr_node->name());
+        if (type == "dynamic") {
+            structure_group[type] = new DynamicStructures(lyr_node);
+        }
+        else if (type == "static") {
+            structure_group[type] = new StaticStructures(lyr_node);
+        }
+        else if (type == "terrain") {
+            structure_group[type] = new TerrainStructures(lyr_node);
+        }
+        node = node->next_sibling();
+    }
 }
