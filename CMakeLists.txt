@@ -11,13 +11,19 @@ find_package(SFML 2.5 COMPONENTS system window graphics network audio REQUIRED)
 include_directories(${CMAKE_SOURCE_DIR}/src, ${CMAKE_SOURCE_DIR}/deps)
 
 file(GLOB_RECURSE SOURCES ${CMAKE_SOURCE_DIR}/src/*.cpp)
-file(GLOB BUILD_DEPS ${CMAKE_SOURCE_DIR}/deps/*.cpp)
 
 add_executable(
     ${APP_NAME}.app
     ${CMAKE_SOURCE_DIR}/src/main.cpp
     ${SOURCES}
-    ${BUILD_DEPS}
 )
-target_include_directories(${APP_NAME}.app PRIVATE ${CMAKE_BINARY_DIR})
-target_link_libraries(${APP_NAME}.app sfml-graphics sfml-window sfml-system)
+
+target_include_directories(${APP_NAME}.app
+    PRIVATE
+    ${CMAKE_BINARY_DIR})
+
+target_link_libraries(${APP_NAME}.app
+    sfml-graphics
+    sfml-window
+    sfml-system
+    ${CMAKE_SOURCE_DIR}/deps/tiledbytes/libTiledBytes.a)
