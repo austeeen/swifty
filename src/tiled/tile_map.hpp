@@ -1,24 +1,26 @@
 #ifndef TLD_TILEMAP_HPP
 #define TLD_TILEMAP_HPP
 
-#include "tiled_core.hpp"
+#include <tiledbytes.hpp>
+#include "../common.hpp"
+
 #include "tileset.hpp"
 #include "tsx.hpp"
 #include "tile_layer.hpp"
 #include "locations_layer.hpp"
 #include "structure_layers.hpp"
 
-class TileMap
+class Level
 {
 public:
-    TileMap(const char* filepath);
-    ~TileMap();
+    Level(const char* filepath);
+    ~Level();
     void build();
     TileSet* getTileset(const int cur_gid);
 
 private:
     void addStructures(rx::xml_node<>* node);
-    
+
     std::map<const int, TileSet*> tilesets;
     TileLayer* background;
     Locations* locations;

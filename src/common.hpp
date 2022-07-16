@@ -17,6 +17,8 @@
 #include <vector>
 #include <utility>
 
+#include <tiledbytes.hpp>
+
 #include "rapidxml/rapidxml.hpp"
 namespace rx = rapidxml;
 #include "typedefs.hpp"
