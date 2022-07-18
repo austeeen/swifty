@@ -1,36 +1,36 @@
 #include "layers.hpp"
 
-Layer::Layer(const int id, const std::string& name)
+ImageLayer::ImageLayer(const int id, const std::string& name)
 {
 
 }
 
-Layer::~Layer()
+ImageLayer::~ImageLayer()
 {
 
 }
 
-void Layer::build()
+void ImageLayer::build()
 {
 
 }
 
-void Layer::setUp()
+void ImageLayer::setUp()
 {
 
 }
 
-void Layer::update(const float dt)
+void ImageLayer::update(const float dt)
 {
 
 }
 
-void Layer::lateupdate()
+void ImageLayer::lateupdate()
 {
 
 }
 
-void Layer::render(sf::RenderWindow &window)
+void ImageLayer::render(sf::RenderWindow &window)
 {
 
 }
