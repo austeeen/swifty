@@ -2,10 +2,15 @@
 #define SCN_SCENE_HPP
 
 #include "../common.hpp"
-#include "layers.hpp"
+#include "../io/devices.hpp"
+#include "../sys_collision.hpp"
+
+class ImageLayer;
+class ObjectLayer;
 
 class ImageResource
 {
+    ImageResource(const tb::Image& rsrc);
     sf::Texture img_texture;
     sf::RenderStates* render_states;
 };
@@ -13,7 +18,7 @@ class ImageResource
 class Scene
 {
 public:
-    Scene(const char* tmx_fp);
+    Scene(const std::string& tmx_fp);
     ~Scene();
     void build();
     void setUp();
@@ -30,12 +35,8 @@ public:
 protected:
     tb::Tmx* tmx;
     std::map<const std::string, ImageResource*> img_srcs;
-    std::vector<Layer*> layers;
-
-    std::shared_ptr<Player> player;
-    std::vector<std::shared_ptr<AiObject>> enemies;
-    std::vector<std::shared_ptr<MovingPlatform>> platforms;
-    std::vector<std::shared_ptr<Boundary>> boundaries;
+    std::vector<ImageLayer*> img_layers;
+    std::vector<ObjectLayer*> obj_layers;
     CollisionSystem collision_system;
 };
 

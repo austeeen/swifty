@@ -17,10 +17,11 @@
 #include <vector>
 #include <utility>
 
-#include <tiledbytes.hpp>
+#include <tiledbytes/tiledbytes.hpp>
 
-#include "rapidxml/rapidxml.hpp"
+#include <rapidxml/rapidxml.hpp>
 namespace rx = rapidxml;
+
 #include "typedefs.hpp"
 
 #endif // COMMON_HPP

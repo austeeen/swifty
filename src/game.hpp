@@ -5,7 +5,7 @@
 #include "data.hpp"
 #include "camera.hpp"
 #include "objects/all.hpp"
-#include "tiled/all.hpp"
+#include "scenes/scene.hpp"
 #include "sys_collision.hpp"
 #include "io/devices.hpp"
 #include "utils/benchmark.hpp"
@@ -15,7 +15,7 @@ class Game
 public:
     Game();
     ~Game();
-    void init();
+    void build();
     void setUp();
     void update();
     void lateupdate();

@@ -30,9 +30,9 @@ app="swifty"
 base_cmd="build/$app.app"
 
 run_cmd=""
-cmake_clean=""
-do_build="false"
-do_run="false"
+do_clean=0
+do_build=0
+do_run=0
 
 if [[ $# -lt 1 ]]; then
     echo "ERROR: not enough arguments! use h to display help and info."
@@ -46,9 +46,13 @@ build () {
     echo "building '$app'"
     mkdir -p build && cd build
     errcheck $?
+    if [[ $do_clean == 1 ]]; then
+        rm -rf ./*
+        errcheck $?
+    fi
     cmake -DAPP_NAME=$app ..
     errcheck $?
-    cmake --build . $cmake_clean
+    cmake --build .
     errcheck $?
     cd ..
 }
@@ -56,22 +60,22 @@ build () {
 for c in "${args[@]}"; do
     case $c in
         b)
-            do_build="true";;
+            do_build=1;;
         c)
-            do_build="true"
-            cmake_clean="--clean-first";;
+            do_build=1
+            do_clean=1;;
         g)
             run_cmd="gdb $base_cmd"
-            do_run="true";;
+            do_run=1;;
         r)
-            do_run="true"
-            run_cmd="$base_cmd";;
+            run_cmd="$base_cmd"
+            do_run=1;;
         v)
             run_cmd="valgrind --track-origins=yes --leak-check=yes --log-file='valgrind.log' $base_cmd"
-            do_run="true";;
+            do_run=1;;
         p)
             run_cmd="valgrind --tool=callgrind $base_cmd"
-            do_run="true";;
+            do_run=1;;
         h)
             usage;;
         *)
@@ -79,11 +83,11 @@ for c in "${args[@]}"; do
   esac
 done
 
-if [[ $do_build == "true" ]]; then
+if [[ $do_build -eq 1 ]]; then
     build
 fi
 
-if [[ $do_run == "true" ]]; then
+if [[ $do_run -eq 1 ]]; then
     eval "$run_cmd $@"
 fi
 

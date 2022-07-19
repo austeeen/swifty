@@ -1,30 +1,30 @@
 #include "scene.hpp"
 
-ImageResource::ImageResource(tb::Image& rsrc)
+ImageResource::ImageResource(const tb::Image& rsrc)
 {
-    img_texture.loadFromFile("res/" + rsrc.source);
+    img_texture.loadFromFile("res/" + std::string(rsrc.source));
     render_states = new sf::RenderStates(&img_texture);
 }
 
-Scene::Scene(const char* tmx_fp):
+Scene::Scene(const std::string& tmx_fp):
     tmx(new tb::Tmx())
 {
     for (auto& [name, tileset]: tmx->tilesets) {
-        img_srcs[tileset.name] = new ImageResource(tileset.image)
+        img_srcs[tileset.name] = new ImageResource(tileset.image);
     }
 
-    load<tb::Tmx>(tmx_fp, *tmx);
+    tb::load<tb::Tmx>(tmx_fp, *tmx);
     for (tb::Layer& lyr : tmx->layers) {
             if (lyr.name == "background") {
-                layers.push_back(new ImageLayer(this, dynamic_cast<tb::TileLayer>(lyr)));
+                img_layers.push_back(new ImageLayer(this, dynamic_cast<tb::TileLayer>(lyr)));
             }  else if (lyr.name == "static") {
-                layers.push_back(new StaticLayer(this, dynamic_cast<tb::ObjectLayer>(lyr)));
+                obj_layers.push_back(new ObjectLayer<Boundary>(this, dynamic_cast<tb::ObjectLayer>(lyr)));
             } else if (lyr.name == "dynamic") {
-                layers.push_back(new SceneObjects(this, dynamic_cast<tb::ObjectLayer>(lyr)));
+                obj_layers.push_back(new ObjectLayer<MovingPlatform>(this, dynamic_cast<tb::ObjectLayer>(lyr)));
             } else if (lyr.name == "terrain") {
                 // work out terrain stuff
             } else if (lyr.name == "locations") {
-                layers.push_back(new GameObjects(this, dynamic_cast<tb::ObjectLayer>(lyr)));
+                obj_layers.push_back(new ObjectLayer<GameObject>(this, dynamic_cast<tb::ObjectLayer>(lyr)));
             }
         }
     }
@@ -32,10 +32,15 @@ Scene::Scene(const char* tmx_fp):
 
 Scene::~Scene()
 {
-    for (auto lyr : layers) {
+    for (auto lyr : img_layers) {
         delete lyr;
     }
-    layers.clear();
+    img_layers.clear();
+
+    for (auto lyr : obj_layers) {
+        delete lyr;
+    }
+    obj_layers.clear();
 
     for (auto src : img_srcs) {
         delete src;
@@ -48,31 +53,23 @@ Scene::~Scene()
 
 void Scene::build()
 {
-    for (auto lyr : layers) {
+    for (auto lyr : img_layers) {
+        lyr->build();
+    }
+    for (auto lyr : obj_layers) {
         lyr->build();
     }
 }
 
 void Scene::setUp()
 {
-    for (auto lyr : layers) {
+    for (auto lyr : obj_layers) {
         lyr->setUp();
     }
 
     // todo - set all game object initial positions
 
-    collision_system.add(player);
-    for (auto& bnd : boundaries) {
-        collision_system.add(bnd);
-    }
-    for (auto& plt : platforms) {
-        collision_system.add(plt);
-    }
-    for (auto& enm : enemies) {
-        collision_system.add(enm);
-    }
-
-
+    // todo - set colliders in collision_system
 }
 
 void Scene::onUserInput(InputDevice *io_device)
@@ -137,7 +134,7 @@ void Scene::onUserEvent(sf::Event &event)
 
 void Scene::update(const float dt)
 {
-    for (auto lyr : layers) {
+    for (auto lyr : obj_layers) {
         lyr->update(dt);
     }
 
@@ -146,14 +143,17 @@ void Scene::update(const float dt)
 
 void Scene::lateUpdate()
 {
-    for (auto lyr : layers) {
+    for (auto lyr : obj_layers) {
         lyr->lateupdate();
     }
 }
 
 void Scene::render(sf::RenderWindow &window)
 {
-    for (auto lyr : layers) {
+    for (auto lyr : img_layers) {
+        lyr->render(window);
+    }
+    for (auto lyr : obj_layers) {
         lyr->render(window);
     }
 }

@@ -10,8 +10,9 @@ Game::Game():
 
     tb::search("res/", rsrc_tbl);
 
-    for (auto& [name, tmx_path] : rsrc_tbl.at(FileType::Tmx)) {
-        scene_table[name] = new Scene(tmx_path);
+    tb::FileMap tmx_files = rsrc_tbl.at(tb::FileType::Tmx);
+    for (auto& [name, fp] : tmx_files) {
+        scene_table[name] = new Scene(fp);
     }
 }
 Game::~Game()
@@ -58,7 +59,7 @@ void Game::update()
 void Game::inputUpdate()
 {
     io_device->update();
-    active_scene->inputUpdate(io_device);
+    active_scene->onUserInput(io_device);
 }
 void Game::eventUpdate()
 {
@@ -71,7 +72,7 @@ void Game::eventUpdate()
                 break;
             }
             case sf::Event::KeyPressed: {
-                active_scene->eventUpdate(event);
+                active_scene->onUserEvent(event);
             }
             default: { break; }
         }

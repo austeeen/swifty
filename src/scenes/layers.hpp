@@ -2,16 +2,15 @@
 #define SCN_LAYERS_HPP
 
 #include "../common.hpp"
-#include "objects/all.hpp"
-
-class Scene;
+#include "../objects/all.hpp"
+#include "scene.hpp"
 
 template <class LayerType> class SceneLayer
 {
 public:
     SceneLayer(Scene* scn, LayerType& lyr):
-        id(tb_lyr.id),
-        name(tb_lyr.name),
+        id(lyr.id),
+        name(lyr.name),
         scene(scn),
         lyr(lyr)
     {}
@@ -34,13 +33,13 @@ protected:
 class ImageLayer : public SceneLayer<tb::TileLayer>
 {
 public:
-    ImageLayer(Scene* scn, tb::TileLayer& tb_lyr):
-        SceneLayer<tb::TileLayer>(scn, tb_lyr),
+    ImageLayer(Scene* scn, tb::TileLayer& lyr):
+        SceneLayer<tb::TileLayer>(scn, lyr),
         render_texture(new sf::RenderTexture())
     {
-        tb::Tmx* tmx = scn->getTmx();
-        render_texture->create(tmx->tilewidth * tb_lyr.width, tmx->tileheight * tb_lyr.height);
-        vertex_array.resize(tb_lyr.width * tb_lyr.height * 4);
+        tb::Tmx* tmx = scene->getTmx();
+        render_texture->create(tmx->tilewidth * lyr.width, tmx->tileheight * lyr.height);
+        vertex_array.resize(lyr.width * lyr.height * 4);
     }
 
     ~ImageLayer()
@@ -54,11 +53,11 @@ public:
         render_texture->clear(sf::Color::Transparent);
 
         tb::Tmx* tmx = scene->getTmx();
-        TileSet* cur_tileset;
-        for (const tb::TextureRect& tile : tb_lyr.tiles)
+        const tb::Tileset* cur_tileset;
+        for (const tb::TextureRect& tile : lyr.tiles)
         {
             // Set tile's position
-            sf::Vertex *quads = &vertex_array[i * 4];
+            sf::Vertex *quads = &vertex_array[tile.id * 4];
             quads[0].position = sf::Vector2f(tile.x,            tile.y);
             quads[1].position = sf::Vector2f(tile.x + tile.width, tile.y);
             quads[2].position = sf::Vector2f(tile.x + tile.width, tile.y  + tile.height);
