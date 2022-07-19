@@ -6,75 +6,157 @@
 
 class Scene;
 
-class Layer
+template <class LayerType> class SceneLayer
 {
 public:
-    Layer(Scene* scn, tb::Layer& tb_lyr);
-    ~Layer();
+    SceneLayer(Scene* scn, LayerType& lyr):
+        id(tb_lyr.id),
+        name(tb_lyr.name),
+        scene(scn),
+        lyr(lyr)
+    {}
 
-    virtual void build() = 0;
-    virtual void setUp() = 0;
-
-    virtual void update(const float dt) { };
-    virtual void lateUpdate() { };
-    virtual void render(sf::RenderWindow &window) { };
+    ~SceneLayer()
+    {
+        scene = nullptr;
+    };
 
 protected:
     const int id;
     const std::string name;
+    Scene* scene;
+    LayerType lyr;
+
 };
 
-class ImageLayer: public Layer
+/**************************************************************************************************/
+
+class ImageLayer : public SceneLayer<tb::TileLayer>
 {
 public:
-    Layer(Scene* scn, tb::TileLayer& tb_lyr);
-    void build() override;
-    void setUp() override;
-    void render(sf::RenderWindow &window) override;
+    ImageLayer(Scene* scn, tb::TileLayer& tb_lyr):
+        SceneLayer<tb::TileLayer>(scn, tb_lyr),
+        render_texture(new sf::RenderTexture())
+    {
+        tb::Tmx* tmx = scn->getTmx();
+        render_texture->create(tmx->tilewidth * tb_lyr.width, tmx->tileheight * tb_lyr.height);
+        vertex_array.resize(tb_lyr.width * tb_lyr.height * 4);
+    }
+
+    ~ImageLayer()
+    {
+        delete render_texture;
+        render_texture = nullptr;
+    }
+
+    virtual void build()
+    {
+        render_texture->clear(sf::Color::Transparent);
+
+        tb::Tmx* tmx = scene->getTmx();
+        TileSet* cur_tileset;
+        for (const tb::TextureRect& tile : tb_lyr.tiles)
+        {
+            // Set tile's position
+            sf::Vertex *quads = &vertex_array[i * 4];
+            quads[0].position = sf::Vector2f(tile.x,            tile.y);
+            quads[1].position = sf::Vector2f(tile.x + tile.width, tile.y);
+            quads[2].position = sf::Vector2f(tile.x + tile.width, tile.y  + tile.height);
+            quads[3].position = sf::Vector2f(tile.x,            tile.y  + tile.height);
+
+            // set tile's texture rect
+            int indx = 0; // arbitrary number
+            if (!tb::getTileset(indx, tmx, tile.gid)) {
+                continue;
+            }
+            cur_tileset = &tmx->tilesets[indx];
+
+            tb::Tile* t;
+            if (!tb::getTile(t, cur_tileset, (gid - cur_tileset.firstgid))) {
+                continue;
+            }
+            tb::Rect tr = t.texture;
+            quads[0].texCoords = sf::Vector2f(tr.x,            tr.y);
+            quads[1].texCoords = sf::Vector2f(tr.x + tr.width, tr.y);
+            quads[2].texCoords = sf::Vector2f(tr.x + tr.width, tr.y  + tr.height);
+            quads[3].texCoords = sf::Vector2f(tr.x,            tr.y  + tr.height);
+
+            // render the texture to the surface
+            render_texture->draw(quads, 4, sf::Quads, *scene->img_srcs.at(cur_tileset.name).render_states);
+        }
+        render_texture->display();
+    }
+
+    virtual void render(sf::RenderWindow &window)
+    {
+        window.draw(sf::Sprite(render_texture->getTexture()));
+    }
 
 private:
     sf::VertexArray vertex_array;
     sf::RenderTexture* render_texture;
 };
 
-class StaticLayer: public Layer
+/**************************************************************************************************/
+
+template <class ObjType> class ObjectLayer : public SceneLayer<tb::ObjectLayer>
 {
 public:
-    Layer(Scene* scn, tb::ObjectLayer& tb_lyr);
-    void build() override;
-    void setUp() override;
+    ObjectLayer(Scene* scn, tb::ObjectLayer& lyr):
+        SceneLayer<tb::ObjectLayer>(scn, lyr)
+    {
+        for (auto& r : lyr.rects) {
+            objects.push_back(new ObjType(this, r));
+        }
+    }
 
-private:
-    std::vector<std::shared_ptr<Boundary>> boundaries;
+    ~ObjectLayer() {
+        for (auto& obj : objects) {
+            delete obj;
+        }
+        objects.clear();
+    }
+
+    void build() {
+        for (auto& obj : objects) {
+            obj->build();
+        }
+    }
+
+    void setUp() {
+        for (auto& obj : objects) {
+            obj->setUp();
+        }
+    }
+
+    void update(const float dt) {
+        for (auto& obj : objects) {
+            obj->update(dt);
+        }
+    }
+
+    void lateUpdate() {
+        for (auto& obj : objects) {
+            obj->lateUpdate();
+        }
+    }
+
+    void render(sf::RenderWindow &window) {
+        for (auto& obj : objects) {
+            obj->render(window);
+        }
+    }
+
+protected:
+    std::vector<ObjType*> objects;
+
 };
 
-class SceneObjects: public Layer
-{
-public:
-    Layer(Scene* scn, tb::ObjectLayer& tb_lyr);
-    void build() override;
-    void setUp() override;
-    void update(const float dt) override;
-    void lateUpdate() override;
-    void render(sf::RenderWindow &window) override;
+template <> class ObjectLayer<Boundary>;
+template <> class ObjectLayer<MovingPlatform>;
+template <> class ObjectLayer<GameObject>;
 
-private:
-    std::vector<std::shared_ptr<MovingPlatform>> platforms;
-};
+/**************************************************************************************************/
 
-class GameObjects: public Layer
-{
-public:
-    Layer(Scene* scn, tb::ObjectLayer& tb_lyr);
-    void build() override;
-    void setUp() override;
-    void update(const float dt) override;
-    void lateUpdate() override;
-    void render(sf::RenderWindow &window) override;
-
-private:
-    std::shared_ptr<Player> player;
-    std::vector<std::shared_ptr<AiObject>> enemies;
-};
 
 #endif // SCN_LAYERS_HPP

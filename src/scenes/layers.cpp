@@ -1,36 +1,49 @@
 #include "layers.hpp"
 
-ImageLayer::ImageLayer(const int id, const std::string& name)
+template <> void ObjectLayer<Boundary>::build()
 {
+    // TODO: set up tiles in object layer as a grid of linked tiles
 
+    // TODO: get tileset entry for texture/collision stuff
+    for (auto& obj : objects) {
+        // TODO: implement tracer agent for combining basic rects
+        obj->build();
+    }
 }
 
-ImageLayer::~ImageLayer()
-{
+template <> void ObjectLayer<Boundary>::setUp()
+{}
 
+template <> void ObjectLayer<Boundary>::update(const float dt)
+{}
+
+template <> void ObjectLayer<Boundary>::lateUpdate()
+{}
+
+template <> void ObjectLayer<Boundary>::render(sf::RenderWindow &window)
+{
+    // todo -- may look at rendering all 'static objects' to a constant surface and list the rects
+    // separately
+    for (auto& obj : objects) {
+        obj->render(window);
+    }
 }
 
-void ImageLayer::build()
-{
+/**************************************************************************************************/
 
+template <> void ObjectLayer<MovingPlatform>::build()
+{
+    // TODO: this should look similar to ObjectLayer<Boundary>::build()
 }
 
-void ImageLayer::setUp()
-{
+template <> void ObjectLayer<MovingPlatform>::setUp()
+{}
 
+/**************************************************************************************************/
+
+template <> void ObjectLayer<GameObject>::build()
+{
+    // TODO -- create spider/cat/etc, then build them
 }
 
-void ImageLayer::update(const float dt)
-{
-
-}
-
-void ImageLayer::lateupdate()
-{
-
-}
-
-void ImageLayer::render(sf::RenderWindow &window)
-{
-
-}
+/**************************************************************************************************/

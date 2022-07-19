@@ -14,6 +14,7 @@ class Game
 {
 public:
     Game();
+    ~Game();
     void init();
     void setUp();
     void update();
@@ -35,12 +36,10 @@ private:
     sf::RenderWindow window;
     Camera camera;
     InputDevice *io_device;
-    std::shared_ptr<TileMap> tile_map;
-    std::shared_ptr<Player> player;
-    std::vector<std::shared_ptr<AiObject>> enemies;
-    std::vector<std::shared_ptr<MovingPlatform>> platforms;
-    std::vector<std::shared_ptr<Boundary>> boundaries;
-    CollisionSystem collision_system;
+
+    tb::ResourceTable rsrc_tbl;
+    std::map<std::string, Scene*> scene_table;
+    Scene *active_scene;
 };
 
 #endif // GAME_HPP
