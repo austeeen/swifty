@@ -6,9 +6,9 @@
 #include "../sys_collision.hpp"
 
 class ImageLayer;
-class ObjectLayer;
+template <class T> class SceneLayer;
 
-class ImageResource
+struct ImageResource
 {
     ImageResource(const tb::Image& rsrc);
     sf::Texture img_texture;
@@ -31,12 +31,15 @@ public:
     const sf::Vector2f& getViewportCenter() const;
 
     tb::Tmx* getTmx() const { return tmx; };
+    sf::RenderStates* getRenderStates(const std::string& img_src) const {
+        return img_srcs.at(img_src)->render_states;
+    };
 
 protected:
     tb::Tmx* tmx;
     std::map<const std::string, ImageResource*> img_srcs;
     std::vector<ImageLayer*> img_layers;
-    std::vector<ObjectLayer*> obj_layers;
+    std::vector<SceneLayer<tb::ObjectLayer>*> obj_layers;
     CollisionSystem collision_system;
 };
 

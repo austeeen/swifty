@@ -53,7 +53,7 @@ public:
         render_texture->clear(sf::Color::Transparent);
 
         tb::Tmx* tmx = scene->getTmx();
-        const tb::Tileset* cur_tileset;
+        tb::Tileset* cur_tileset;
         for (const tb::TextureRect& tile : lyr.tiles)
         {
             // Set tile's position
@@ -65,23 +65,23 @@ public:
 
             // set tile's texture rect
             int indx = 0; // arbitrary number
-            if (!tb::getTileset(indx, tmx, tile.gid)) {
+            if (!tb::getTileset(indx, *tmx, tile.gid)) {
                 continue;
             }
-            cur_tileset = &tmx->tilesets[indx];
+            *cur_tileset = tmx->tilesets[indx];
 
             tb::Tile* t;
-            if (!tb::getTile(t, cur_tileset, (gid - cur_tileset.firstgid))) {
+            if (!tb::getTile(*t, *cur_tileset, (tile.gid - cur_tileset->firstgid))) {
                 continue;
             }
-            tb::Rect tr = t.texture;
+            tb::Rect tr = t->texture;
             quads[0].texCoords = sf::Vector2f(tr.x,            tr.y);
             quads[1].texCoords = sf::Vector2f(tr.x + tr.width, tr.y);
             quads[2].texCoords = sf::Vector2f(tr.x + tr.width, tr.y  + tr.height);
             quads[3].texCoords = sf::Vector2f(tr.x,            tr.y  + tr.height);
 
             // render the texture to the surface
-            render_texture->draw(quads, 4, sf::Quads, *scene->img_srcs.at(cur_tileset.name).render_states);
+            render_texture->draw(quads, 4, sf::Quads, *scene->getRenderStates(cur_tileset->name));
         }
         render_texture->display();
     }

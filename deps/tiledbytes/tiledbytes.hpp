@@ -213,7 +213,7 @@ namespace tb
 //      SIMPLE UTILITY FUNCTIONS
 //------------------------------------------------------------------------------------------------//
 
-    bool getTileset(tb::Tileset& dest, tb::Tmx& tmx, const int gid);
+    bool getTileset(int& indx, tb::Tmx& tmx, const int gid);
 
     bool getTile(tb::Tile& dest, tb::Tileset& tileset, const int gid);
 
