@@ -128,6 +128,29 @@ void ObjectLayer::toggleDisplay()
 BoundaryLayer::BoundaryLayer(Scene* scn, tb::ObjectLayer& lyr):
     ObjectLayer(scn, lyr)
 {
+    tb::Tmx* tmx = scene->getTmx();
+
+    std::map<const int, std::vector<GridTile*>> grid;
+    for (auto& [id, tile] : lyr.tilemap) {
+        grid[tile.x].push_back(new GridTile{tile});
+    }
+
+    for (auto& [x, gt] : grid) {
+        std::sort(
+            gt.begin(),
+            gt.end(),
+            [](const GridTile *a, const GridTile *b) { return a->tile.y < b->tile.y; }
+        );
+    }
+
+    for (auto& [x, gt] : grid) {
+        std::sort(
+            gt.begin(),
+            gt.end(),
+            [](const GridTile *a, const GridTile *b) { return a->tile.y < b->tile.y; }
+        );
+    }
+
     // TODO: set up tiles in object layer as a grid of linked tiles
 }
 

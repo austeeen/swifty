@@ -85,6 +85,7 @@ namespace tb
     typedef std::map<const FileType,    FileMap>           ResourceTable;
     typedef std::map<const std::string, const Property>    PropertyMap;
     typedef std::map<const int,         const Rect>        RectMap;
+    typedef std::map<const int,         const TileRect>    TileMap;
     typedef std::map<const int,         const Tileset>     TilesetMap;
     typedef std::map<const int,         const Wangtile>    WangtileMap;
     typedef std::map<const int,         const FrameList>   AnimationMap;
@@ -114,7 +115,7 @@ namespace tb
     };
 
     struct ObjectLayer: Layer {
-        RectMap rects;
+        TileMap tilemap;
     };
 
     struct GroupedLayer: Layer {

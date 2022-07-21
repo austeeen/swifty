@@ -56,6 +56,12 @@ protected:
 
 /**************************************************************************************************/
 
+struct GridTile
+{
+    const tb::TileRect tile;
+    GridTile* adjacent[4];
+};
+
 class BoundaryLayer : public ObjectLayer
 {
 public:
@@ -65,6 +71,7 @@ public:
     void update(const float dt) override;
     void lateUpdate() override;
     void render(sf::RenderWindow &window) override;
+
 };
 
 /**************************************************************************************************/
