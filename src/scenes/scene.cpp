@@ -1,4 +1,6 @@
 #include "scene.hpp"
+#include "layers.hpp"
+
 
 ImageResource::ImageResource(const tb::Image& rsrc)
 {
@@ -6,7 +8,14 @@ ImageResource::ImageResource(const tb::Image& rsrc)
     render_states = new sf::RenderStates(&img_texture);
 }
 
-Scene::Scene(const std::string& tmx_fp):
+ImageResource::~ImageResource()
+{
+    delete render_states;
+    render_states = nullptr;
+}
+
+Scene::Scene(GameManager* mngr, const std::string& tmx_fp):
+    game_manager(mngr),
     tmx(new tb::Tmx())
 {
     for (auto& [name, tileset]: tmx->tilesets) {
@@ -15,17 +24,16 @@ Scene::Scene(const std::string& tmx_fp):
 
     tb::load<tb::Tmx>(tmx_fp, *tmx);
     for (tb::Layer& lyr : tmx->layers) {
-            if (lyr.name == "background") {
-                img_layers.push_back(new ImageLayer(this, dynamic_cast<tb::TileLayer>(lyr)));
-            }  else if (lyr.name == "static") {
-                obj_layers.push_back(new ObjectLayer<Boundary>(this, dynamic_cast<tb::ObjectLayer>(lyr)));
-            } else if (lyr.name == "dynamic") {
-                obj_layers.push_back(new ObjectLayer<MovingPlatform>(this, dynamic_cast<tb::ObjectLayer>(lyr)));
-            } else if (lyr.name == "terrain") {
-                // work out terrain stuff
-            } else if (lyr.name == "locations") {
-                obj_layers.push_back(new ObjectLayer<GameObject>(this, dynamic_cast<tb::ObjectLayer>(lyr)));
-            }
+        if (lyr.name == "background") {
+            img_layers.push_back(new ImageLayer(this, dynamic_cast<tb::TileLayer&>(lyr)));
+        }  else if (lyr.name == "static") {
+            obj_layers.push_back(new BoundaryLayer(this, dynamic_cast<tb::ObjectLayer&>(lyr)));
+        } else if (lyr.name == "dynamic") {
+            obj_layers.push_back(new PlatformLayer(this, dynamic_cast<tb::ObjectLayer&>(lyr)));
+        } else if (lyr.name == "terrain") {
+            // work out terrain stuff
+        } else if (lyr.name == "locations") {
+            obj_layers.push_back(new GameObjectLayer(this, dynamic_cast<tb::ObjectLayer&>(lyr)));
         }
     }
 }
@@ -42,7 +50,7 @@ Scene::~Scene()
     }
     obj_layers.clear();
 
-    for (auto src : img_srcs) {
+    for (auto [id, src] : img_srcs) {
         delete src;
     }
     img_srcs.clear();
@@ -99,7 +107,7 @@ void Scene::onUserInput(InputDevice *io_device)
 void Scene::onUserEvent(sf::Event &event)
 {
     switch (event.key.code) {
-        case sf::Keyboard::Escape: { window.close(); break; }
+        case sf::Keyboard::Escape: { game_manager->closeWindow(); break; }
 
         case sf::Keyboard::A: { player->increase(PhysicsCoeffs::AsEnum::mass); break; }
         case sf::Keyboard::Z: { player->decrease(PhysicsCoeffs::AsEnum::mass); break; }
@@ -119,12 +127,8 @@ void Scene::onUserEvent(sf::Event &event)
         case sf::Keyboard::J: { player->increase(PhysicsCoeffs::AsEnum::gravity); break; }
         case sf::Keyboard::M: { player->decrease(PhysicsCoeffs::AsEnum::gravity); break; }
         case sf::Keyboard::R: {
-            player->toggleRects();
-            for (auto& plt : platforms) {
-                plt->toggleDisplay();
-            }
-            for (auto& enm : enemies) {
-                enm->toggleRects();
+            for (auto& lyr : obj_layers) {
+                lyr->toggleDisplay();
             }
             break;
         }
@@ -137,14 +141,13 @@ void Scene::update(const float dt)
     for (auto lyr : obj_layers) {
         lyr->update(dt);
     }
-
     collision_system.checkCollisions();
 }
 
 void Scene::lateUpdate()
 {
     for (auto lyr : obj_layers) {
-        lyr->lateupdate();
+        lyr->lateUpdate();
     }
 }
 
@@ -158,7 +161,7 @@ void Scene::render(sf::RenderWindow &window)
     }
 }
 
-const sf::Vector2f& Scene::getViewportCenter() const
+const sf::Vector2f Scene::getViewportCenter() const
 {
     return player->cmpnt<RigidBody>()->getPosition();
 }

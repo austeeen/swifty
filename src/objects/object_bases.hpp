@@ -8,10 +8,17 @@
 class ObjectBase
 {
 public:
+    virtual ~ObjectBase() {};
+    virtual void build() {};
     virtual void setUp() {};
     virtual void update(const float dt) {};
     virtual void lateUpdate() {};
     virtual void render(sf::RenderWindow &window) {};
+
+    virtual void toggleDisplay() {};
+
+protected:
+
 };
 
 class StaticObject : public ObjectBase

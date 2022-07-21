@@ -102,6 +102,7 @@ namespace tb
     };
 
     struct Layer {
+        virtual ~Layer() {};
         int id;
         std::string name;
         PropertyMap properties;

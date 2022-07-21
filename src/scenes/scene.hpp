@@ -4,15 +4,15 @@
 #include "../common.hpp"
 #include "../io/devices.hpp"
 #include "../sys_collision.hpp"
+#include "../game_manager.hpp"
 
-// class SceneLayer;
-// class ImageLayer;
-// class ObjectLayer;
-
+class ImageLayer;
+class ObjectLayer;
 
 struct ImageResource
 {
     ImageResource(const tb::Image& rsrc);
+    ~ImageResource();
     sf::Texture img_texture;
     sf::RenderStates* render_states;
 };
@@ -20,7 +20,7 @@ struct ImageResource
 class Scene
 {
 public:
-    Scene(const std::string& tmx_fp);
+    Scene(GameManager* game, const std::string& tmx_fp);
     ~Scene();
     void build();
     void setUp();
@@ -30,7 +30,7 @@ public:
     void lateUpdate();
     void render(sf::RenderWindow &window);
 
-    const sf::Vector2f& getViewportCenter() const;
+    const sf::Vector2f getViewportCenter() const;
 
     tb::Tmx* getTmx() const { return tmx; };
     sf::RenderStates* getRenderStates(const std::string& img_src) const {
@@ -38,10 +38,12 @@ public:
     };
 
 protected:
+    GameManager* game_manager;
     tb::Tmx* tmx;
     std::map<const std::string, ImageResource*> img_srcs;
     std::vector<ImageLayer*> img_layers;
-    std::vector<ObjectLayer> obj_layers;
+    std::vector<ObjectLayer*> obj_layers;
+    Player* player;
     CollisionSystem collision_system;
 };
 

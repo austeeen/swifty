@@ -3,14 +3,14 @@
 
 #include "../common.hpp"
 #include "../objects/all.hpp"
-#include "scene.hpp"
 
+class Scene;
 
 class SceneLayer
 {
 public:
     SceneLayer(const int id, const std::string& name, Scene* scn);
-    ~SceneLayer();
+    virtual ~SceneLayer();
 
 protected:
     const int id;
@@ -36,29 +36,55 @@ private:
 
 /**************************************************************************************************/
 
-template <class T>
 class ObjectLayer : public SceneLayer
 {
 public:
     ObjectLayer(Scene* scn, tb::ObjectLayer& lyr);
     ~ObjectLayer();
-    void build();
-    void setUp();
-    void update(const float dt);
-    void lateUpdate();
-    void render(sf::RenderWindow &window);
+    virtual void build();
+    virtual void setUp();
+    virtual void update(const float dt);
+    virtual void lateUpdate();
+    virtual void render(sf::RenderWindow &window);
+
+    virtual void toggleDisplay();
 
 protected:
     tb::ObjectLayer layer;
-    std::vector<T*> objects;
-
+    std::vector<ObjectBase*> entities;
 };
 
-// template <> class ObjectLayer<Boundary>;
-// template <> class ObjectLayer<MovingPlatform>;
-// template <> class ObjectLayer<GameObject>;
+/**************************************************************************************************/
+
+class BoundaryLayer : public ObjectLayer
+{
+public:
+    BoundaryLayer(Scene* scn, tb::ObjectLayer& lyr);
+    void build() override;
+    void setUp() override;
+    void update(const float dt) override;
+    void lateUpdate() override;
+    void render(sf::RenderWindow &window) override;
+};
 
 /**************************************************************************************************/
+
+class PlatformLayer : public ObjectLayer
+{
+public:
+    PlatformLayer(Scene* scn, tb::ObjectLayer& lyr);
+    void build() override;
+    void setUp() override;
+};
+
+/**************************************************************************************************/
+
+class GameObjectLayer: public ObjectLayer
+{
+public:
+    GameObjectLayer(Scene* scn, tb::ObjectLayer& lyr);
+    void build() override;
+};
 
 
 #endif // SCN_LAYERS_HPP

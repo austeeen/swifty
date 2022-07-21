@@ -13,13 +13,14 @@ public:
     void lateUpdate() override;
     void render(sf::RenderWindow &window) override;
 
+    void toggleDisplay() override;
+    
     void move(const Dir4 d);
     void stop(const Dir4 d);
     void stopAll();
 
     virtual void setState(const ObjectState s);
     void setStartPosition(const int x, const int y);
-    void toggleRects();
 
     void onColliding(const sf::Vector2f& offset, const ColliderType m_type, const ColliderType b_type) const;
     void updateInertia(const sf::Vector2f& inertia) const;

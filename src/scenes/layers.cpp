@@ -1,5 +1,5 @@
 #include "layers.hpp"
-
+#include "scene.hpp"
 
 SceneLayer::SceneLayer(const int id, const std::string& name, Scene* scn):
     id(id),
@@ -12,7 +12,7 @@ SceneLayer::~SceneLayer()
     scene = nullptr;
 }
 
-
+/**************************************************************************************************/
 
 ImageLayer::ImageLayer(Scene* scn, tb::TileLayer& lyr):
     SceneLayer(lyr.id, lyr.name, scn),
@@ -35,7 +35,6 @@ void ImageLayer::build()
     render_texture->clear(sf::Color::Transparent);
 
     tb::Tmx* tmx = scene->getTmx();
-    tb::Tileset* cur_tileset;
     for (const tb::TextureRect& tile : layer.tiles)
     {
         // Set tile's position
@@ -50,20 +49,20 @@ void ImageLayer::build()
         if (!tb::getTileset(indx, *tmx, tile.gid)) {
             continue;
         }
-        *cur_tileset = tmx->tilesets[indx];
+        tb::Tileset cur_tileset = tmx->tilesets[indx];
 
-        tb::Tile* t;
-        if (!tb::getTile(*t, *cur_tileset, (tile.gid - cur_tileset->firstgid))) {
+        tb::Tile t;
+        if (!tb::getTile(t, cur_tileset, (tile.gid - cur_tileset.firstgid))) {
             continue;
         }
-        tb::Rect tr = t->texture;
+        tb::Rect tr = t.texture;
         quads[0].texCoords = sf::Vector2f(tr.x,            tr.y);
         quads[1].texCoords = sf::Vector2f(tr.x + tr.width, tr.y);
         quads[2].texCoords = sf::Vector2f(tr.x + tr.width, tr.y  + tr.height);
         quads[3].texCoords = sf::Vector2f(tr.x,            tr.y  + tr.height);
 
         // render the texture to the surface
-        render_texture->draw(quads, 4, sf::Quads, *scene->getRenderStates(cur_tileset->name));
+        render_texture->draw(quads, 4, sf::Quads, *scene->getRenderStates(cur_tileset.name));
     }
     render_texture->display();
 }
@@ -73,99 +72,117 @@ void ImageLayer::render(sf::RenderWindow &window)
     window.draw(sf::Sprite(render_texture->getTexture()));
 }
 
-
+/**************************************************************************************************/
 
 ObjectLayer::ObjectLayer(Scene* scn, tb::ObjectLayer& lyr):
     SceneLayer(lyr.id, lyr.name, scn),
     layer(lyr)
-{
-    for (auto& r : lyr.rects) {
-        objects.push_back(new ObjType(this, r));
-    }
-}
+{}
 
 ObjectLayer::~ObjectLayer() {
-    for (auto& obj : objects) {
-        delete obj;
+    for (auto& enty : entities) {
+        delete enty;
     }
-    objects.clear();
+    entities.clear();
 }
 
 void ObjectLayer::build() {
-    for (auto& obj : objects) {
-        obj->build();
+    for (auto& enty : entities) {
+        enty->build();
     }
 }
 
 void ObjectLayer::setUp() {
-    for (auto& obj : objects) {
-        obj->setUp();
+    for (auto& enty : entities) {
+        enty->setUp();
     }
 }
 
 void ObjectLayer::update(const float dt) {
-    for (auto& obj : objects) {
-        obj->update(dt);
+    for (auto& enty : entities) {
+        enty->update(dt);
     }
 }
 
 void ObjectLayer::lateUpdate() {
-    for (auto& obj : objects) {
-        obj->lateUpdate();
+    for (auto& enty : entities) {
+        enty->lateUpdate();
     }
 }
 
 void ObjectLayer::render(sf::RenderWindow &window) {
-    for (auto& obj : objects) {
-        obj->render(window);
+    for (auto& enty : entities) {
+        enty->render(window);
     }
 }
 
-/*
-template <> void ObjectLayer<Boundary>::build()
+void ObjectLayer::toggleDisplay()
+{
+    for (auto& enty : entities) {
+        enty->toggleDisplay();
+    }
+}
+
+/**************************************************************************************************/
+
+BoundaryLayer::BoundaryLayer(Scene* scn, tb::ObjectLayer& lyr):
+    ObjectLayer(scn, lyr)
 {
     // TODO: set up tiles in object layer as a grid of linked tiles
-
-    // TODO: get tileset entry for texture/collision stuff
-    for (auto& obj : objects) {
-        // TODO: implement tracer agent for combining basic rects
-        obj->build();
-    }
 }
 
-template <> void ObjectLayer<Boundary>::setUp()
-{}
-
-template <> void ObjectLayer<Boundary>::update(const float dt)
-{}
-
-template <> void ObjectLayer<Boundary>::lateUpdate()
-{}
-
-template <> void ObjectLayer<Boundary>::render(sf::RenderWindow &window)
+void BoundaryLayer::build()
 {
-    // todo -- may look at rendering all 'static objects' to a constant surface and list the rects
-    // separately
-    for (auto& obj : objects) {
-        obj->render(window);
+    // TODO: get tileset entry for texture/collision stuff
+    for (auto& enty : entities) {
+        // TODO: implement tracer agent for combining basic rects
+        enty->build();
     }
 }
 
+void BoundaryLayer::setUp()
+{}
 
+void BoundaryLayer::update(const float dt)
+{}
 
-template <> void ObjectLayer<MovingPlatform>::build()
+void BoundaryLayer::lateUpdate()
+{}
+
+void BoundaryLayer::render(sf::RenderWindow &window)
+{
+    // todo -- may look at rendering all 'static entities' to a constant surface and list the rects
+    // separately
+    for (auto& enty : entities) {
+        enty->render(window);
+    }
+}
+
+/**************************************************************************************************/
+
+PlatformLayer::PlatformLayer(Scene* scn, tb::ObjectLayer& lyr):
+    ObjectLayer(scn, lyr)
+{
+
+}
+
+void PlatformLayer::build()
 {
     // TODO: this should look similar to ObjectLayer<Boundary>::build()
 }
 
-template <> void ObjectLayer<MovingPlatform>::setUp()
+void PlatformLayer::setUp()
 {}
 
+/**************************************************************************************************/
 
+GameObjectLayer::GameObjectLayer(Scene* scn, tb::ObjectLayer& lyr):
+    ObjectLayer(scn, lyr)
+{
 
-template <> void ObjectLayer<GameObject>::build()
+}
+
+void GameObjectLayer::build()
 {
     // TODO -- create spider/cat/etc, then build them
 }
-
-*/

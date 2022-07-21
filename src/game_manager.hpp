@@ -1,34 +1,36 @@
-#ifndef GAME_HPP
-#define GAME_HPP
+#ifndef GAME_MANAGER_HPP
+#define GAME_MANAGER_HPP
 
 #include "common.hpp"
 #include "data.hpp"
 #include "camera.hpp"
-#include "objects/all.hpp"
-#include "scenes/scene.hpp"
-#include "sys_collision.hpp"
 #include "io/devices.hpp"
 #include "utils/benchmark.hpp"
 
-class Game
+class Scene;
+
+class GameManager
 {
 public:
-    Game();
-    ~Game();
+    GameManager();
+    ~GameManager();
     void build();
     void setUp();
     void update();
     void lateupdate();
     void render();
+
     void exit();
+    void closeWindow();
     bool isRunning() const;
 
 private:
-    void sleep(const float sec);
     void inputUpdate();
     void eventUpdate();
     void gameUpdate();
     void lateUpdate();
+
+    void sleep(const float sec);
 
     sf::Clock frame_clock;
     float dt;
@@ -42,4 +44,4 @@ private:
     Scene *active_scene;
 };
 
-#endif // GAME_HPP
+#endif // GAME_MANAGER_HPP

@@ -85,7 +85,7 @@ void GameObject::setStartPosition(const int x, const int y)
 {
     cmpnt<RigidBody>()->move(x, y);
 }
-void GameObject::toggleRects()
+void GameObject::toggleDisplay()
 {
     cmpnt<RigidBody>()->toggleDisplay();
 }

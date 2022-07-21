@@ -1,8 +1,8 @@
-#include "game.hpp"
+#include "game_manager.hpp"
 
 int main()
 {
-    Game game;
+    GameManager game;
     game.setUp();
     game.render();
     while (game.isRunning()) {

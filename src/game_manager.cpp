@@ -1,6 +1,7 @@
-#include "game.hpp"
+#include "game_manager.hpp"
+#include "scenes/scene.hpp"
 
-Game::Game():
+GameManager::GameManager():
     window(sf::VideoMode(WINDOW::width, WINDOW::height), WINDOW::title, WINDOW::style),
     camera(CAMERA::view_rect)
 {
@@ -12,17 +13,19 @@ Game::Game():
 
     tb::FileMap tmx_files = rsrc_tbl.at(tb::FileType::Tmx);
     for (auto& [name, fp] : tmx_files) {
-        scene_table[name] = new Scene(fp);
+        scene_table[name] = new Scene(this, fp);
     }
 }
-Game::~Game()
+
+GameManager::~GameManager()
 {
     for (auto& [name, scene] : scene_table) {
         delete scene;
     }
     scene_table.clear();
 }
-void Game::build()
+
+void GameManager::build()
 {
     std::vector<int> cons;
     if (joy::connected_joys(cons)) {
@@ -36,7 +39,8 @@ void Game::build()
     active_scene = scene_table.at("new_basic_level");
     active_scene->build();
 }
-void Game::setUp()
+
+void GameManager::setUp()
 {
     active_scene->setUp();
 
@@ -48,7 +52,8 @@ void Game::setUp()
 
     dt = frame_clock.restart().asSeconds();
 }
-void Game::update()
+
+void GameManager::update()
 {
     dt = frame_clock.restart().asSeconds();
     inputUpdate();
@@ -56,12 +61,14 @@ void Game::update()
     gameUpdate();
     fclock.tick();
 }
-void Game::inputUpdate()
+
+void GameManager::inputUpdate()
 {
     io_device->update();
     active_scene->onUserInput(io_device);
 }
-void Game::eventUpdate()
+
+void GameManager::eventUpdate()
 {
     sf::Event event;
     while (window.pollEvent(event)) {
@@ -78,7 +85,8 @@ void Game::eventUpdate()
         }
     }
 }
-void Game::gameUpdate()
+
+void GameManager::gameUpdate()
 {
     active_scene->update(dt);
     active_scene->lateUpdate();
@@ -86,20 +94,33 @@ void Game::gameUpdate()
     camera.setCenter(active_scene->getViewportCenter());
     camera.applyView(window);
 }
-void Game::render()
+
+void GameManager::render()
 {
     window.clear(sf::Color::Black);
     active_scene->render(window);
     window.display();
 }
-void Game::exit()
+
+void GameManager::exit()
 {
     fclock.stop();
     std::cout << "num frames: " << fclock.num_ticks << "\n";
     std::cout << "run time: " << fclock.duration.count() << "\n";
     std::cout << "fps: " << fclock.num_ticks / fclock.duration.count() << "\n";
 }
-void Game::sleep(const float sec)
+
+void GameManager::closeWindow()
+{
+    window.close();
+}
+
+bool GameManager::isRunning() const
+{
+    return window.isOpen();
+}
+
+void GameManager::sleep(const float sec)
 {
     sf::Clock wait_clock;
     wait_clock.restart().asSeconds();
@@ -108,8 +129,4 @@ void Game::sleep(const float sec)
         wait_dt += wait_clock.restart().asSeconds();
     }
     frame_clock.restart().asSeconds();
-}
-bool Game::isRunning() const
-{
-    return window.isOpen();
 }
