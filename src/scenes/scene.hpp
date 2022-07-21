@@ -5,8 +5,10 @@
 #include "../io/devices.hpp"
 #include "../sys_collision.hpp"
 
-class ImageLayer;
-template <class T> class SceneLayer;
+// class SceneLayer;
+// class ImageLayer;
+// class ObjectLayer;
+
 
 struct ImageResource
 {
@@ -39,7 +41,7 @@ protected:
     tb::Tmx* tmx;
     std::map<const std::string, ImageResource*> img_srcs;
     std::vector<ImageLayer*> img_layers;
-    std::vector<SceneLayer<tb::ObjectLayer>*> obj_layers;
+    std::vector<ObjectLayer> obj_layers;
     CollisionSystem collision_system;
 };
 
