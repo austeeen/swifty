@@ -126,30 +126,12 @@ void ObjectLayer::toggleDisplay()
 /**************************************************************************************************/
 
 BoundaryLayer::BoundaryLayer(Scene* scn, tb::ObjectLayer& lyr):
-    ObjectLayer(scn, lyr)
+    ObjectLayer(scn, lyr),
+    render_texture(new sf::RenderTexture())
 {
     tb::Tmx* tmx = scene->getTmx();
-
-    std::map<const int, std::vector<GridTile*>> grid;
-    for (auto& [id, tile] : lyr.tilemap) {
-        grid[tile.x].push_back(new GridTile{tile});
-    }
-
-    for (auto& [x, gt] : grid) {
-        std::sort(
-            gt.begin(),
-            gt.end(),
-            [](const GridTile *a, const GridTile *b) { return a->tile.y < b->tile.y; }
-        );
-    }
-
-    for (auto& [x, gt] : grid) {
-        std::sort(
-            gt.begin(),
-            gt.end(),
-            [](const GridTile *a, const GridTile *b) { return a->tile.y < b->tile.y; }
-        );
-    }
+    render_texture->create(tmx->tilewidth * tmx->width, tmx->tileheight * tmx->height);
+    vertex_array.resize(tmx->width * tmx->height * 4);
 
     // TODO: set up tiles in object layer as a grid of linked tiles
 }
@@ -157,10 +139,45 @@ BoundaryLayer::BoundaryLayer(Scene* scn, tb::ObjectLayer& lyr):
 void BoundaryLayer::build()
 {
     // TODO: get tileset entry for texture/collision stuff
-    for (auto& enty : entities) {
-        // TODO: implement tracer agent for combining basic rects
-        enty->build();
+
+    render_texture->clear(sf::Color::Transparent);
+
+    tb::Tmx* tmx = scene->getTmx();
+    for (auto [id, tile] : layer.tilemap)
+    {
+        // Set tile's position
+        sf::Vertex *quads = &vertex_array[tile.id * 4];
+        quads[0].position = sf::Vector2f(tile.x,            tile.y);
+        quads[1].position = sf::Vector2f(tile.x + tile.width, tile.y);
+        quads[2].position = sf::Vector2f(tile.x + tile.width, tile.y  + tile.height);
+        quads[3].position = sf::Vector2f(tile.x,            tile.y  + tile.height);
+
+        // set tile's texture rect
+        int indx = 0; // arbitrary number
+        if (!tb::getTileset(indx, *tmx, tile.gid)) {
+            continue;
+        }
+        tb::Tileset cur_tileset = tmx->tilesets[indx];
+
+        tb::Tile t;
+        if (!tb::getTile(t, cur_tileset, (tile.gid - cur_tileset.firstgid))) {
+            continue;
+        }
+
+        for (const tb::Rect r : t.rects) {
+            entities.push_back(new Boundary(sf::IntRect(tile.x + r.x, tile.y + r.y, r.width, r.height)));
+        }
+
+        tb::Rect tr = t.texture;
+        quads[0].texCoords = sf::Vector2f(tr.x,            tr.y);
+        quads[1].texCoords = sf::Vector2f(tr.x + tr.width, tr.y);
+        quads[2].texCoords = sf::Vector2f(tr.x + tr.width, tr.y  + tr.height);
+        quads[3].texCoords = sf::Vector2f(tr.x,            tr.y  + tr.height);
+
+        // render the texture to the surface
+        render_texture->draw(quads, 4, sf::Quads, *scene->getRenderStates(cur_tileset.name));
     }
+    render_texture->display();
 }
 
 void BoundaryLayer::setUp()
@@ -176,9 +193,7 @@ void BoundaryLayer::render(sf::RenderWindow &window)
 {
     // todo -- may look at rendering all 'static entities' to a constant surface and list the rects
     // separately
-    for (auto& enty : entities) {
-        enty->render(window);
-    }
+    window.draw(sf::Sprite(render_texture->getTexture()));
 }
 
 /**************************************************************************************************/

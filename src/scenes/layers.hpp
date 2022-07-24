@@ -72,6 +72,10 @@ public:
     void lateUpdate() override;
     void render(sf::RenderWindow &window) override;
 
+private:
+    sf::VertexArray vertex_array;
+    sf::RenderTexture* render_texture;
+
 };
 
 /**************************************************************************************************/
