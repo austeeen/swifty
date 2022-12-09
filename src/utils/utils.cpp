@@ -76,7 +76,7 @@ sf::Vector2f stovf(const std::string& str)
     std::vector<std::string> rs;
     split(str, ',', rs);
     if (rs.size() != 2) {
-        std::cout << str << " != 2 int/float values" << std::endl;
+        out::err("TileMap()", "%s != 2 int/float values", str);
         throw std::out_of_range(str);
     }
     return sf::Vector2f(std::stof(rs[0]), std::stof(rs[1]));

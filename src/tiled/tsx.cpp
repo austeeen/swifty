@@ -7,7 +7,7 @@ TileObject::TileObject(const char* filepath)
     std::string content = "";
     loadXML(filepath, content, doc);
     if (doc == nullptr || content == "") {
-        std::cout << "tile object construction failed" << std::endl;
+        out::err("TileObject()", "tile object construction failed for %s", filepath);
         return;
     }
 
@@ -57,9 +57,9 @@ TileObject::TileObject(const char* filepath)
     }
 
     if (facing_right) {
-        printf("%s is facing right\n", name.c_str());
+        out::debug("TileObject()", "%s is facing right", name.c_str());
     } else {
-        printf("%s is facing left\n", name.c_str());
+         out::debug("TileObject()", "%s is facing left", name.c_str());
     }
 
     delete doc;
@@ -86,7 +86,7 @@ void TileObject::loadConfig(const char *filepath)
     std::string content = "";
     loadXML(filepath, content, doc);
     if (doc == nullptr || content == "") {
-        std::cout << "tile object config construction failed" << std::endl;
+        out::err("TileObject::loadConfig", "tile object construction failed for %s", filepath);
         return;
     }
     rx::xml_node<> *cfg = doc->first_node("config");

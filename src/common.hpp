@@ -20,5 +20,6 @@
 #include "rapidxml/rapidxml.hpp"
 namespace rx = rapidxml;
 #include "typedefs.hpp"
+#include "logging.hpp"
 
 #endif // COMMON_HPP

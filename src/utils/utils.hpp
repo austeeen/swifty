@@ -31,6 +31,9 @@ template<class T> T attr_if(const rx::xml_node<> *n, const char* key)
     return val;
 }
 
+template <> bool attr(const rx::xml_node<> *n, const char *key);
+template<> bool attr_if(const rx::xml_node<> *n, const char* key);
+
 bool stob(const std::string& str);
 sf::Vector2f stovf(const std::string& str);
 
@@ -38,5 +41,18 @@ void extractProperties(const rx::xml_node<> *prp, std::map<std::string, std::str
 
 inline const float min(float a, float b) { return (a < b) ? a : b; };
 inline const float max(float a, float b) { return (a < b) ? b : a; };
+
+template <class T> inline void bound_low(T &val, T low) {
+    if (val < low) { val = low; }
+}
+
+template <class T> inline void bound_up(T &val, T up) {
+    if (val > up) { val = up; }
+}
+
+template <class T> inline void bounded(T &val, T up, T low) {
+    bound_low(val, low);
+    bound_up(val, up);
+}
 
 #endif // TLD_UTILS_HPP

@@ -6,7 +6,7 @@ TileMap::TileMap(const char* filepath)
     std::string content = "";
     loadXML(filepath, content, doc);
     if (doc == nullptr || content == "") {
-        std::cout << "tile map construction failed" << std::endl;
+        out::err("TileMap()", "tile map construction failed");
         return;
     }
     rx::xml_node<> *map = doc->first_node();

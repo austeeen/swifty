@@ -32,7 +32,7 @@ void Game::setUp()
 {
     std::vector<int> cons;
     if (joy::connected_joys(cons)) {
-        printf("%d connected controller(s)", (int) cons.size());
+        out::msg("Game::setUp", "%d connected controller(s)", (int) cons.size());
         io_device = new Joystick(cons);
     }
     else {
@@ -41,7 +41,7 @@ void Game::setUp()
 
     player->build();
     for (auto& enm : enemies) {
-        printf("building: %s\n", enm->getName().c_str());
+        out::msg("Game::setUp", "building: %s\n", enm->getName().c_str());
         enm->build();
     }
 
@@ -50,7 +50,7 @@ void Game::setUp()
         plt->setUp();
     }
     for (auto& enm : enemies) {
-        printf("setting up: %s\n", enm->getName().c_str());
+        out::msg("Game::setUp", "setting up: %s\n", enm->getName().c_str());
         enm->setUp();
     }
 
@@ -204,9 +204,9 @@ void Game::render()
 void Game::exit()
 {
     fclock.stop();
-    std::cout << "num frames: " << fclock.num_ticks << "\n";
-    std::cout << "run time: " << fclock.duration.count() << "\n";
-    std::cout << "fps: " << fclock.num_ticks / fclock.duration.count() << "\n";
+    out::msg("Game::exit", "run time: %d", fclock.num_ticks);
+    out::msg("Game::exit", "  frames: %f", fclock.duration.count());
+    out::msg("Game::exit", "     fps: %f", fclock.num_ticks / fclock.duration.count());
 }
 void Game::sleep(const float sec)
 {

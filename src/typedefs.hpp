@@ -6,6 +6,7 @@
 #include <memory>
 #include <iomanip>
 #include <iostream>
+#include <string>
 
 static const float FLT_ZERO = 0.1;
 static const float STUCK_TIMEOUT = 5.f;
@@ -22,10 +23,6 @@ enum class ObjectState { idle, running, jumping, falling, healing, damaged, dead
 
 enum class RollState { none, next, done };
 
-namespace out {
-    const std::string toStr(const ObjectState s);
-}
-
 struct PhysicsCoeffs {
     static const int MASS_UNIT = 10;
     static const int SPEED_UNIT = 1;
@@ -41,6 +38,8 @@ struct PhysicsCoeffs {
     int mass, speed, maxvel, jump, gravity, damping;
     void increase(const AsEnum n);
     void decrease(const AsEnum n);
+
+    const std::string asStr() const;
 };
 
 std::ostream& operator<<(std::ostream& o, const PhysicsCoeffs& u);

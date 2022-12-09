@@ -3,6 +3,7 @@
 
 #include "../common.hpp"
 #include "../utils/bitmask.hpp"
+#include "../logging.hpp"
 #include "io_core.hpp"
 
 class InputDevice

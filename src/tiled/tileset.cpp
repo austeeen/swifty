@@ -41,7 +41,7 @@ TileSet::TileSet(rx::xml_node<> *node)
                         attr<int>(obj, "x"), attr<int>(obj, "y"),
                         attr<int>(obj, "width"), attr<int>(obj, "height"));
                 } else {
-                    printf("TileSet '%s' has tile entry without object in object group\n", name.c_str());
+                    out::warn("TileSet()", "'%s' has tile entry without object in object group", name.c_str());
                 }
             }
         }

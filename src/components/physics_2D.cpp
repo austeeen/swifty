@@ -45,7 +45,7 @@ void Physics2D::update(const float dt)
         vel.y = 0.f;
     }
 
-    // printf("Physics2D: v(%f, %f)\n", vel.x, vel.y);
+    out::debug("Physics2D::update", "v(%f, %f)", vel.x, vel.y);
     // POSITION
     body->move((vel.x + inertia.x) * dt, (vel.y + inertia.y) * dt);
 }
@@ -171,7 +171,7 @@ void Physics2D::decrease(const PhysicsCoeffs::AsEnum cf)
 }
 void Physics2D::print() const
 {
-    printf("[Physics2D] %s %s acl(%f, %f) vel(%f, %f)\n", obj->getName().c_str(), out::toStr(cur_state).c_str(), acl.x, acl.y, vel.x, vel.y);
+    out::msg("Physics2D::print", "%s %s acl(%f, %f) vel(%f, %f)\n", obj->getName().c_str(), out::toStr(cur_state).c_str(), acl.x, acl.y, vel.x, vel.y);
 }
 void Physics2D::Force2D::update(const PhysicsCoeffs& new_u)
 {
@@ -179,5 +179,5 @@ void Physics2D::Force2D::update(const PhysicsCoeffs& new_u)
     damp = new_u.damping;
     jump = new_u.jump * 100 / new_u.mass;
     move = new_u.speed * new_u.mass * 100;
-    std::cout << new_u << std::endl;
+    out::debug("Physics2D::Force2D::update", new_u.asStr().c_str());
 }

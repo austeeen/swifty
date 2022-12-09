@@ -27,7 +27,7 @@ usage () {
 }
 
 app="swifty"
-base_cmd="build/$app.app"
+base_cmd="build/$app"
 
 run_cmd=""
 cmake_clean=""

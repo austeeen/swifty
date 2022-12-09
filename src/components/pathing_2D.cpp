@@ -7,10 +7,10 @@ void PathingVSI::update(const float dt)
 {
     last_dt = dt * 100000;
     if (!hasDestination()) {
-        printf("Spider has no destination\n");
+        out::debug("PathingVSI::update", "Spider has no destination");
         return;
     } else if (obj->cmpnt<RigidBody>()->intersects(m_destination)) {
-        printf("Spider reached destination\n");
+        out::debug("PathingVSI::update", "Spider reached destination");
         clearDestination();
         obj->stopAll();
     } else {
@@ -18,17 +18,17 @@ void PathingVSI::update(const float dt)
         if (posrect.left < m_destination.x && posrect.left + posrect.width < m_destination.x) {
             obj->stop(Dir4::left);
             obj->move(Dir4::right);
-            printf("Spider moving right\n");
+            out::debug("PathingVSI::update", "Spider moving right");
         } else {
             obj->stop(Dir4::right);
             obj->move(Dir4::left);
-            printf("Spider moving left\n");
+            out::debug("PathingVSI::update", "Spider moving left");
         }
     }
 }
 void PathingVSI::setZone(const sf::IntRect& zone)
 {
-    printf("set zone (%d, %d, %d, %d)\n", zone.left, zone.top, zone.width, zone.height);
+    out::debug("PathingVSI::setZone", "(%d, %d, %d, %d)", zone.left, zone.top, zone.width, zone.height);
     m_zone = zone;
 }
 void PathingVSI::newDestination()
@@ -36,18 +36,18 @@ void PathingVSI::newDestination()
     srand(last_dt);
     m_destination.y = m_zone.top - (m_zone.height / 2);
     m_destination.x = (rand() % m_zone.width) + m_zone.left;
-    printf("new destination (%f, %f)\n", m_destination.x, m_destination.y);
+    out::debug("PathingVSI::newDestination", "(%f, %f)", m_destination.x, m_destination.y);
 }
 void PathingVSI::setDestination(const sf::Vector2f& dest)
 {
     m_destination = dest;
-    printf("set destination (%f, %f)\n", m_destination.x, m_destination.y);
+    out::debug("PathingVSI::setDestination", "(%f, %f)", m_destination.x, m_destination.y);
 }
 void PathingVSI::clearDestination()
 {
     m_destination.x = 0.f;
     m_destination.y = 0.f;
-    printf("cleared destination (%f, %f)\n", m_destination.x, m_destination.y);
+    out::debug("PathingVSI::clearDestination", "(%f, %f)", m_destination.x, m_destination.y);
 }
 const sf::Vector2f PathingVSI::getDestination() const
 {

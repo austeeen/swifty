@@ -10,57 +10,57 @@ AiObject::AiObject(const GameObjectAsset ast):
 }
 void AiObject::setState(const ObjectState s)
 {
-    printf("AiObject::setState %s\n", out::toStr(s).c_str());
+    out::debug("AiObject::setState", out::toStr(s).c_str());
     this->cmpnt<Animator>()->setState(cur_state);
     this->cmpnt<Physics2D>()->setState(cur_state);
     this->cmpnt<AiController>()->setState(cur_state);
 }
 void AiObject::setTarget(GameObject* target)
 {
-    printf("AiObject::setTarget %s\n", target->getName().c_str());
+    out::debug("AiObject::setTarget", target->getName().c_str());
     m_target = target;
 }
 void AiObject::setAiZone(const sf::IntRect& zone)
 {
-    printf("AiObject::setAiZone\n");
+    out::debug("AiObject::setAiZone");
     cmpnt<PathingVSI>()->setZone(zone);
 }
 
 void AiObject::noAction()
 {
-    printf("AiObject::noAction\n");
+    out::debug("AiObject::noAction");
     return;
 }
 void AiObject::attackTarget()
 {
     // todo
-    printf("AiObject::attackTarget\n");
+    out::debug("AiObject::attackTarget");
     return;
 }
 void AiObject::clearDestination()
 {
-    printf("AiObject::clearDestination\n");
+    out::debug("AiObject::clearDestination");
     cmpnt<PathingVSI>()->clearDestination();
 }
 void AiObject::setPathFromZone()
 {
-    printf("AiObject::setPathFromZone\n");
+    out::debug("AiObject::setPathFromZone");
     cmpnt<PathingVSI>()->newDestination();
 }
 void AiObject::setPathToTarget()
 {
-    printf("AiObject::setPathToTarget\n");
+    out::debug("AiObject::setPathToTarget");
     const sf::FloatRect tpos = m_target->getPositionRect();
     cmpnt<PathingVSI>()->setDestination(sf::Vector2f(tpos.left + (tpos.width / 2), tpos.top + (tpos.height / 2)));
 }
 void AiObject::setPathToHome()
 {
-    printf("AiObject::setPathToHome\n");
+    out::debug("AiObject::setPathToHome");
     cmpnt<PathingVSI>()->setDestination(m_home);
 }
 void AiObject::redrawPath()
 {
-    printf("AiObject::redrawPath\n");
+    out::debug("AiObject::redrawPath");
     // cmpnt<PathingVSI>()->redrawPath();
     cmpnt<PathingVSI>()->newDestination();
 }
@@ -68,32 +68,32 @@ void AiObject::redrawPath()
 
 bool AiObject::hasDestination() const
 {
-    printf("AiObject::hasDestination\n");
+    out::debug("AiObject::hasDestination");
     return cmpnt<PathingVSI>()->hasDestination();
 }
 bool AiObject::targetDetected() const
 {
-    printf("AiObject::targetDetected\n");
+    out::debug("AiObject::targetDetected");
     // todo check m_target against los component or shape?
     return false;
 }
 bool AiObject::closeToDestination() const
 {
-    printf("AiObject::closeToDestination\n");
+    out::debug("AiObject::closeToDestination");
     return cmpnt<RigidBody>()->closeTo(cmpnt<PathingVSI>()->getDestination());
 }
 bool AiObject::closeToTarget() const
 {
-    printf("AiObject::closeToTarget\n");
+    out::debug("AiObject::closeToTarget");
     return cmpnt<RigidBody>()->closeTo(m_target->getPositionRect());
 }
 bool AiObject::closeToHome() const
 {
-    printf("AiObject::closeToHome\n");
+    out::debug("AiObject::closeToHome");
     return cmpnt<RigidBody>()->closeTo(m_home);
 }
 bool AiObject::isStuck() const
 {
-    printf("AiObject::isStuck\n");
+    out::debug("AiObject::isStuck");
     return cmpnt<AiController>()->stuckTimedout();
 }

@@ -79,6 +79,7 @@ void AiController::build()
     m_allnodes.push_back(r_c0);
     m_allnodes.push_back(r_c1);
 
+    m_state = AiState::Type::wandering;
 
 }
 void AiController::setUp()

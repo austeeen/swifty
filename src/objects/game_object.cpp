@@ -9,11 +9,11 @@ GameObject::GameObject(const GameObjectAsset ast):
     cmpts[typeid(Animator)] = std::make_shared<Animator>(this);
 
     if (orientation == Dir4::right) {
-        printf("GameObject ctor: %s facing right\n", ast.name.c_str());
+        out::debug("GameObject()", "%s facing right", ast.name.c_str());
     } else if (orientation == Dir4::left) {
-        printf("GameObject ctor: %s facing left\n", ast.name.c_str());
+        out::debug("GameObject()", "%s facing left", ast.name.c_str());
     } else {
-        printf("GameObject ctor: %s unknown facing %d\n", ast.name.c_str(), (int) orientation);
+        out::debug("GameObject()", " %s unknown facing %d", ast.name.c_str(), (int) orientation);
     }
 }
 void GameObject::build()

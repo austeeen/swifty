@@ -22,9 +22,9 @@ void Sprite::flipTexture(bool f)
     if (flip_texture == f) {
         return;
     } else if (f) {
-        printf("sprite: %s flip texture\n", obj->getName().c_str());
+        out::debug("Sprite::flipTexture", obj->getName().c_str());
     } else {
-        printf("sprite: %s unflip texture\n", obj->getName().c_str());
+        out::debug("Sprite::flipTexture", "%s unflipped", obj->getName().c_str());
     }
     flip_texture = f;
     updateTextureRect();
