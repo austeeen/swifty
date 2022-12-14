@@ -13,6 +13,7 @@ class Logger {
 public:
     enum loglevel { err = 0, wrn, msg, dbg };
     static loglevel lvl;
+    static std::map<std::string, loglevel> str2log;
     static const int numlvls = 4;
 
     static void setlvl(const int lvl_num);

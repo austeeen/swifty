@@ -12,7 +12,7 @@ io::state InputDevice::get(const io::binding b)
 }
 Keyboard::Keyboard() : InputDevice()
 {
-    out::msg("Keyboard()", "Using Keyboard\n");
+    out::msg("Keyboard()", "Using Keyboard");
     this->bindings[io::left] = sf::Keyboard::Left;
     this->bindings[io::right] = sf::Keyboard::Right;
     this->bindings[io::down] = sf::Keyboard::Down;

@@ -1,6 +1,7 @@
 #include "logging.hpp"
 
 Logger::loglevel Logger::lvl;
+// std::map<std::string, Logger::loglevel> Logger::str2log;
 
 void Logger::setlvl(const int lvl_num) {
     if (lvl_num < numlvls) {

@@ -41,7 +41,7 @@ void Game::setUp()
 
     player->build();
     for (auto& enm : enemies) {
-        out::msg("Game::setUp", "building: %s\n", enm->getName().c_str());
+        out::msg("Game::setUp", "building: %s", enm->getName().c_str());
         enm->build();
     }
 
@@ -50,7 +50,7 @@ void Game::setUp()
         plt->setUp();
     }
     for (auto& enm : enemies) {
-        out::msg("Game::setUp", "setting up: %s\n", enm->getName().c_str());
+        out::msg("Game::setUp", "setting up: %s", enm->getName().c_str());
         enm->setUp();
     }
 

@@ -61,7 +61,7 @@ for c in "${args[@]}"; do
             do_build="true"
             cmake_clean="--clean-first";;
         g)
-            run_cmd="gdb $base_cmd"
+            run_cmd="gdb --args $base_cmd"
             do_run="true";;
         r)
             do_run="true"
