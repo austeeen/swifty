@@ -19,7 +19,7 @@ public:
 
     virtual void setState(const ObjectState s);
     void setStartPosition(const int x, const int y);
-    void toggleRects();
+    void toggleRects(const int opt = -1);
 
     void onColliding(const sf::Vector2f& offset, const ColliderType m_type, const ColliderType b_type) const;
     void updateInertia(const sf::Vector2f& inertia) const;

@@ -15,7 +15,7 @@ public:
     void render(sf::RenderWindow&) override;
 
     void move(const float dx, const float dy);
-    void toggleDisplay();
+    void toggleDisplay(const int opt = -1);
 
     const CollisionRect& getCollider() const override;
     const sf::Vector2f& getVelocity() const override;

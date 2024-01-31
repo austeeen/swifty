@@ -7,7 +7,7 @@ void PathingVSI::update(const float dt)
 {
     last_dt = dt * 100000;
     if (!hasDestination()) {
-        out::debug("PathingVSI::update", "Spider has no destination");
+        // out::debug("PathingVSI::update", "Spider has no destination");
         return;
     } else if (obj->cmpnt<RigidBody>()->intersects(m_destination)) {
         out::debug("PathingVSI::update", "Spider reached destination");

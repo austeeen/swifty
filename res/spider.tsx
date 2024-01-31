@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.8" tiledversion="1.8.5" name="spider" tilewidth="16" tileheight="16" tilecount="54" columns="9">
+<tileset version="1.10" tiledversion="1.10.2" name="spider" tilewidth="16" tileheight="16" tilecount="54" columns="9">
  <properties>
   <property name="config" type="file" value="spider.cfg"/>
   <property name="facing_right" type="bool" value="false"/>
@@ -129,7 +129,7 @@
    <property name="one_shot" type="bool" value="false"/>
   </properties>
   <objectgroup draworder="index" id="2">
-   <object id="1" type="body" x="2" y="5" width="9" height="6"/>
+   <object id="1" type="body" x="2" y="9" width="9" height="6"/>
   </objectgroup>
   <animation>
    <frame tileid="23" duration="150"/>
@@ -140,7 +140,7 @@
  </tile>
  <tile id="24">
   <objectgroup draworder="index" id="2">
-   <object id="1" type="body" x="2" y="10" width="9" height="6"/>
+   <object id="1" type="body" x="2" y="9" width="9" height="6"/>
   </objectgroup>
  </tile>
  <tile id="25">

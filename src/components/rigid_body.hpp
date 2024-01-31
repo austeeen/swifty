@@ -11,7 +11,7 @@ public:
     void setUp() override;
     void render(sf::RenderWindow &window) override;
 
-    void toggleDisplay();
+    void toggleDisplay(const int opt = -1);
     void move(const float x, const float y);
 
     void setColliders(const std::vector<CollisionRect>& rects);

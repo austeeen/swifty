@@ -8,7 +8,7 @@ Physics2D::Physics2D(GameObject* obj):
     next_state(ObjectState::idle),
     moving_left(0), moving_right(0), moving_dir(0), is_jumping(0),
     vel(0, 0), inertia(0, 0), acl(0, 0), body_offset(0, 0), other_offset(0, 0),
-    falling_dt(0), block_falling(0.1)
+    falling_dt(0), block_falling(0.2)
 {}
 void Physics2D::build()
 {
@@ -45,7 +45,7 @@ void Physics2D::update(const float dt)
         vel.y = 0.f;
     }
 
-    out::debug("Physics2D::update", "v(%f, %f)", vel.x, vel.y);
+    // out::debug("Physics2D::update", "v(%f, %f)", vel.x, vel.y);
     // POSITION
     body->move((vel.x + inertia.x) * dt, (vel.y + inertia.y) * dt);
 }

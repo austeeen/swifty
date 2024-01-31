@@ -3,7 +3,7 @@
 AiObject::AiObject(const GameObjectAsset ast):
     GameObject(ast)
 {
-    cmpts[typeid(AiController)] = std::make_shared<AiController>(this);
+    // cmpts[typeid(AiController)] = std::make_shared<AiController>(this);
     cmpts[typeid(PathingVSI)] = std::make_shared<PathingVSI>(this);
     // todo add new los component or create los shape
     m_home = ast.start_pos;
@@ -13,7 +13,7 @@ void AiObject::setState(const ObjectState s)
     out::debug("AiObject::setState", out::toStr(s).c_str());
     this->cmpnt<Animator>()->setState(cur_state);
     this->cmpnt<Physics2D>()->setState(cur_state);
-    this->cmpnt<AiController>()->setState(cur_state);
+    // this->cmpnt<AiController>()->setState(cur_state);
 }
 void AiObject::setTarget(GameObject* target)
 {
@@ -25,6 +25,8 @@ void AiObject::setAiZone(const sf::IntRect& zone)
     out::debug("AiObject::setAiZone");
     cmpnt<PathingVSI>()->setZone(zone);
 }
+
+/* action hooks */
 
 void AiObject::noAction()
 {
@@ -65,7 +67,7 @@ void AiObject::redrawPath()
     cmpnt<PathingVSI>()->newDestination();
 }
 
-
+/* condition hooks */
 bool AiObject::hasDestination() const
 {
     out::debug("AiObject::hasDestination");

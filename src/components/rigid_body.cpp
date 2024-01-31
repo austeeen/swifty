@@ -40,9 +40,15 @@ void RigidBody::render(sf::RenderWindow &window)
         window.draw(collision_shapes[i]);
     }
 }
-void RigidBody::toggleDisplay()
+void RigidBody::toggleDisplay(const int opt)
 {
-    display_body = !display_body;
+    if (opt == -1) {
+        display_body = !display_body;    
+    } else if (opt == 0) {
+        display_body = false;
+    } else {
+        display_body = true;
+    }
 }
 void RigidBody::setColliders(const std::vector<CollisionRect>& rects)
 {

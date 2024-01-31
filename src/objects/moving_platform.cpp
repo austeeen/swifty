@@ -91,9 +91,15 @@ void MovingPlatform::move(const float dx, const float dy)
     collider.aabb.left = position_rect.left + collider.offset.x;
     collider.aabb.top = position_rect.top + collider.offset.y;
 }
-void MovingPlatform::toggleDisplay()
+void MovingPlatform::toggleDisplay(const int opt)
 {
-    display_body = !display_body;
+    if (opt == -1) {
+        display_body = !display_body;    
+    } else if (opt == 0) {
+        display_body = false;
+    } else {
+        display_body = true;
+    }
 }
 void MovingPlatform::nextWaypoint()
 {

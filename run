@@ -27,8 +27,9 @@ declare SCRIPTNAME=$(echo "$SCRIPT" | cut -d'.' -f1)
 declare SCRIPTDIR=$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")
 
 declare -a RAW_ARGS=()
+declare -a GAME_ARGS=()
 declare ARG_DEST=""
-for argv in "$@"; do RAW_ARGS+=("$argv") ; done # Array for arguments
+for argv in "$@"; do RAW_ARGS+=("$argv") ; done
 
 declare APPNAME="swifty"
 declare BASE_CMD="build/$APPNAME"
@@ -147,7 +148,7 @@ function show_version() { echo -e "$COLOR_CYAN[$SCRIPTNAME] v$VERSION $COLOR_DEF
 #--/ CLI /----------------------------------------------------------------------
 
 function run_app() {
-    eval "$RUN_CMD $@"
+    cmd "$RUN_CMD ${GAME_ARGS[@]}"
 }
 
 function build_app() {
@@ -172,6 +173,10 @@ function main() {
     elif [[ $USR_CMD == "run" ]] || [[ $USR_CMD == "r" ]]; then
         RUN_CMD=$BASE_CMD
         run_app
+    elif [[ $USR_CMD == "build-run" ]] || [[ $USR_CMD == "br" ]]; then
+        RUN_CMD=$BASE_CMD
+        build_app
+        run_app
     elif [[ $USR_CMD == "valgrind" ]] || [[ $USR_CMD == "v" ]]; then
         RUN_CMD="valgrind --track-origins=yes --leak-check=yes --log-file='valgrind.log' $BASE_CMD"
         run_app
@@ -185,7 +190,7 @@ function main() {
     fi
 }
 
-help_page () {
+function help_page() {
 cat << HELP_PAGE
 
     [$SCRIPTNAME] build and/or run the game
@@ -197,14 +202,18 @@ cat << HELP_PAGE
     commands:
         * the 'run' command is used by default if no commands AND no options are given.
 
-        b | build     : run the build
-        c | clear     : clear build files first, then build
-        r | run       : run the app (must be built in the build/ dir)
-        g | gdb       : run using GDB
-        v | valgrind  : run using valgrind
-        p | profiling : run with valgrind, but using more profiling-related args
+        b  | build     : run the build
+        c  | clear     : clear build files first, then build
+        r  | run       : run the app (must be built in the build/ dir)
+        br | build-run : run the build and then run the app
+        g  | gdb       : run using GDB
+        v  | valgrind  : run using valgrind
+        p  | profiling : run with valgrind, but using more profiling-related args
 
     options:
+        --args        : game app args
+            * MUST be the very last arg
+
         -h, --help    : show this help page
         -v, --version : print this tool's version number and quit
         --dry-run     : run but do not execute any real commands
@@ -217,7 +226,7 @@ cat << HELP_PAGE
 
     requirements:
         * SFML installed in a 'cmake-recognizeable' install path. See the SFML main page
-            to get started.
+            to get started (https://www.sfml-dev.org/).
 HELP_PAGE
 }
 
@@ -232,11 +241,16 @@ function parse_args() {
 
     for base_arg in "${RAW_ARGS[@]}" ; do
         if [[ "$ARG_DEST" != '' ]] ; then
-            eval "$ARG_DEST='$base_arg'"
-            ARG_DEST=''
+            if [[ "$ARG_DEST" == "GAME_ARGS" ]]; then
+                GAME_ARGS+=("$base_arg")
+            else 
+                eval "$ARG_DEST='$base_arg'"
+                ARG_DEST=''
+            fi
         else
             for arg in $(arg_eval "$base_arg"); do
             if [[ "$arg" == '--' ]]; then break 2
+            elif [[ "$arg" == '--args'    ]]; then ARG_DEST="GAME_ARGS"
             elif [[ "$arg" == '--dry-run' ]]; then DRY_RUN=$TRUE
             elif [[ "$arg" == '--help' ]] || [[ "$arg" == '-?' ]] || [[ "$arg" == '-h' ]]; then help_page && exit 0
             elif [[ "$arg" == '-v'     ]] || [[ "$arg" == '--version' ]]; then show_version && exit 0

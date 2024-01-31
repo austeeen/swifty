@@ -1,6 +1,7 @@
 #include <tclap/CmdLine.h>
 #include "game.hpp"
 
+#define DEFAULT_FPS 60
 
 Logger::loglevel lvl = Logger::loglevel::err;
 std::map<std::string, Logger::loglevel> Logger::str2log {
@@ -12,8 +13,10 @@ std::map<std::string, Logger::loglevel> Logger::str2log {
 
 int main(int argc, char** argv)
 {
+    int fps = DEFAULT_FPS;
+    bool rects_on = false;
 
-    try {  
+    try {
 
         TCLAP::CmdLine game_args("Swifty. A game about a cat.", ' ', "0.0.1");
 
@@ -24,19 +27,34 @@ int main(int argc, char** argv)
         TCLAP::ValuesConstraint<std::string> allowed_loglvls(loglevel_keys);
 
         TCLAP::ValueArg<std::string> loglevel_arg(
-            "l", "log-level", "Set the log level", false, "debug", &allowed_loglvls);
+            "l", "log-level", "Set the log level", 
+            false, "debug", &allowed_loglvls
+        );
+        TCLAP::ValueArg<int> fps_arg(
+            "f",  "fps", "Set the max FPS",
+            false, DEFAULT_FPS, "integer"
+        );
+        TCLAP::SwitchArg rects_on_arg(
+            "r", "rects-on", "Show collision/animation rects"
+        );
 
         game_args.add(loglevel_arg);
+        game_args.add(fps_arg);
+        game_args.add(rects_on_arg);
+
         game_args.parse(argc, argv);
         
         Logger::setlvl(Logger::str2log.at(loglevel_arg.getValue()));
+
+        fps = fps_arg.getValue();
+        rects_on = rects_on_arg.getValue();
 	
     } catch (TCLAP::ArgException &e) { 
         std::cerr << "error: " << e.error() << " for arg " << e.argId() << std::endl; 
         return 0;
     }
 
-    Game game;
+    Game game(fps, rects_on);
     game.setUp();
     game.render();
     while (game.isRunning()) {

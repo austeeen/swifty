@@ -84,10 +84,12 @@ void GameObject::setState(const ObjectState s)
 void GameObject::setStartPosition(const int x, const int y)
 {
     cmpnt<RigidBody>()->move(x, y);
+    std::cout << "Set start position for: " << getName() << std::endl;
+    out::debug("GameObject::setStartPosition", "(%s) Setting game object start pos: (%d, %d)", getName().c_str(), x, y);
 }
-void GameObject::toggleRects()
+void GameObject::toggleRects(const int opt)
 {
-    cmpnt<RigidBody>()->toggleDisplay();
+    cmpnt<RigidBody>()->toggleDisplay(opt);
 }
 void GameObject::onColliding(const sf::Vector2f& offset, const ColliderType m_type, const ColliderType b_type) const
 {

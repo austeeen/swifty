@@ -1,11 +1,13 @@
 #include "game.hpp"
 
-Game::Game():
-window(sf::VideoMode(WINDOW::width, WINDOW::height), WINDOW::title, WINDOW::style),
-camera(CAMERA::view_rect)
+Game::Game(const int fps, const bool rects_on):
+    fps(fps),
+    rects_on(rects_on),
+    window(sf::VideoMode(WINDOW::width, WINDOW::height), WINDOW::title, WINDOW::style),
+    camera(CAMERA::view_rect)
 {
     window.setKeyRepeatEnabled(false);
-    // window.setFramerateLimit(60);
+    window.setFramerateLimit(fps);
     window.setVerticalSyncEnabled(true);
 
     player = std::make_shared<Player>(GameObjectAsset(std::make_shared<TileObject>("res/cat_new.tsx")));
@@ -81,6 +83,17 @@ void Game::setUp()
     fclock.start();
 
     dt = frame_clock.restart().asSeconds();
+
+    // Turn on all rects
+    if (rects_on) {
+        player->toggleRects(true);
+        for (auto& plt : platforms) {
+            plt->toggleDisplay(true);
+        }
+        for (auto& enm : enemies) {
+            enm->toggleRects(true);
+        }
+    }
 }
 void Game::update()
 {
@@ -165,6 +178,16 @@ void Game::eventUpdate()
 }
 void Game::gameUpdate()
 {
+
+    // Cap dt between frames to 10 ms max.
+    // This should remedy issues where the game window hangs for some time and the update method
+    // tries to process using a super high dt.
+    if (dt > 0.01f) {
+        float og_dt = dt;
+        dt = 0.01f;
+        out::debug("Game::gameUpdate", "DT: %f -> %f (sec)", og_dt, dt);
+    }
+
     player->update(dt);
     for (auto& enm : enemies) {
         enm->update(dt);

@@ -13,7 +13,7 @@
 class Game
 {
 public:
-    Game();
+    Game(const int fps, const bool rects_on);
     void init();
     void setUp();
     void update();
@@ -28,6 +28,10 @@ private:
     void eventUpdate();
     void gameUpdate();
     void lateUpdate();
+
+    // args
+    const int fps;
+    const bool rects_on;
 
     sf::Clock frame_clock;
     float dt;
