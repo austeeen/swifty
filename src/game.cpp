@@ -182,9 +182,9 @@ void Game::gameUpdate()
     // Cap dt between frames to 10 ms max.
     // This should remedy issues where the game window hangs for some time and the update method
     // tries to process using a super high dt.
-    if (dt > 0.01f) {
+    if (dt > MAX_FRAME_DT) {
         float og_dt = dt;
-        dt = 0.01f;
+        dt = MAX_FRAME_DT;
         out::debug("Game::gameUpdate", "DT: %f -> %f (sec)", og_dt, dt);
     }
 

@@ -10,6 +10,9 @@
 #include "io/devices.hpp"
 #include "utils/benchmark.hpp"
 
+
+#define MAX_FRAME_DT 0.1
+
 class Game
 {
 public:

@@ -33,13 +33,12 @@ for argv in "$@"; do RAW_ARGS+=("$argv") ; done
 
 declare APPNAME="swifty"
 declare BASE_CMD="build/$APPNAME"
-
+declare BUILD_DIR="$SCRIPTDIR/build"
 
 #--/ commands /-----------------------------------------------------------------
 
 declare USR_CMD=""
 declare RUN_CMD=""
-declare CMAKE_CLEAN=""
 
 #--/ options /------------------------------------------------------------------
 
@@ -153,10 +152,10 @@ function run_app() {
 
 function build_app() {
     title "Building '$APPNAME'"
-    cmd mkdir -p build 
-    cmd cd build
+    cmd mkdir -p $BUILD_DIR 
+    cmd cd $BUILD_DIR 
     cmd cmake -DAPP_NAME=$APPNAME ..
-    cmd cmake --build . $CMAKE_CLEAN
+    cmd cmake --build .
     cmd cd ..
     drop
 }
@@ -165,7 +164,7 @@ function main() {
     if [[ $USR_CMD == "build" ]] || [[ $USR_CMD == "b" ]]; then
         build_app
     elif [[ $USR_CMD == "clean" ]] || [[ $USR_CMD == "c" ]]; then
-        CMAKE_CLEAN="--clean-first"
+        cmd rm -rf $BUILD_DIR 
         build_app
     elif [[ $USR_CMD == "gdb" ]] || [[ $USR_CMD == "g" ]]; then
         RUN_CMD="gdb --args $BASE_CMD"

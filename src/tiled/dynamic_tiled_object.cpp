@@ -1,5 +1,6 @@
 #include "dynamic_tiled_object.hpp"
 #include "tmx.hpp"
+#include "tiled_core.hpp"
 
 ObjectEntry::ObjectEntry(rx::xml_node<>* node)
 {
@@ -13,8 +14,9 @@ DynamicTiledObject::DynamicTiledObject(rx::xml_node<>* node):
     speed(-1), render_texture(new sf::RenderTexture()), type("")
 {
     name = attr<std::string>(node, "name");
-    type = attr<std::string>(node, "type");
+    type = type_attr(node);
 }
+
 DynamicTiledObject::~DynamicTiledObject()
 {
     /*
@@ -27,6 +29,7 @@ DynamicTiledObject::~DynamicTiledObject()
     root_waypoint = nullptr;
     */
 }
+
 void DynamicTiledObject::add(rx::xml_node<>* node)
 {
     pieces.push_back(ObjectEntry(node));
@@ -38,6 +41,7 @@ void DynamicTiledObject::add(rx::xml_node<>* node)
         root_next_wp = std::stoi(prp_tbl.at("path"));
     }
 }
+
 void DynamicTiledObject::combinePieces(TileMap *map)
 {
     // union all pieces' position_rects
@@ -114,6 +118,7 @@ void DynamicTiledObject::combinePieces(TileMap *map)
     collider.aabb = collision_rect;
     collider.type = ColliderType::platform;
 }
+
 void DynamicTiledObject::setWaypointTree(std::map<int, Waypoint>& all_waypoints)
 {
     root_waypoint = new Waypoint(sf::Vector2f(position_rect.left, position_rect.top), root_next_wp);

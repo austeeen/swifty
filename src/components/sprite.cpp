@@ -21,11 +21,12 @@ void Sprite::flipTexture(bool f)
 {
     if (flip_texture == f) {
         return;
-    } else if (f) {
-        out::debug("Sprite::flipTexture", obj->getName().c_str());
-    } else {
-        out::debug("Sprite::flipTexture", "%s unflipped", obj->getName().c_str());
-    }
+    } 
+    // else if (f) {
+    //     out::debug("Sprite::flipTexture", obj->getName().c_str());
+    // } else {
+    //     out::debug("Sprite::flipTexture", "%s unflipped", obj->getName().c_str());
+    // }
     flip_texture = f;
     updateTextureRect();
 }

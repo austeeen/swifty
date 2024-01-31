@@ -13,6 +13,7 @@ template<class T> T attr(const rx::xml_node<> *n, const char* key)
     rx::xml_attribute<> *n_attr = n->first_attribute(key);
     T val;
     if (n_attr == nullptr) {
+        out::err("Missing attribute: %s", key);
         throw std::out_of_range(key);
     }
     std::istringstream ss(n_attr->value());
@@ -31,7 +32,7 @@ template<class T> T attr_if(const rx::xml_node<> *n, const char* key)
     return val;
 }
 
-template <> bool attr(const rx::xml_node<> *n, const char *key);
+template<> bool attr(const rx::xml_node<> *n, const char *key);
 template<> bool attr_if(const rx::xml_node<> *n, const char* key);
 
 bool stob(const std::string& str);

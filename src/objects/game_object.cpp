@@ -8,13 +8,13 @@ GameObject::GameObject(const GameObjectAsset ast):
     cmpts[typeid(RigidBody)] = std::make_shared<RigidBody>(this);
     cmpts[typeid(Animator)] = std::make_shared<Animator>(this);
 
-    if (orientation == Dir4::right) {
-        out::debug("GameObject()", "%s facing right", ast.name.c_str());
-    } else if (orientation == Dir4::left) {
-        out::debug("GameObject()", "%s facing left", ast.name.c_str());
-    } else {
-        out::debug("GameObject()", " %s unknown facing %d", ast.name.c_str(), (int) orientation);
-    }
+    // if (orientation == Dir4::right) {
+    //     out::debug("GameObject()", "%s facing right", ast.name.c_str());
+    // } else if (orientation == Dir4::left) {
+    //     out::debug("GameObject()", "%s facing left", ast.name.c_str());
+    // } else {
+    //     out::debug("GameObject()", " %s unknown facing %d", ast.name.c_str(), (int) orientation);
+    // }
 }
 void GameObject::build()
 {

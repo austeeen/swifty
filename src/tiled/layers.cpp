@@ -1,5 +1,6 @@
 #include "layers.hpp"
 #include "tmx.hpp"
+#include "tiled_core.hpp"
 
 LayerBase::LayerBase(rx::xml_node<> *node)
 {
@@ -17,11 +18,13 @@ TileLayer::TileLayer(rx::xml_node<> *node):
     rx::xml_node<> *data = node->first_node("data");
     gidstr = data->value();
 }
+
 TileLayer::~TileLayer()
 {
     delete render_texture;
     render_texture = nullptr;
 }
+
 void TileLayer::build(TileMap *map)
 {
     render_texture->create(map->tilesize.x * size.x, map->tilesize.y * size.y);
@@ -103,7 +106,7 @@ DynamicObjectGroup::DynamicObjectGroup(rx::xml_node<> *node):
             sf::Vector2f(attr<int>(obj_node, "x"), attr<int>(obj_node, "y")), next_id
         };
 
-        std::string type = attr_if<std::string>(obj_node, "type");
+        std::string type = type_attr_if(obj_node);
         if (type == "platform") {
             std::string obj_name = attr<std::string>(obj_node, "name");
             if (objects.count(obj_name) == 0) {
@@ -129,7 +132,7 @@ SpawnLocations::SpawnLocations(rx::xml_node<>* node):
 {
     rx::xml_node<> *obj_node = node->first_node();
     while (obj_node) {
-        std::string type = attr<std::string>(obj_node, "type");
+        std::string type = type_attr(obj_node);
         if (type == "spawn") {
             std::string name = attr<std::string>(obj_node, "name");
             to_spawn[name] = sf::IntRect(
@@ -148,7 +151,7 @@ AiZones::AiZones(rx::xml_node<>* node):
 {
     rx::xml_node<> *obj_node = node->first_node();
     while (obj_node) {
-        std::string type = attr<std::string>(obj_node, "type");
+        std::string type = type_attr(obj_node);
         if (type == "zone") {
             std::string name = attr<std::string>(obj_node, "name");
             all_zones[name] = sf::IntRect(

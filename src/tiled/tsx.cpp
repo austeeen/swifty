@@ -1,5 +1,6 @@
 #include "tsx.hpp"
 #include "tmx.hpp"
+#include "tiled_core.hpp"
 
 TileObject::TileObject(const char* filepath)
 {
@@ -37,7 +38,7 @@ TileObject::TileObject(const char* filepath)
 
     node = ts_node->first_node();
     while(node != nullptr) {
-        std::string anim_roll = attr_if<std::string>(node, "type");
+        std::string anim_roll = type_attr_if(node);
         if (anim_roll == "idle") {
             addRoll(animation_rolls[ObjectState::idle], node);
         } else if (anim_roll == "running") {
@@ -56,11 +57,11 @@ TileObject::TileObject(const char* filepath)
         node = node->next_sibling();
     }
 
-    if (facing_right) {
-        out::debug("TileObject()", "%s is facing right", name.c_str());
-    } else {
-         out::debug("TileObject()", "%s is facing left", name.c_str());
-    }
+    // if (facing_right) {
+    //     out::debug("TileObject()", "%s is facing right", name.c_str());
+    // } else {
+    //      out::debug("TileObject()", "%s is facing left", name.c_str());
+    // }
 
     delete doc;
 }
@@ -125,7 +126,7 @@ void TileObject::addTile(rx::xml_node<> *node)
     }
     tile_tbl[gid] = tile;
 
-    std::string anim_roll = attr_if<std::string>(node, "type");
+    std::string anim_roll = type_attr_if(node);
     if (anim_roll == "idle") {
         animation_rolls[ObjectState::idle] = std::make_shared<AnimRoll>();
     } else if (anim_roll == "running") {
