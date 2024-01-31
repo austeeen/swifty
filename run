@@ -1,90 +1,251 @@
 #!/usr/bin/env bash
 
-quit() {
-    exit $1
+#-------------------------------------------------------------------------------
+# Run a build and optionally run the application
+#-------------------------------------------------------------------------------
+
+
+#--/ debug /--------------------------------------------------------------------
+
+# set -u        # require all vars be declared/defined before referenced.
+set -o pipefail # return the first error encountered for piped commands
+# set -e        # make sure we break on first error.
+# set -x        # display every line of code as it executes.
+
+
+#--/ globals /------------------------------------------------------------------
+
+declare TRUE=1
+declare FALSE=0
+declare RC_GOOD=0
+declare RC_ERROR=1
+
+declare VERSION="0.0.1"
+declare DATE="$(date)"
+declare SCRIPT=$(basename "$0")
+declare SCRIPTNAME=$(echo "$SCRIPT" | cut -d'.' -f1)
+declare SCRIPTDIR=$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")
+
+declare -a RAW_ARGS=()
+declare ARG_DEST=""
+for argv in "$@"; do RAW_ARGS+=("$argv") ; done # Array for arguments
+
+declare APPNAME="swifty"
+declare BASE_CMD="build/$APPNAME"
+
+
+#--/ commands /-----------------------------------------------------------------
+
+declare USR_CMD=""
+declare RUN_CMD=""
+declare CMAKE_CLEAN=""
+
+#--/ options /------------------------------------------------------------------
+
+declare EXIT_ON_ERR=$TRUE
+declare DRY_RUN=$FALSE
+
+
+#--/ output /-------------------------------------------------------------------
+
+declare COLS=$(tput cols)
+
+declare COLOR_BLACK='\E[30m'
+declare COLOR_DEFAULT='\E[0m'
+declare COLOR_RED='\E[31;1m'
+declare COLOR_GREEN='\E[32;1m'
+declare COLOR_YELLOW='\E[33;1m'
+declare COLOR_BLUE='\E[34;1m'
+declare COLOR_MAGENTA='\E[35;1m'
+declare COLOR_CYAN='\E[36;1m'
+declare COLOR_WHITE='\E[37;1m'
+
+declare TAB=".   "
+declare STR="+ "
+declare CNT="| "
+declare LVL=0
+declare IND="$STR"
+
+function up_ind() {
+  (( LVL < 0 )) && LVL=0
+  IND="$(for ((i=0; i < LVL; i++)); do printf '%s' "$TAB"; done;)$STR"
 }
 
-errcheck() {
-    if [[ $1 -ne 0 ]]; then
-        quit 1
+function st_ind() { (( LVL = $1 )); up_ind; }
+function bump()   { (( LVL += 1 )); up_ind; }
+function drop()   { (( LVL -= 1 )); up_ind; }
+
+function outc() {
+  if [[ $# -eq 0 ]]; then
+    echo "ERROR -- outc() called with no args"
+    RC=$RC_ERROR
+  elif [[ $# -eq 1 ]]; then
+    echo "$1"
+  else
+    local col="$1"
+    local str="$2"
+    echo -e "$IND$col$str$COLOR_DEFAULT"
+  fi
+}
+
+function outw() {
+  # wrap the given function's output with color
+  local col=$1
+  shift
+  output="$("$@" 2>&1)"
+  echo -e "$col$output$COLOR_DEFAULT"
+}
+
+function center() {
+  local line="$1"
+  printf "%*s\n" $(((${#line} + COLS) / 2)) "$line"
+}
+
+function out_line() {
+  local dlm=""
+  if (( $# > 0 )); then dlm="$1"; else dlm="-"; fi
+  printf "%*s\n" "$COLS" " " | tr " " "$dlm"
+}
+
+function hdr()   { out_line "="; center "$1"; out_line; }
+function sys()   { outc "$COLOR_WHITE"    "[SYS] $*"; }
+function err()   { outc "$COLOR_RED"      "[ERR] $*"; (( EXIT_ON_ERR )) && exit $RC_ERROR || return 1; }
+function ok()    { outc "$COLOR_GREEN"    "[OK] $*"; }
+function dbg()   { outc "$COLOR_MAGENTA"  "[DBG] $*"; }
+function warn()  { outc "$COLOR_YELLOW"   "$*"; }
+function good()  { outc "$COLOR_GREEN"    "$*"; }
+function fail()  { outc "$COLOR_RED"      "$*"; }
+function msg()   { outc "$COLOR_BLUE"     "$*"; }
+function note()  { outc "$COLOR_MAGENTA"  "$*"; }
+function title() { outc "$COLOR_CYAN"     "$*"; bump; }
+
+
+#--/ utils /--------------------------------------------------------------------
+
+function arg_eval() {
+  flags="${1:1}"
+  [[ "${1:0:2}" == '--' ]]      && printf '%s' "${1//_/-}" && return
+  [[ "${1:0:1}" != '-'  ]]      && printf '%s' "$1"        && return
+  for f in $(seq 1 ${#flags}) ; do printf '%s ' "-${1:$f:1}" ; done
+}
+
+function cmd() {
+  # run command, but don't redirect stdout -- call err if command failed.
+  local cmd_str="$*"
+
+  if (( DRY_RUN == TRUE )); then echo "$cmd_str"; else eval "$cmd_str"; fi
+  rc=$?
+  if [[ $rc -ne $RC_GOOD ]]; then
+    err "$cmd_str"
+  fi
+  return $rc
+}
+
+function show_version() { echo -e "$COLOR_CYAN[$SCRIPTNAME] v$VERSION $COLOR_DEFAULT"; }
+
+
+#--/ CLI /----------------------------------------------------------------------
+
+function run_app() {
+    eval "$RUN_CMD $@"
+}
+
+function build_app() {
+    title "Building '$APPNAME'"
+    cmd mkdir -p build 
+    cmd cd build
+    cmd cmake -DAPP_NAME=$APPNAME ..
+    cmd cmake --build . $CMAKE_CLEAN
+    cmd cd ..
+    drop
+}
+
+function main() {
+    if [[ $USR_CMD == "build" ]] || [[ $USR_CMD == "b" ]]; then
+        build_app
+    elif [[ $USR_CMD == "clean" ]] || [[ $USR_CMD == "c" ]]; then
+        CMAKE_CLEAN="--clean-first"
+        build_app
+    elif [[ $USR_CMD == "gdb" ]] || [[ $USR_CMD == "g" ]]; then
+        RUN_CMD="gdb --args $BASE_CMD"
+        run_app
+    elif [[ $USR_CMD == "run" ]] || [[ $USR_CMD == "r" ]]; then
+        RUN_CMD=$BASE_CMD
+        run_app
+    elif [[ $USR_CMD == "valgrind" ]] || [[ $USR_CMD == "v" ]]; then
+        RUN_CMD="valgrind --track-origins=yes --leak-check=yes --log-file='valgrind.log' $BASE_CMD"
+        run_app
+    elif [[ $USR_CMD == "profile" ]] || [[ $USR_CMD == "p" ]]; then
+        RUN_CMD="valgrind --tool=callgrind $BASE_CMD"
+        run_app
+    elif [[ "$USR_CMD" == '-h' ]] || [[ "$USR_CMD" == '--help' ]]; then help_page && exit 0
+    elif [[ "$USR_CMD" == '-v' ]] || [[ "$USR_CMD" == '--version' ]]; then show_version && exit 0
+    else
+        err "Unrecognized command '$USR_CMD'"
     fi
 }
 
-usage () {
-    echo "run [OPTIONS]+ [APP OPTIONS]"
-    echo "  build and/or run the app"
-    echo "  at least one OPTION is required."
-    echo "  OPTIONS are listed as single chars with no whitespace"
-    echo "     ex: 'rb' uses r and b to build then run the app."
-    echo "[OPTIONS]"
-    echo "  b - build regularly"
-    echo "  c - clear all build files first, then build the app"
-    echo "  r - run app in the build dir"
-    echo "  g - same as 'r' but using gdb"
-    echo "  v - same as 'r' but using valgrind"
-    echo "  p - same as 'v' but more options for detailed profiling with valgrind"
-    echo "  h - display this help blurb"
+help_page () {
+cat << HELP_PAGE
+
+    [$SCRIPTNAME] build and/or run the game
+        version = ${VERSION}
+
+    usage:
+        $SCRIPTNAME {command} {options|flags...}
+
+    commands:
+        * the 'run' command is used by default if no commands AND no options are given.
+
+        b | build     : run the build
+        c | clear     : clear build files first, then build
+        r | run       : run the app (must be built in the build/ dir)
+        g | gdb       : run using GDB
+        v | valgrind  : run using valgrind
+        p | profiling : run with valgrind, but using more profiling-related args
+
+    options:
+        -h, --help    : show this help page
+        -v, --version : print this tool's version number and quit
+        --dry-run     : run but do not execute any real commands
+
+    examples:
+        * run the game:
+            ./run
+        * build the game:
+            ./run b
+
+    requirements:
+        * SFML installed in a 'cmake-recognizeable' install path. See the SFML main page
+            to get started.
+HELP_PAGE
 }
 
-app="swifty"
-base_cmd="build/$app"
+function parse_args() {
+    if [[ ${#RAW_ARGS[@]} -lt 1 ]]; then
+        USR_CMD="run"
+        return
+    fi
 
-run_cmd=""
-cmake_clean=""
-do_build="false"
-do_run="false"
+    USR_CMD="${RAW_ARGS[0]}"
+    unset RAW_ARGS[0]
 
-if [[ $# -lt 1 ]]; then
-    echo "ERROR: not enough arguments! use h to display help and info."
-    quit 1
-fi
-
-args=($(echo $1 | grep -o .))
-shift
-
-build () {
-    echo "building '$app'"
-    mkdir -p build && cd build
-    errcheck $?
-    cmake -DAPP_NAME=$app ..
-    errcheck $?
-    cmake --build . $cmake_clean
-    errcheck $?
-    cd ..
+    for base_arg in "${RAW_ARGS[@]}" ; do
+        if [[ "$ARG_DEST" != '' ]] ; then
+            eval "$ARG_DEST='$base_arg'"
+            ARG_DEST=''
+        else
+            for arg in $(arg_eval "$base_arg"); do
+            if [[ "$arg" == '--' ]]; then break 2
+            elif [[ "$arg" == '--dry-run' ]]; then DRY_RUN=$TRUE
+            elif [[ "$arg" == '--help' ]] || [[ "$arg" == '-?' ]] || [[ "$arg" == '-h' ]]; then help_page && exit 0
+            elif [[ "$arg" == '-v'     ]] || [[ "$arg" == '--version' ]]; then show_version && exit 0
+            else err "Argument not recognized: [$arg]; try --help"
+            fi
+            done
+        fi
+    done
 }
 
-for c in "${args[@]}"; do
-    case $c in
-        b)
-            do_build="true";;
-        c)
-            do_build="true"
-            cmake_clean="--clean-first";;
-        g)
-            run_cmd="gdb --args $base_cmd"
-            do_run="true";;
-        r)
-            do_run="true"
-            run_cmd="$base_cmd";;
-        v)
-            run_cmd="valgrind --track-origins=yes --leak-check=yes --log-file='valgrind.log' $base_cmd"
-            do_run="true";;
-        p)
-            run_cmd="valgrind --tool=callgrind $base_cmd"
-            do_run="true";;
-        h)
-            usage;;
-        *)
-            echo "bad arg: $c";;
-  esac
-done
-
-if [[ $do_build == "true" ]]; then
-    build
-fi
-
-if [[ $do_run == "true" ]]; then
-    eval "$run_cmd $@"
-fi
-
-quit 0
+parse_args
+main
