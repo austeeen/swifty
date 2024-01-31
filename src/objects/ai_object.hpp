@@ -8,7 +8,7 @@ class AiObject: public GameObject
 public:
     AiObject(const GameObjectAsset ast);
 
-    void setState(const ObjectState s) override;
+    void setState(const ObjectState next_state) override;
     void setTarget(GameObject* target);
     void setAiZone(const sf::IntRect& zone);
 

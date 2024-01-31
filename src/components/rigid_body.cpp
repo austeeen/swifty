@@ -60,7 +60,7 @@ void RigidBody::setColliders(const std::vector<CollisionRect>& rects)
             m_body_collider = &collision_rects.back();
         }
     }
-    copy(rects.begin(), rects.end(), back_inserter(collision_rects));
+    // copy(rects.begin(), rects.end(), back_inserter(collision_rects));
     if (cur_facing == Dir4::left) {
         faceLeft();
     }

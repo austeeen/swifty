@@ -8,11 +8,9 @@ AiObject::AiObject(const GameObjectAsset ast):
     // todo add new los component or create los shape
     m_home = ast.start_pos;
 }
-void AiObject::setState(const ObjectState s)
+void AiObject::setState(const ObjectState next_state)
 {
-    out::debug("AiObject::setState", out::toStr(s).c_str());
-    this->cmpnt<Animator>()->setState(cur_state);
-    this->cmpnt<Physics2D>()->setState(cur_state);
+    GameObject::setState(next_state);
     this->cmpnt<AiController>()->setState(cur_state);
 }
 void AiObject::setTarget(GameObject* target)
@@ -30,7 +28,7 @@ void AiObject::setAiZone(const sf::IntRect& zone)
 
 void AiObject::noAction()
 {
-    out::debug("AiObject::noAction");
+    // out::debug("AiObject::noAction");
     return;
 }
 void AiObject::attackTarget()
@@ -70,18 +68,18 @@ void AiObject::redrawPath()
 /* condition hooks */
 bool AiObject::hasDestination() const
 {
-    out::debug("AiObject::hasDestination");
+    // out::debug("AiObject::hasDestination");
     return cmpnt<PathingVSI>()->hasDestination();
 }
 bool AiObject::targetDetected() const
 {
-    out::debug("AiObject::targetDetected");
+    // out::debug("AiObject::targetDetected");
     // todo check m_target against los component or shape?
     return false;
 }
 bool AiObject::closeToDestination() const
 {
-    out::debug("AiObject::closeToDestination");
+    // out::debug("AiObject::closeToDestination");
     return cmpnt<RigidBody>()->closeTo(cmpnt<PathingVSI>()->getDestination());
 }
 bool AiObject::closeToTarget() const
@@ -96,6 +94,6 @@ bool AiObject::closeToHome() const
 }
 bool AiObject::isStuck() const
 {
-    out::debug("AiObject::isStuck");
+    // out::debug("AiObject::isStuck");
     return cmpnt<AiController>()->stuckTimedout();
 }

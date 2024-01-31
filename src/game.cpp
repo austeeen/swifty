@@ -1,8 +1,9 @@
 #include "game.hpp"
 
-Game::Game(const int fps, const bool rects_on):
+Game::Game(const int fps, const bool rects_on, const bool wait_per_frame):
     fps(fps),
     rects_on(rects_on),
+    wait_per_frame(wait_per_frame),
     window(sf::VideoMode(WINDOW::width, WINDOW::height), WINDOW::title, WINDOW::style),
     camera(CAMERA::view_rect)
 {
@@ -102,6 +103,10 @@ void Game::update()
     eventUpdate();
     gameUpdate();
     fclock.tick();
+
+    if (wait_per_frame) {
+        waitPerFrame();
+    }
 }
 void Game::inputUpdate()
 {
@@ -166,6 +171,10 @@ void Game::eventUpdate()
                         for (auto& enm : enemies) {
                             enm->toggleRects();
                         }
+                        break;
+                    }
+                    case sf::Keyboard::Tilde: {
+                        wait_per_frame = true;
                         break;
                     }
                     default: { break; }
@@ -240,6 +249,42 @@ void Game::sleep(const float sec)
         wait_dt += wait_clock.restart().asSeconds();
     }
     frame_clock.restart().asSeconds();
+}
+void Game::waitPerFrame()
+{
+    bool wait = true;
+    out::msg("Press 'n' for next frame...");
+    while (wait) {
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) { 
+                window.close();
+            }
+            else if (event.type == sf::Event::Resized) {
+                camera.update(sf::Vector2u(event.size.width, event.size.height));
+            }
+            else if (event.type == sf::Event::KeyPressed) {
+                if (event.key.code == sf::Keyboard::N) {
+                    wait = false;
+                }
+                else if (event.key.code == sf::Keyboard::Tilde) {
+                    wait_per_frame = false;
+                }
+                else if (event.key.code == sf::Keyboard::R) {
+                    player->toggleRects();
+                    for (auto& plt : platforms) {
+                        plt->toggleDisplay();
+                    }
+                    for (auto& enm : enemies) {
+                        enm->toggleRects();
+                    }
+                }
+                else if (event.key.code == sf::Keyboard::Escape) { 
+                    window.close();
+                }
+            }
+        }
+    }
 }
 bool Game::isRunning() const
 {

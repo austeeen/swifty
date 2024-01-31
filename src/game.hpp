@@ -11,12 +11,12 @@
 #include "utils/benchmark.hpp"
 
 
-#define MAX_FRAME_DT 0.1
+#define MAX_FRAME_DT 0.025
 
 class Game
 {
 public:
-    Game(const int fps, const bool rects_on);
+    Game(const int fps, const bool rects_on, const bool wait_per_frame);
     void init();
     void setUp();
     void update();
@@ -27,6 +27,8 @@ public:
 
 private:
     void sleep(const float sec);
+    void waitPerFrame();
+
     void inputUpdate();
     void eventUpdate();
     void gameUpdate();
@@ -35,7 +37,8 @@ private:
     // args
     const int fps;
     const bool rects_on;
-
+    bool wait_per_frame;
+    
     sf::Clock frame_clock;
     float dt;
     Clock fclock;

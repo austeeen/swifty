@@ -15,6 +15,7 @@ int main(int argc, char** argv)
 {
     int fps = DEFAULT_FPS;
     bool rects_on = false;
+    bool wait_per_frame = false;
 
     try {
 
@@ -37,10 +38,14 @@ int main(int argc, char** argv)
         TCLAP::SwitchArg rects_on_arg(
             "r", "rects-on", "Show collision/animation rects"
         );
+        TCLAP::SwitchArg wait_per_frame_arg(
+            "w", "wait-per-frame", "Halt after each frame, use 'n' to move forward"
+        );
 
         game_args.add(loglevel_arg);
         game_args.add(fps_arg);
         game_args.add(rects_on_arg);
+        game_args.add(wait_per_frame_arg);
 
         game_args.parse(argc, argv);
         
@@ -48,13 +53,14 @@ int main(int argc, char** argv)
 
         fps = fps_arg.getValue();
         rects_on = rects_on_arg.getValue();
+        wait_per_frame = wait_per_frame_arg.getValue();
 	
     } catch (TCLAP::ArgException &e) { 
         std::cerr << "error: " << e.error() << " for arg " << e.argId() << std::endl; 
         return 0;
     }
 
-    Game game(fps, rects_on);
+    Game game(fps, rects_on, wait_per_frame);
     game.setUp();
     game.render();
     while (game.isRunning()) {

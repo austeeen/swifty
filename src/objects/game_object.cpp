@@ -37,10 +37,9 @@ void GameObject::update(const float dt)
 }
 void GameObject::lateUpdate()
 {
-    ObjectState next = this->cmpnt<Physics2D>()->nextState();
-    if (next != cur_state) {
-        cur_state = next;
-        setState(cur_state);
+    ObjectState next_state = this->cmpnt<Physics2D>()->nextState();
+    if (cur_state != next_state) {
+        setState(next_state);
     }
 }
 void GameObject::render(sf::RenderWindow &window)
@@ -76,10 +75,13 @@ void GameObject::stopAll()
     cmpnt<Physics2D>()->stopMoving(Dir4::left);
     cmpnt<Physics2D>()->stopMoving(Dir4::right);
 }
-void GameObject::setState(const ObjectState s)
+void GameObject::setState(const ObjectState next_state)
 {
-    this->cmpnt<Animator>()->setState(cur_state);
-    this->cmpnt<Physics2D>()->setState(cur_state);
+    if (cur_state != next_state) {
+        this->cur_state = next_state;
+        this->cmpnt<Animator>()->setState(cur_state);
+        this->cmpnt<Physics2D>()->setState(cur_state);
+    }
 }
 void GameObject::setStartPosition(const int x, const int y)
 {

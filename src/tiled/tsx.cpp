@@ -109,7 +109,7 @@ void TileObject::addTile(rx::xml_node<> *node)
                                     tilesize.x, tilesize.y);
     rx::xml_node<>* c_rects = node->first_node("objectgroup")->first_node("object");
     while(c_rects != nullptr) {
-        std::string type = attr_if<std::string>(c_rects, "type");
+        std::string type = type_attr_if(c_rects);
         ColliderType ct = ColliderType::generic;
         if (type == "body") {
             ct = ColliderType::body;

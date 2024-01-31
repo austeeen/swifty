@@ -18,11 +18,11 @@ void PathingVSI::update(const float dt)
         if (posrect.left < m_destination.x && posrect.left + posrect.width < m_destination.x) {
             obj->stop(Dir4::left);
             obj->move(Dir4::right);
-            out::debug("PathingVSI::update", "Spider moving right");
+            // out::debug("PathingVSI::update", "Spider moving right");
         } else {
             obj->stop(Dir4::right);
             obj->move(Dir4::left);
-            out::debug("PathingVSI::update", "Spider moving left");
+            // out::debug("PathingVSI::update", "Spider moving left");
         }
     }
 }
