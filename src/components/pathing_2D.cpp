@@ -10,7 +10,7 @@ void PathingVSI::update(const float dt)
         // out::debug("PathingVSI::update", "Spider has no destination");
         return;
     } else if (obj->cmpnt<RigidBody>()->intersects(m_destination)) {
-        out::debug("PathingVSI::update", "Spider reached destination");
+        // out::debug("PathingVSI::update", "Spider reached destination");
         clearDestination();
         obj->stopAll();
     } else {
@@ -28,7 +28,7 @@ void PathingVSI::update(const float dt)
 }
 void PathingVSI::setZone(const sf::IntRect& zone)
 {
-    out::debug("PathingVSI::setZone", "(%d, %d, %d, %d)", zone.left, zone.top, zone.width, zone.height);
+    // out::debug("PathingVSI::setZone", "(%d, %d, %d, %d)", zone.left, zone.top, zone.width, zone.height);
     m_zone = zone;
 }
 void PathingVSI::newDestination()
@@ -36,18 +36,18 @@ void PathingVSI::newDestination()
     srand(last_dt);
     m_destination.y = m_zone.top - (m_zone.height / 2);
     m_destination.x = (rand() % m_zone.width) + m_zone.left;
-    out::debug("PathingVSI::newDestination", "(%f, %f)", m_destination.x, m_destination.y);
+    // out::debug("PathingVSI::newDestination", "(%f, %f)", m_destination.x, m_destination.y);
 }
 void PathingVSI::setDestination(const sf::Vector2f& dest)
 {
     m_destination = dest;
-    out::debug("PathingVSI::setDestination", "(%f, %f)", m_destination.x, m_destination.y);
+    // out::debug("PathingVSI::setDestination", "(%f, %f)", m_destination.x, m_destination.y);
 }
 void PathingVSI::clearDestination()
 {
     m_destination.x = 0.f;
     m_destination.y = 0.f;
-    out::debug("PathingVSI::clearDestination", "(%f, %f)", m_destination.x, m_destination.y);
+    // out::debug("PathingVSI::clearDestination", "(%f, %f)", m_destination.x, m_destination.y);
 }
 const sf::Vector2f PathingVSI::getDestination() const
 {

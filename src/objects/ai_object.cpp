@@ -15,16 +15,16 @@ void AiObject::setState(const ObjectState next_state)
 }
 void AiObject::setTarget(GameObject* target)
 {
-    out::debug("AiObject::setTarget", target->getName().c_str());
+    // out::debug("AiObject::setTarget", target->getName().c_str());
     m_target = target;
 }
 void AiObject::setAiZone(const sf::IntRect& zone)
 {
-    out::debug("AiObject::setAiZone");
+    // out::debug("AiObject::setAiZone");
     cmpnt<PathingVSI>()->setZone(zone);
 }
 
-/* action hooks */
+/* actions */
 
 void AiObject::noAction()
 {
@@ -34,38 +34,38 @@ void AiObject::noAction()
 void AiObject::attackTarget()
 {
     // todo
-    out::debug("AiObject::attackTarget");
+    // out::debug("AiObject::attackTarget");
     return;
 }
 void AiObject::clearDestination()
 {
-    out::debug("AiObject::clearDestination");
+    // out::debug("AiObject::clearDestination");
     cmpnt<PathingVSI>()->clearDestination();
 }
 void AiObject::setPathFromZone()
 {
-    out::debug("AiObject::setPathFromZone");
+    // out::debug("AiObject::setPathFromZone");
     cmpnt<PathingVSI>()->newDestination();
 }
 void AiObject::setPathToTarget()
 {
-    out::debug("AiObject::setPathToTarget");
+    // out::debug("AiObject::setPathToTarget");
     const sf::FloatRect tpos = m_target->getPositionRect();
     cmpnt<PathingVSI>()->setDestination(sf::Vector2f(tpos.left + (tpos.width / 2), tpos.top + (tpos.height / 2)));
 }
 void AiObject::setPathToHome()
 {
-    out::debug("AiObject::setPathToHome");
+    // out::debug("AiObject::setPathToHome");
     cmpnt<PathingVSI>()->setDestination(m_home);
 }
 void AiObject::redrawPath()
 {
-    out::debug("AiObject::redrawPath");
+    // out::debug("AiObject::redrawPath");
     // cmpnt<PathingVSI>()->redrawPath();
     cmpnt<PathingVSI>()->newDestination();
 }
 
-/* condition hooks */
+/* conditions */
 bool AiObject::hasDestination() const
 {
     // out::debug("AiObject::hasDestination");
@@ -84,12 +84,12 @@ bool AiObject::closeToDestination() const
 }
 bool AiObject::closeToTarget() const
 {
-    out::debug("AiObject::closeToTarget");
+    // out::debug("AiObject::closeToTarget");
     return cmpnt<RigidBody>()->closeTo(m_target->getPositionRect());
 }
 bool AiObject::closeToHome() const
 {
-    out::debug("AiObject::closeToHome");
+    // out::debug("AiObject::closeToHome");
     return cmpnt<RigidBody>()->closeTo(m_home);
 }
 bool AiObject::isStuck() const

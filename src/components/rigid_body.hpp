@@ -12,8 +12,9 @@ public:
     void render(sf::RenderWindow &window) override;
 
     void toggleDisplay(const int opt = -1);
-    void move(const float x, const float y);
 
+    void move(const float x, const float y);
+    void setPosition(const int x, const int y);
     void setColliders(const std::vector<CollisionRect>& rects);
     void updateFacing(const Dir4 next_facing);
     void xCollision(const float offset);

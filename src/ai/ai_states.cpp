@@ -6,13 +6,13 @@ AiState::AiState(AiObject* obj):
 {}
 AiState::~AiState()
 {}
-void AiState::setRoot(Node* root)
+void AiState::setRoot(NodePtr root)
 {
     decision_root = root;
 }
 void AiState::processDecision() const
 {
-    Node* n = decision_root;
+    Node* n = decision_root.get();
     while (n != nullptr) {
         n = n->exec(m_obj);
     }

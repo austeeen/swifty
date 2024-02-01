@@ -59,11 +59,11 @@ void Game::setUp()
 
     // todo - will make this more robust eventually
     const sf::IntRect player_start = tile_map->spawn_locations->to_spawn["player"];
-    player->setStartPosition(player_start.left, player_start.top);
+    player->setStartPosition(player_start.getPosition());
 
     // todo - will make this more robust eventually
     const sf::IntRect spider_start = tile_map->spawn_locations->to_spawn["spider"];
-    enemies[0]->setStartPosition(spider_start.left, spider_start.top);
+    enemies[0]->setStartPosition(spider_start.getPosition());
     enemies[0]->setAiZone(tile_map->ai_zones->all_zones["spider"]);
 
     collision_system.add(player);
@@ -143,41 +143,51 @@ void Game::eventUpdate()
                 break;
             }
             case sf::Event::KeyPressed: {
-                switch (event.key.code) {
-                    case sf::Keyboard::Escape: { window.close(); break; }
+                if (event.key.alt) {
+                    switch (event.key.code) {
+                        default: { break; }
 
-                    case sf::Keyboard::A: { player->increase(PhysicsCoeffs::AsEnum::mass); break; }
-                    case sf::Keyboard::Z: { player->decrease(PhysicsCoeffs::AsEnum::mass); break; }
+                        case sf::Keyboard::A: { player->increase(PhysicsCoeffs::AsEnum::mass); break; }
+                        case sf::Keyboard::Z: { player->decrease(PhysicsCoeffs::AsEnum::mass); break; }
 
-                    case sf::Keyboard::S: { player->increase(PhysicsCoeffs::AsEnum::speed); break; }
-                    case sf::Keyboard::X: { player->decrease(PhysicsCoeffs::AsEnum::speed); break; }
+                        case sf::Keyboard::S: { player->increase(PhysicsCoeffs::AsEnum::speed); break; }
+                        case sf::Keyboard::X: { player->decrease(PhysicsCoeffs::AsEnum::speed); break; }
 
-                    case sf::Keyboard::D: { player->increase(PhysicsCoeffs::AsEnum::maxvel); break; }
-                    case sf::Keyboard::C: { player->decrease(PhysicsCoeffs::AsEnum::maxvel); break; }
+                        case sf::Keyboard::D: { player->increase(PhysicsCoeffs::AsEnum::maxvel); break; }
+                        case sf::Keyboard::C: { player->decrease(PhysicsCoeffs::AsEnum::maxvel); break; }
 
-                    case sf::Keyboard::F: { player->increase(PhysicsCoeffs::AsEnum::jump); break; }
-                    case sf::Keyboard::V: { player->decrease(PhysicsCoeffs::AsEnum::jump); break; }
+                        case sf::Keyboard::F: { player->increase(PhysicsCoeffs::AsEnum::jump); break; }
+                        case sf::Keyboard::V: { player->decrease(PhysicsCoeffs::AsEnum::jump); break; }
 
-                    case sf::Keyboard::H: { player->increase(PhysicsCoeffs::AsEnum::damping); break; }
-                    case sf::Keyboard::N: { player->decrease(PhysicsCoeffs::AsEnum::damping); break; }
+                        case sf::Keyboard::H: { player->increase(PhysicsCoeffs::AsEnum::damping); break; }
+                        case sf::Keyboard::N: { player->decrease(PhysicsCoeffs::AsEnum::damping); break; }
 
-                    case sf::Keyboard::J: { player->increase(PhysicsCoeffs::AsEnum::gravity); break; }
-                    case sf::Keyboard::M: { player->decrease(PhysicsCoeffs::AsEnum::gravity); break; }
-                    case sf::Keyboard::R: {
-                        player->toggleRects();
-                        for (auto& plt : platforms) {
-                            plt->toggleDisplay();
-                        }
-                        for (auto& enm : enemies) {
-                            enm->toggleRects();
-                        }
-                        break;
+                        case sf::Keyboard::J: { player->increase(PhysicsCoeffs::AsEnum::gravity); break; }
+                        case sf::Keyboard::M: { player->decrease(PhysicsCoeffs::AsEnum::gravity); break; }
                     }
-                    case sf::Keyboard::Tilde: {
-                        wait_per_frame = true;
-                        break;
+                } else {
+                    switch (event.key.code) {
+                        case sf::Keyboard::Escape: { window.close(); break; }
+                        case sf::Keyboard::Tab: {
+                            resetPlayer();
+                            break;
+                        }
+                        case sf::Keyboard::R: {
+                            player->toggleRects();
+                            for (auto& plt : platforms) {
+                                plt->toggleDisplay();
+                            }
+                            for (auto& enm : enemies) {
+                                enm->toggleRects();
+                            }
+                            break;
+                        }
+                        case sf::Keyboard::Tilde: {
+                            wait_per_frame = true;
+                            break;
+                        }
+                        default: { break; }
                     }
-                    default: { break; }
                 }
                 break;
             }
@@ -286,7 +296,14 @@ void Game::waitPerFrame()
         }
     }
 }
+
 bool Game::isRunning() const
 {
     return window.isOpen();
+}
+
+void Game::resetPlayer()
+{
+    player->stopAll();
+    player->resetPosition();
 }

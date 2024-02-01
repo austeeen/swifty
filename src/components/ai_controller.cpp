@@ -1,5 +1,7 @@
 #include "ai_controller.hpp"
 #include "../objects/ai_object.hpp"
+#include "../typedefs.hpp"
+
 
 AiController::AiController(AiObject* obj):
     Component(obj), m_obj(obj)
@@ -8,84 +10,91 @@ AiController::AiController(AiObject* obj):
     m_state_tbl[AiState::Type::stalking] = new Stalking(obj);
     m_state_tbl[AiState::Type::returning] = new Returning(obj);
 }
+
 AiController::~AiController()
 {
-    for (auto& n : m_allnodes) {
-        delete n;
-    }
-    m_allnodes.clear();
-
     for (auto& [state_type, state] : m_state_tbl) {
         delete state;
     }
     m_state_tbl.clear();
 }
+
 void AiController::build()
 {
-    // todo create state decision trees
-    ActionNode* a0 = new ActionNode(&AiObject::setPathFromZone);
-    ActionNode* a1 = new ActionNode(&AiObject::clearDestination);
-    ActionNode* a2 = new ActionNode(&AiObject::noAction);
-    ActionNode* a3 = new ActionNode(&AiObject::attackTarget);
-    ActionNode* a4 = new ActionNode(&AiObject::redrawPath);
-    ActionNode* a5 = new ActionNode(&AiObject::setPathToHome);
+    // initializing actions to reference
+    ActionPtr set_new_path  = std::make_shared<ActionNode>(&AiObject::setPathFromZone);
+    ActionPtr clear_dest    = std::make_shared<ActionNode>(&AiObject::clearDestination);
+    ActionPtr no_op         = std::make_shared<ActionNode>(&AiObject::noAction);
+    ActionPtr attack_target = std::make_shared<ActionNode>(&AiObject::attackTarget);
+    ActionPtr redraw_path   = std::make_shared<ActionNode>(&AiObject::redrawPath);
+    ActionPtr set_path_home = std::make_shared<ActionNode>(&AiObject::setPathToHome);
 
-    // wandering tree
-    ConditionalNode* w_c0 = new ConditionalNode(&AiObject::hasDestination);
-    ConditionalNode* w_c1 = new ConditionalNode(&AiObject::closeToDestination);
-    ConditionalNode* w_c2 = new ConditionalNode(&AiObject::isStuck);
-    w_c0->pass = w_c1;
-    w_c0->fail = a0;
+    /* Build the WANDERING tree */
+    {
+        // initializing conditions
+        ConditionPtr has_dest      = std::make_shared<ConditionalNode>(&AiObject::hasDestination);
+        ConditionPtr close_to_dest = std::make_shared<ConditionalNode>(&AiObject::closeToDestination);
+        ConditionPtr is_stuck      = std::make_shared<ConditionalNode>(&AiObject::isStuck);
+        
+        // associating conditions with actions
+        has_dest->pass = close_to_dest;
+        has_dest->fail = set_new_path;
 
-    w_c1->pass = a1;
-    w_c1->fail = w_c2;
+        close_to_dest->pass = clear_dest;
+        close_to_dest->fail = is_stuck;
 
-    w_c2->pass = a1;
-    w_c2->fail = a2;
-    m_state_tbl[AiState::Type::wandering]->setRoot(w_c0);
+        is_stuck->pass = clear_dest;
+        is_stuck->fail = no_op;
 
-    // stalking tree
-    ConditionalNode* s_c0 = new ConditionalNode(&AiObject::closeToTarget);
-    ConditionalNode* s_c1 = new ConditionalNode(&AiObject::isStuck);
-    s_c0->pass = a3;
-    s_c0->fail = s_c1;
+        // add the wandering tree root to the state table
+        m_state_tbl[AiState::Type::wandering]->setRoot(has_dest);
+    }
+    
 
-    s_c1->pass = a4;
-    s_c1->fail = a2;
-    m_state_tbl[AiState::Type::stalking]->setRoot(s_c0);
+    /* Build the STALKING tree */
+    {
+        // initializing conditions
+        ConditionPtr close_to_target = std::make_shared<ConditionalNode>(&AiObject::closeToTarget);
+        ConditionPtr is_stuck = std::make_shared<ConditionalNode>(&AiObject::isStuck);
 
-    // returning tree
-    ConditionalNode* r_c0 = new ConditionalNode(&AiObject::hasDestination);
-    ConditionalNode* r_c1 = new ConditionalNode(&AiObject::isStuck);
-    r_c0->pass = r_c1;
-    r_c0->fail = a5;
+        // associating conditions with actions
+        close_to_target->pass = attack_target;
+        close_to_target->fail = is_stuck;
 
-    s_c1->pass = a4;
-    s_c1->fail = a2;
-    m_state_tbl[AiState::Type::returning]->setRoot(r_c0);
+        is_stuck->pass = redraw_path;
+        is_stuck->fail = no_op;
 
-    m_allnodes.push_back(a0);
-    m_allnodes.push_back(a1);
-    m_allnodes.push_back(a2);
-    m_allnodes.push_back(a3);
-    m_allnodes.push_back(a4);
-    m_allnodes.push_back(a5);
+        // add the stalking tree root to the state table
+        m_state_tbl[AiState::Type::stalking]->setRoot(close_to_target);
+    }
+    
+    /* Build the RETURNING tree */
+    {
+        // initializing conditions
+        ConditionPtr has_dest = std::make_shared<ConditionalNode>(&AiObject::hasDestination);
+        ConditionPtr is_stuck = std::make_shared<ConditionalNode>(&AiObject::isStuck);
 
-    m_allnodes.push_back(w_c0);
-    m_allnodes.push_back(w_c1);
-    m_allnodes.push_back(w_c2);
-    m_allnodes.push_back(s_c0);
-    m_allnodes.push_back(s_c1);
-    m_allnodes.push_back(r_c0);
-    m_allnodes.push_back(r_c1);
+        // associating conditions with actions
+        has_dest->pass = is_stuck;
+        has_dest->fail = set_path_home;
 
+        is_stuck->pass = redraw_path;
+        is_stuck->fail = no_op;
+
+        // add the returning tree root to the state table
+        m_state_tbl[AiState::Type::returning]->setRoot(has_dest);
+    }
+
+    // set initial state
     m_state = AiState::Type::wandering;
 
 }
+
 void AiController::setUp()
 {
 
 }
+
 void AiController::update(const float dt)
 {
     m_state_tbl[m_state]->observe();
@@ -97,10 +106,12 @@ void AiController::update(const float dt)
         stuck_dt = 0.f;
     }
 }
+
 void AiController::setState(ObjectState s)
 {
     m_obj_state = s;
 }
+
 const bool AiController::stuckTimedout() const
 {
     return stuck_dt > stuck_timeout;

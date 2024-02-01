@@ -20,8 +20,8 @@ struct ConditionalNode: public Node
     Node* exec(AiObject* obj) override;
 
     Condition condition;
-    Node* pass;
-    Node* fail;
+    std::shared_ptr<Node> pass;
+    std::shared_ptr<Node> fail;
 };
 
 struct ActionNode:  public Node
@@ -33,6 +33,8 @@ struct ActionNode:  public Node
     Action action;
 };
 
-
+typedef std::shared_ptr<Node>            NodePtr;
+typedef std::shared_ptr<ActionNode>      ActionPtr;
+typedef std::shared_ptr<ConditionalNode> ConditionPtr;
 
 #endif // AI_CORE_HPP

@@ -17,8 +17,10 @@ public:
     void stop(const Dir4 d);
     void stopAll();
 
+    void resetPosition();
+
     virtual void setState(const ObjectState s);
-    void setStartPosition(const int x, const int y);
+    void setStartPosition(const sf::Vector2i pos);
     void toggleRects(const int opt = -1);
 
     void onColliding(const sf::Vector2f& offset, const ColliderType m_type, const ColliderType b_type) const;
@@ -42,6 +44,7 @@ protected:
     ObjectState cur_state;
     GameObjectAsset ast;
     const Dir4 orientation;
+    sf::Vector2i start_pos;
 };
 
 #endif // GAMEOBJECT_HPP

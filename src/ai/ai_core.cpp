@@ -11,9 +11,9 @@ ConditionalNode::~ConditionalNode()
 Node* ConditionalNode::exec(AiObject* obj)
 {
     if ((obj->*condition)()) {
-        return pass;
+        return pass.get();
     } else {
-        return fail;
+        return fail.get();
     }
 }
 

@@ -10,13 +10,13 @@ public:
 
     AiState(AiObject* obj);
     virtual ~AiState();
-    void setRoot(Node* root);
+    void setRoot(NodePtr root);
     virtual const Type observe() const =0;
     void processDecision() const;
 
 protected:
     AiObject* m_obj;
-    Node* decision_root;
+    NodePtr decision_root;
 };
 
 class Wandering: public AiState

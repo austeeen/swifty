@@ -34,6 +34,8 @@ private:
     void gameUpdate();
     void lateUpdate();
 
+    void resetPlayer();
+
     // args
     const int fps;
     const bool rects_on;

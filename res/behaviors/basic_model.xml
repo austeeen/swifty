@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model name="basic_model">
+    <state_logic start_state="wandering">
+        <state name="wandering">
+            <if func="targetDetected" next_state="stalking"/>
+        </state>
+        <state name="stalking">
+            <if func="targetNotDetected" next_state="returning"/>
+        </state>
+        <state name="returning">
+            <if func="closeToHome" next_state="wandering"/>
+            <else_if func="targetDetected" next_state="stalking"/>
+        </state>
+    </state_logic>
+
+    <action_list>
+        <action func="setPathFromZone"/>
+        <action func="clearDestination"/>
+        <action func="noAction"/>
+        <action func="attackTarget"/>
+        <action func="redrawPath"/>
+        <action func="setPathToHome"/>
+    </action_list>
+
+    <tree state="wandering">
+        <root_condition type="condition" func="hasDestination">
+            <pass func="closeToDestination">
+            <fail func="setPathFromZone">
+        </root_condition>
+        <condition func="closeToDestination">
+            <pass func="clearDestination">
+            <fail func="isStuck">
+        </condition>
+        <condition func="isStuck">
+            <pass func="clearDestination">
+            <fail func="noAction">
+        </condition>
+    </tree>
+</model>

@@ -34,32 +34,69 @@ void MovingPlatform::update(const float dt)
 {
     const float dx = position_rect.left - wp->loc.x;
     const float dy = position_rect.top - wp->loc.y;
+    float new_vx = 0.f;
+    float new_vy = 0.f;
 
     if (dx != 0.f) {
         if (fabs(dx) < FLT_ZERO) {
             position_rect.left = wp->loc.x;
             vel.x = 0;
-        }
-        else if (dx > 0) {
+        } else if (dx > 0) {
             vel.x = -ast.speed;
+            new_vx = vel.x * dt;
+
+            float next_dx = (position_rect.left + new_vx) - wp->loc.x;
+            if (next_dx < 0) {
+                // out::debug(ast.name.c_str(), "overshoot X axis stopped!");
+                position_rect.left = wp->loc.x;
+                vel.x = 0;
+                new_vx= 0;
+            }
         } else {
             vel.x = ast.speed;
+            new_vx = vel.x * dt;
+
+            float next_dx = (position_rect.left + new_vx) - wp->loc.x;
+            if (next_dx > 0) {
+                // out::debug(ast.name.c_str(), "undershoot X axis stopped!");
+                position_rect.left = wp->loc.x;
+                vel.x = 0;
+                new_vx= 0;
+            }
         }
     }
 
     if (dy != 0.f) {
-        if (fabs(dy) < FLT_ZERO) {
-            position_rect.top = wp->loc.y;
-            vel.y = 0;
-        }
-        else if (dy > 0) {
+        if (dy > 0) {
             vel.y = -ast.speed;
+            new_vy = vel.y * dt;
+
+            // check for overshooting the waypoint position, consider this object there already if 
+            // so.
+            float next_dy = (position_rect.top + new_vy) - wp->loc.y;
+            if (next_dy < 0) {
+                // out::debug(ast.name.c_str(), "overshoot Y axis stopped!");
+                position_rect.top = wp->loc.y;
+                vel.y = 0;
+                new_vy = 0;
+            }
         } else {
             vel.y = ast.speed;
+            new_vy = vel.y * dt;
+
+            // check for overshooting the waypoint position, consider this object there already if 
+            // so.
+            float next_dy = (position_rect.top + new_vy) - wp->loc.y;
+            if (next_dy > 0) {
+                // out::debug(ast.name.c_str(), "undershoot Y axis stopped!");
+                position_rect.top = wp->loc.y;
+                vel.y = 0;
+                new_vy = 0;
+            }
         }
     }
 
-    move(vel.x * dt, vel.y * dt);
+    move(new_vx, new_vy);
 }
 void MovingPlatform::lateUpdate()
 {

@@ -19,7 +19,6 @@ public:
 
 private:
     AiObject* m_obj;
-    std::vector<Node*> m_allnodes;
     std::map<const AiState::Type, AiState*> m_state_tbl;
     ObjectState m_obj_state;
     AiState::Type m_state;

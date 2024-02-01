@@ -75,6 +75,10 @@ void GameObject::stopAll()
     cmpnt<Physics2D>()->stopMoving(Dir4::left);
     cmpnt<Physics2D>()->stopMoving(Dir4::right);
 }
+void GameObject::resetPosition()
+{
+    setStartPosition(this->start_pos);
+}
 void GameObject::setState(const ObjectState next_state)
 {
     if (cur_state != next_state) {
@@ -83,11 +87,10 @@ void GameObject::setState(const ObjectState next_state)
         this->cmpnt<Physics2D>()->setState(cur_state);
     }
 }
-void GameObject::setStartPosition(const int x, const int y)
+void GameObject::setStartPosition(const sf::Vector2i pos)
 {
-    cmpnt<RigidBody>()->move(x, y);
-    std::cout << "Set start position for: " << getName() << std::endl;
-    out::debug("GameObject::setStartPosition", "(%s) Setting game object start pos: (%d, %d)", getName().c_str(), x, y);
+    start_pos = pos;
+    cmpnt<RigidBody>()->setPosition(pos.x, pos.y);    
 }
 void GameObject::toggleRects(const int opt)
 {
