@@ -1,0 +1,51 @@
+/*
+* Purely for conceptual purposes. This is not intended to build or work.
+*/
+
+#include "game_context.hpp"
+#include "managers.hpp"
+#include "systems.hpp"
+#include "entities.hpp"
+#include "notifications.hpp"
+
+
+int main() {
+
+    SharedGameContext gameContext;
+    gameContext.addManager<EntityManager>();
+    gameContext.addSystem<EntityLoaderSystem>();
+    gameContext.addSystem<EntityUpdateSystem>();
+    gameContext.addSystem<EntityRenderSystem>();
+    
+    // Create entities
+    Entity * playerEntity = gameContext.getManager<EntityManager>()->createEntity<Entity>();
+    Entity * enemyEntity = gameContext.getManager<EntityManager>()->createEntity<Entity>();
+    
+    // Add components to entities
+    playerEntity->addComponent<SpriteComponent>("path/to/player_sprite.png", 32, 32);
+    playerEntity->addComponent<CombatComponent>();
+    playerEntity->addComponent<WeaponComponent>();
+
+    enemyEntity->addComponent<SpriteComponent>("path/to/enemy_sprite.png", 32, 32);
+    enemyEntity->addComponent<CombatComponent>();
+    enemyEntity->addComponent<WeaponComponent>();
+
+    gameContext.getSystem<EntityLoaderSystem>()->loadEntities(gameContext.getManager<EntityManager>()->getAllEntities());
+    gameContext.getSystem<EntityUpdateSystem>()->updateEntities(gameContext.getManager<EntityManager>()->getAllEntities());
+    gameContext.getSystem<EntityUpdateSystem>()->lateUpdateEntities(gameContext.getManager<EntityManager>()->getAllEntities());
+    gameContext.getSystem<EntityRenderSystem>()->renderEntities(gameContext.getManager<EntityManager>()->getAllEntities());
+
+    // Subscribe the Player to EntityDestroyedMessage
+    gameContext.getPublisher()->subscribe<EntityDestroyedMessage>(playerEntity);
+
+    // Simulate an entity being destroyed
+    gameContext.getManager<EntityManager>()->destroyEntity(enemyEntity);
+    EntityDestroyedMessage entityDestroyedMessage(enemyEntity->getID());
+    gameContext.getPublisher()->publish(entityDestroyedMessage);
+
+    // Clean up
+    gameContext.getPublisher()->unsubscribe<EntityDestroyedMessage>(playerEntity);
+    gameContext.getManager<EntityManager>()->destroyEntity(playerEntity);
+
+    return 0;
+}

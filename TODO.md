@@ -11,8 +11,9 @@ Outlining issues/ideas that need to get done or things I want to get done
 
 ## Up Next
 
-- Implement AI behavior trees from XML files
+- Load AI behavior trees from XML files
 - Player death, enemies have aggression
+- Spawn multiple enemies
 - Actual systems that update objects/components
     - collision system
     - physics system?
