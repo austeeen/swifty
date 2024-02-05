@@ -84,20 +84,21 @@ public:
 };
 
 class InputHandlerSystem: public System {
+private:
+    Entity * inputTarget;
+    InputBinding * inputBinding;
+
 public:
     InputHandlerSystem(SharedGameContext * gameContext) : System(gameContext) {}
 
-    static void handleInput(Entity& playerEntity) {
+    void 
+
+    void handleInput() {
         // Example: Pressing a key triggers an attack
-        if (isAttackKeyPressed()) {
-            Entity enemyEntity = findClosestEnemy(playerEntity);
-            if (enemyEntity.isValid()) {
-                CombatSystem::performAttack(playerEntity, enemyEntity);
-            }
+        if (inputBinding->moveKeyLeft()) {
+            inputTarget->moveLeft();
+        } else if (inputBinding->moveKeyRight()) {
+            inputTarget->moveRight();
         }
     }
-
-private:
-    // Implement input handling and enemy detection logic
-    // (isAttackKeyPressed, findClosestEnemy, etc.)
 };

@@ -82,3 +82,10 @@ public:
         return result;
     }
 };
+
+class UserInputManager: public Manager {
+private:
+
+public:
+    UserInputManager(SharedGameContext * gameContext) : Manager(gameContext) {}
+};

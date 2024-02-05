@@ -7,7 +7,7 @@ class Manager;
 class SharedGameContext {
 private:
     Publisher * publisher;
-    std::unordered_map<std::type_index, std::shared_ptr<System>>   allSystems;
+    std::unordered_map<std::type_index, std::shared_ptr<System>>  allSystems;
     std::unordered_map<std::type_index, std::shared_ptr<Manager>> allManagers;
 
 public:
@@ -21,9 +21,10 @@ public:
 
     /* SYSTEMS */
     template <typename T, typename... Args>
-    void addSystem(Args&&... args) {
+    T*  addSystem(Args&&... args) {
         std::shared_ptr<T> system = std::make_shared<T>(this, std::forward<Args>(args)...);
         allSystems[typeid(T)] = system;
+        return system;
     }
 
     template <typename T>

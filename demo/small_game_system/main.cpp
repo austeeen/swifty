@@ -13,6 +13,7 @@ int main() {
 
     SharedGameContext gameContext;
     gameContext.addManager<EntityManager>();
+    gameContext.addManager<UserInputManager>();
     gameContext.addSystem<EntityLoaderSystem>();
     gameContext.addSystem<EntityUpdateSystem>();
     gameContext.addSystem<EntityRenderSystem>();
@@ -25,15 +26,20 @@ int main() {
     playerEntity->addComponent<SpriteComponent>("path/to/player_sprite.png", 32, 32);
     playerEntity->addComponent<CombatComponent>();
     playerEntity->addComponent<WeaponComponent>();
+    playerEntity->addComponent<UserInputComponent>(gameContext.getManager<UserInputManager>());
 
     enemyEntity->addComponent<SpriteComponent>("path/to/enemy_sprite.png", 32, 32);
     enemyEntity->addComponent<CombatComponent>();
     enemyEntity->addComponent<WeaponComponent>();
 
-    gameContext.getSystem<EntityLoaderSystem>()->loadEntities(gameContext.getManager<EntityManager>()->getAllEntities());
-    gameContext.getSystem<EntityUpdateSystem>()->updateEntities(gameContext.getManager<EntityManager>()->getAllEntities());
-    gameContext.getSystem<EntityUpdateSystem>()->lateUpdateEntities(gameContext.getManager<EntityManager>()->getAllEntities());
-    gameContext.getSystem<EntityRenderSystem>()->renderEntities(gameContext.getManager<EntityManager>()->getAllEntities());
+    std::vector<Entity*> allEntities = gameContext.getManager<EntityManager>()->getAllEntities();
+    gameContext.getSystem<EntityLoaderSystem>()->loadEntities(allEntities);
+
+    // Game loop:
+    gameContext.getSystem<InputHandlerSystem>()->handleInput(playerEntity);
+    gameContext.getSystem<EntityUpdateSystem>()->updateEntities(allEntities);
+    gameContext.getSystem<EntityUpdateSystem>()->lateUpdateEntities(allEntities);
+    gameContext.getSystem<EntityRenderSystem>()->renderEntities(allEntities);
 
     // Subscribe the Player to EntityDestroyedMessage
     gameContext.getPublisher()->subscribe<EntityDestroyedMessage>(playerEntity);

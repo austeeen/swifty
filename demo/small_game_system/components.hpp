@@ -84,6 +84,17 @@ public:
     }
 };
 
+class UserInputComponent : public Component {
+private:
+    UserInputManager * inputManager;
+
+public:
+    UserInputComponent(Entity * parent, UserInputManager * inputManager)
+        : Component(parent),
+          inputManager(inputManager)
+    {}
+};
+
 class CombatComponent : public Component {
 public:
     int health;
@@ -102,3 +113,4 @@ public:
     int totalFrames;    // Total frames in the cutscene
     // Add other necessary data
 };
+
