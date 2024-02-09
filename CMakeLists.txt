@@ -6,9 +6,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "-Wall -ggdb3")
 set(CMAKE_BUILD_TYPE Debug)
 
-set(SFML_DIR "C:/mingw64/lib/cmake/SFML")
+set(SFML_DIR "C:/msys64/mingw64/lib/cmake/SFML")
 
-find_package(SFML 2.5 COMPONENTS system window graphics REQUIRED)
+find_package(SFML 2.6 COMPONENTS system window graphics REQUIRED)
 
 include_directories(${CMAKE_SOURCE_DIR}/src, ${CMAKE_SOURCE_DIR}/deps)
 
